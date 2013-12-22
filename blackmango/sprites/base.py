@@ -55,7 +55,3 @@ class BaseSprite(pyglet.sprite.Sprite):
             self.world_location[0] * scale,
             h - self.world_location[1] * scale,
         )
-
-        print 'sprite h: ', h
-        p = pyglet.window.get_platform().get_default_display()
-        print 'screen h: ', pyglet.window.Display.get_default_screen(p).height

@@ -4,8 +4,6 @@ import sys
 
 import blackmango.configure
 import blackmango.engine
-import blackmango.materials
-import blackmango.mob
 
 game_window_size = None
 
@@ -14,9 +12,6 @@ class GameWindow(pyglet.window.Window):
     def __init__(self):
 
         global game_window_size
-
-        self.label = pyglet.text.Label(
-                blackmango.configure.MAIN_WINDOW_TITLE)
 
         if blackmango.configure.FULLSCREEN:
             super(GameWindow, self).__init__(
@@ -37,23 +32,41 @@ class GameWindow(pyglet.window.Window):
         game_window_size = self.get_size()
         self.resizeable = False
 
+        self.current_key_symbol = None,
+        self.current_key_modifiers = None,
+
     def on_draw(self):
         self.clear()
-        self.label.draw()
 
-        blackmango.materials.materials_batch.draw()
-        blackmango.mob.mobs_batch.draw()
+        self.engine.on_draw(self)
 
     def on_key_press(self, symbol, modifiers):
         
         self.logger.debug('%s.on_key_press(%s, %s)' % (self, symbol, modifiers))
+
+        self.current_key_symbol = symbol
+        self.current_key_modifiers = modifiers
+
+    def on_key_release(self, symbol, modifiers):
+
+        self.logger.debug('%s.on_key_release(%s, %s)' % (self, symbol, modifiers))
         
-        if symbol == pyglet.window.key.Q:
+        if self.current_key_symbol == symbol:
+            self.current_key_symbol = None
+
+        self.current_key_modifiers ^= modifiers
+
+
+    def tick(self): 
+        
+        if self.current_key_symbol == pyglet.window.key.Q:
             sys.exit(0)
 
         if self.mode == 'menu':
-            if symbol == pyglet.window.key.N:
+            if self.current_key_symbol == pyglet.window.key.N:
                 self.engine.new_game()
                 self.mode = 'game'
         elif self.mode == 'game':
-            pass
+
+            self.engine.on_key_press(self.current_key_symbol,
+                    self.current_key_modifiers)
