@@ -9,7 +9,7 @@ game_window_size = None
 
 class GameWindow(pyglet.window.Window):
 
-    def __init__(self):
+    def __init__(self, engine):
 
         global game_window_size
 
@@ -34,7 +34,7 @@ class GameWindow(pyglet.window.Window):
         self.logger = blackmango.configure.logger
 
         self.mode = 'menu'
-        self.engine = blackmango.engine.GameEngine()
+        self.engine = engine
 
         game_window_size = self.get_size()
         

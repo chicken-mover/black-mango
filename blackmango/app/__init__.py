@@ -1,14 +1,19 @@
 
 import pyglet
 
+import blackmango.engine
+import blackmango.ui.window
+
 class BlackMangoApp(pyglet.app.EventLoop):
 
-    def __init__(self, main_window):
+    def __init__(self):
 
         super(BlackMangoApp, self).__init__()
-        self.main_window = main_window
 
-        pyglet.clock.schedule(main_window.tick)
+        self.engine = blackmango.engine.GameEngine()
+        self.main_window = blackmango.ui.window.GameWindow(self.engine)
+
+        pyglet.clock.schedule(self.main_window.tick)
 
     def idle(self):
         """
