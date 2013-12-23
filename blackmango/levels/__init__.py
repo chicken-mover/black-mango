@@ -41,15 +41,12 @@ class BasicLevel(object):
                         m = material(x = x, y = y, 
                                 z = floor)
                         self.floors[floor][y][x] = m
-                        if self.current_floor == floor:
-                            m.visible = True
-                        else:
-                            m.visible = False
+                        m.visible = floor == self.current_floor
                         m.translate()
                     else:
                         self.floors[floor][y][x] = None
 
-
+    
     def place_player(self, player, x = 0, y = 0, floor = 0):
         """
         Place the player in the game world, at position <x>, <y>, <floor>, or

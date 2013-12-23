@@ -15,12 +15,16 @@ class GameWindow(pyglet.window.Window):
 
         if blackmango.configure.FULLSCREEN:
             super(GameWindow, self).__init__(
-                    fullscreen = blackmango.configure.FULLSCREEN)
+                    fullscreen = blackmango.configure.FULLSCREEN,
+                    style = pyglet.window.Window.WINDOW_STYLE_BORDERLESS,
+                    caption = blackmango.configure.MAIN_WINDOW_TITLE)
         else:
             width, height = blackmango.configure.SCREEN_SIZE
             super(GameWindow, self).__init__(
                     width = width,
-                    height = height)
+                    height = height,
+                    style = pyglet.window.Window.WINDOW_STYLE_BORDERLESS,
+                    caption = blackmango.configure.MAIN_WINDOW_TITLE)
 
         #self.set_exclusive_mouse()
 
@@ -30,7 +34,9 @@ class GameWindow(pyglet.window.Window):
         self.engine = blackmango.engine.GameEngine()
 
         game_window_size = self.get_size()
+        
         self.resizeable = False
+        self.set_location(1, 1)
 
         self.current_key_symbol = None,
         self.current_key_modifiers = None,
@@ -57,15 +63,17 @@ class GameWindow(pyglet.window.Window):
         self.current_key_modifiers ^= modifiers
 
 
-    def tick(self): 
-        
+    def tick(self, dt):
+
         if self.current_key_symbol == pyglet.window.key.Q:
             sys.exit(0)
 
         if self.mode == 'menu':
+        
             if self.current_key_symbol == pyglet.window.key.N:
                 self.engine.new_game()
                 self.mode = 'game'
+        
         elif self.mode == 'game':
 
             self.engine.on_key_press(self.current_key_symbol,

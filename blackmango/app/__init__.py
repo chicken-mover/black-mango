@@ -8,8 +8,13 @@ class BlackMangoApp(pyglet.app.EventLoop):
         super(BlackMangoApp, self).__init__()
         self.main_window = main_window
 
-    def idle(self):
+        raise Exception("Write a proper event handler")
+        pyglet.clock.schedule(main_window.tick)
 
-        self.main_window.tick()
+    def idle(self):
+        """
+        Potentially very useful. Fires on any kind of input, including OS-level
+        key repeats
+        """
         return super(BlackMangoApp, self).idle()
 

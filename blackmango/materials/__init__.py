@@ -1,12 +1,16 @@
+"""
+Materials are sprites that inherit from the BaseSprite class and are used as
+objects in a level.
+"""
 
 import pyglet
 
 import blackmango.configure
-import blackmango.sprites.base
+import blackmango.sprites
 
 materials_batch = pyglet.graphics.Batch()
 
-class BasicMaterialSprite(blackmango.sprites.base.BaseSprite):
+class BasicMaterialSprite(blackmango.sprites.BaseSprite):
     
     def __init__(self, image = None,
             x = 0,

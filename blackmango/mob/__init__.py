@@ -2,12 +2,11 @@
 import pyglet
 
 import blackmango.configure
-import blackmango.sprites.base
-
+import blackmango.sprites
 mobs_batch = pyglet.graphics.Batch()
 
 
-class BasicMobileSprite(blackmango.sprites.base.BaseSprite):
+class BasicMobileSprite(blackmango.sprites.BaseSprite):
     
     def __init__(self, image = None,
             x = 0,
