@@ -11,18 +11,10 @@ class BasicLevel(object):
     previous_level = None
 
     floors = None
+    blocks = None
+    mobs = None
 
     def __init__(self, level_data):
-        """
-        Load the data in <level_data> into a BasicLevel instance. 
-        
-        This parses the map data into actual materials objects and calls the 
-        .translate() method on each material object so that it is assigned a 
-        screen position. (That may need to change in the future)
-
-        Material blocks on other floors have their visibility setting set to
-        False.
-        """
 
         # This is lazy because it isn't doing any error checking, and is very
         # breakage-prone
@@ -33,21 +25,28 @@ class BasicLevel(object):
 
         # Load all of the materials objects by iterating the data for each
         # floor
+        self.blocks = {}
+        self.mobs = {}
         for floor, floor_data in self.floors.items():
+            self.blocks[floor] = []
+            self.mobs[floor] = []
             for y, row in enumerate(floor_data):
+                self.blocks[floor].append([])
+                self.mobs[floor].append([])
                 for x, v in enumerate(row):
+                    self.blocks[floor][y].append(None)
+                    self.mobs[floor][y].append(None)
                     if v:
                         if isinstance(v, blackmango.materials.BaseMaterial):
                             m = v
+                            self.blocks[floor][y][x] = v
                         else:
                             material = blackmango.materials.MATERIALS[v]
                             m = material(x = x, y = y, 
                                     z = floor)
-                            self.floors[floor][y][x] = m
+                            self.blocks[floor][y][x] = m
                         m.visible = floor == self.current_floor
                         m.translate()
-                    else:
-                        self.floors[floor][y][x] = None
 
     
     def place_player(self, player, x = 0, y = 0, floor = 0):
@@ -59,7 +58,7 @@ class BasicLevel(object):
         x = x or self.starting_location[0]
         y = y or self.starting_location[1]
 
-        #self.set_block(player, x, y, floor)
+        self.set_mob(player, x, y, floor)
         player.world_location = (x, y, floor)
         player.translate()
         player.current_level = self
@@ -69,7 +68,7 @@ class BasicLevel(object):
         """
         Set the location of a block for quick collision lookup.
         """
-        self.floors[floor][y][x] = block
+        self.blocks[floor][y][x] = block
 
     def get_block(self, x, y, floor):
         """
@@ -79,7 +78,17 @@ class BasicLevel(object):
         try:
             if x < 0 or y < 0 or floor < 0:
                 raise IndexError("Bad level coordinates")
-            return self.floors[floor][y][x]
+            return self.blocks[floor][y][x]
         except IndexError:
             return blackmango.materials.MATERIALS[-1]()
 
+    def set_mob(self, mob, x, y, floor):
+        self.mobs[floor][y][x] = mob
+
+    def get_mob(self, x, y, floor):
+        try:
+            if x < 0 or y < 0 or floor < 0:
+                raise IndexError("Bad level coordinates")
+            return self.mobs[floor][y][x]
+        except IndexError:
+            return None
