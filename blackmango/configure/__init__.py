@@ -16,6 +16,8 @@ ORDERED_GROUPS = {
     'foreground': 1,
 }
 
+BASE_ANIMATION_FRAMES = 10
+
 # Set up console logging
 logging.basicConfig()
 logger = logging.getLogger('blackmango')

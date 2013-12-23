@@ -34,6 +34,12 @@ class BasicMaterialSprite(blackmango.sprites.BaseSprite):
 class Wall(BasicMaterialSprite):
    pass
 
+class StairUp(BasicMaterialSprite):
+    pass
+
+class StairDown(BasicMaterialSprite):
+    pass
+
 class VoidMaterial(BasicMaterialSprite):
 
     def __init__(self):
@@ -52,4 +58,7 @@ MATERIALS = {
     -1: VoidMaterial,
     0: None,
     1: Wall,
+
+    8: StairUp,
+    9: StairDown,
 }

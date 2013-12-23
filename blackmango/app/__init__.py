@@ -8,7 +8,6 @@ class BlackMangoApp(pyglet.app.EventLoop):
         super(BlackMangoApp, self).__init__()
         self.main_window = main_window
 
-        raise Exception("Write a proper event handler")
         pyglet.clock.schedule(main_window.tick)
 
     def idle(self):
@@ -17,4 +16,5 @@ class BlackMangoApp(pyglet.app.EventLoop):
         key repeats
         """
         return super(BlackMangoApp, self).idle()
+
 

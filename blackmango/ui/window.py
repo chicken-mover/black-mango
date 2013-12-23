@@ -28,6 +28,9 @@ class GameWindow(pyglet.window.Window):
 
         #self.set_exclusive_mouse()
 
+        self.keyboard = pyglet.window.key.KeyStateHandler()
+        self.push_handlers(self.keyboard)
+
         self.logger = blackmango.configure.logger
 
         self.mode = 'menu'
@@ -46,35 +49,17 @@ class GameWindow(pyglet.window.Window):
 
         self.engine.on_draw(self)
 
-    def on_key_press(self, symbol, modifiers):
-        
-        self.logger.debug('%s.on_key_press(%s, %s)' % (self, symbol, modifiers))
-
-        self.current_key_symbol = symbol
-        self.current_key_modifiers = modifiers
-
-    def on_key_release(self, symbol, modifiers):
-
-        self.logger.debug('%s.on_key_release(%s, %s)' % (self, symbol, modifiers))
-        
-        if self.current_key_symbol == symbol:
-            self.current_key_symbol = None
-
-        self.current_key_modifiers ^= modifiers
-
-
     def tick(self, dt):
 
-        if self.current_key_symbol == pyglet.window.key.Q:
+        if self.keyboard[pyglet.window.key.Q]:
             sys.exit(0)
 
         if self.mode == 'menu':
         
-            if self.current_key_symbol == pyglet.window.key.N:
+            if self.keyboard[pyglet.window.key.N]:
                 self.engine.new_game()
                 self.mode = 'game'
         
         elif self.mode == 'game':
 
-            self.engine.on_key_press(self.current_key_symbol,
-                    self.current_key_modifiers)
+            self.engine.tick(self.keyboard)

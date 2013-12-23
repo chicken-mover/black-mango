@@ -55,4 +55,3 @@ class BaseSprite(pyglet.sprite.Sprite):
             self.world_location[0] * scale,
             h - (self.world_location[1] + 1) * scale,
         )
-
