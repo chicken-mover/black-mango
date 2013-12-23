@@ -36,11 +36,14 @@ class BasicLevel(object):
         for floor, floor_data in self.floors.items():
             for y, row in enumerate(floor_data):
                 for x, v in enumerate(row):
-                    material = blackmango.materials.MATERIALS[v]
-                    if material:
-                        m = material(x = x, y = y, 
-                                z = floor)
-                        self.floors[floor][y][x] = m
+                    if v:
+                        if isinstance(v, blackmango.materials.BaseMaterial):
+                            m = v
+                        else:
+                            material = blackmango.materials.MATERIALS[v]
+                            m = material(x = x, y = y, 
+                                    z = floor)
+                            self.floors[floor][y][x] = m
                         m.visible = floor == self.current_floor
                         m.translate()
                     else:
@@ -56,7 +59,7 @@ class BasicLevel(object):
         x = x or self.starting_location[0]
         y = y or self.starting_location[1]
 
-        self.set_block(player, x, y, floor)
+        #self.set_block(player, x, y, floor)
         player.world_location = (x, y, floor)
         player.translate()
         player.current_level = self

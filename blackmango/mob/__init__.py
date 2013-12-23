@@ -33,7 +33,6 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
         if self.animations:
             return
 
-        print 'Move'
         dest = (
             self.world_location[0] + delta_x,
             self.world_location[1] + delta_y,
@@ -42,13 +41,15 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
 
         if self.current_level:
             block = self.current_level.get_block(*dest)
-            print block
             if block and block.is_solid:
                 return
             else:
+                mob = self.current_level.get_mob(*dest)
+                if mob and mob.is_solid:
+                    return
                 
-                self.current_level.set_block(None, *self.world_location)
-                self.current_level.set_block(self, *dest)
+                self.current_level.set_mob(None, *self.world_location)
+                self.current_level.set_mob(self, *dest)
                 self.world_location = dest
                 self.smooth_translate()
 
@@ -78,13 +79,12 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
             ))
         pyglet.clock.schedule_once(self.animate, .001)
 
-    def animate(self, dt, t = .04):
+    def animate(self, dt, t = .025):
         
         frames = blackmango.configure.BASE_ANIMATION_FRAMES
         for idx, fargs in enumerate(self.animations):
             timer = t * idx
             args = [fargs[0], timer] + list(fargs[1:])
-            print args
             pyglet.clock.schedule_once(*args)
         
         pyglet.clock.schedule_once(self.reset_animations,
