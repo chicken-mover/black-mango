@@ -53,8 +53,6 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
             self.world_location[2] + delta_z,
         )
 
-        print dest
-
         if self.current_level:
             block = self.current_level.get_block(*dest)
             if block and block.is_solid:

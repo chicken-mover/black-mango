@@ -82,7 +82,7 @@ MATERIALS = {
     -1: VoidMaterial,
     0: None,
     1: Wall,
-
+    7: Door,
     8: StairUp,
     9: StairDown,
 }
