@@ -37,7 +37,7 @@ class BasePortalMaterial(BaseMaterial):
             y = 0,
             z = 0,
             color = None,
-            destination = None
+            destination = None, 
         ):
 
         color = color or (255,0,0,255)
@@ -47,6 +47,10 @@ class BasePortalMaterial(BaseMaterial):
         self.is_solid = 0
         self.is_portal = 1
         self.destination = destination
+
+    def interaction_callback(self, mob):
+        mob.teleport(*self.destination)
+
 
 class Wall(BaseMaterial):
    pass

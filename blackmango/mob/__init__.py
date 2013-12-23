@@ -1,10 +1,11 @@
 
+import functools
 import pyglet
 
 import blackmango.configure
 import blackmango.sprites
-mobs_batch = pyglet.graphics.Batch()
 
+mobs_batch = pyglet.graphics.Batch()
 
 class BasicMobileSprite(blackmango.sprites.BaseSprite):
     
@@ -28,10 +29,23 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
 
         self.animations = []
 
+    def teleport(self, x, y, z):
+        dest = (x, y, z)
+        self.current_level.set_mob(None, *self.world_location)
+        self.current_level.set_mob(self, *dest)
+        self.world_location = dest
+        if self.current_level.current_floor != z:
+            self.visible = False
+        else:
+            self.visible = True
+        self.translate()
+
     def move(self, delta_x, delta_y, delta_z):
 
         if self.animations:
             return
+
+        callback = None
 
         dest = (
             self.world_location[0] + delta_x,
@@ -39,24 +53,30 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
             self.world_location[2] + delta_z,
         )
 
+        print dest
+
         if self.current_level:
             block = self.current_level.get_block(*dest)
             if block and block.is_solid:
                 return
-            else:
-                mob = self.current_level.get_mob(*dest)
-                if mob and mob.is_solid:
-                    return
-                
-                self.current_level.set_mob(None, *self.world_location)
-                self.current_level.set_mob(self, *dest)
-                self.world_location = dest
-                self.smooth_translate()
+            elif block and hasattr(block, 'interaction_callback'):
+                callback = functools.partial(block.interaction_callback,
+                        self)
+        
+            mob = self.current_level.get_mob(*dest)
+            if mob and mob.is_solid:
+                return
+            
+            self.current_level.set_mob(None, *self.world_location)
+            self.current_level.set_mob(self, *dest)
+
+            self.world_location = dest
+            self.smooth_translate(callback = callback)
 
     def scheduled_set_position(self, dt, *args):
         self.set_position(*args)
 
-    def smooth_translate(self):
+    def smooth_translate(self, callback = None):
 
         w, h = blackmango.ui.window.game_window_size
         scale = blackmango.configure.GRID_SIZE
@@ -77,9 +97,10 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
                 cur_x + delta_x * i,
                 cur_y + delta_y * i,
             ))
-        pyglet.clock.schedule_once(self.animate, .001)
+        
+        pyglet.clock.schedule_once(self.animate, .001, callback)
 
-    def animate(self, dt, t = .025):
+    def animate(self, dt, callback = None, t = .025):
         
         frames = blackmango.configure.BASE_ANIMATION_FRAMES
         for idx, fargs in enumerate(self.animations):
@@ -87,6 +108,9 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
             args = [fargs[0], timer] + list(fargs[1:])
             pyglet.clock.schedule_once(*args)
         
+        if callback:
+            pyglet.clock.schedule_once(lambda dt: callback(), timer)
+
         pyglet.clock.schedule_once(self.reset_animations,
                 timer)
 
@@ -106,8 +130,12 @@ class Player(BasicMobileSprite):
         super(Player, self).__init__(None, x, y, z,
                 color)
 
+    def teleport(self, x, y, z):
+        dest = (x, y, z)
+        self.current_level.set_mob(None, *self.world_location)
+        self.current_level.set_mob(self, *dest)
+        self.world_location = dest
+        if self.current_level.current_floor != z:
+            self.current_level.switch_floor(z)
+        self.translate()
 
-MATERIALS = {
-    0: None,
-    1: blackmango.materials.Wall,
-}

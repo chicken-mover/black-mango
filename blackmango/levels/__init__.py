@@ -37,16 +37,35 @@ class BasicLevel(object):
                     self.blocks[floor][y].append(None)
                     self.mobs[floor][y].append(None)
                     if v:
-                        if isinstance(v, blackmango.materials.BaseMaterial):
-                            m = v
-                            self.blocks[floor][y][x] = v
+                        if isinstance(v, tuple):
+                            material = blackmango.materials.MATERIALS[v[0]]
+                            kwargs = v[1]
+                            kwargs.update({
+                                'x': x,
+                                'y': y,
+                                'z': floor,
+                            })
+                            m = material(**kwargs)
                         else:
                             material = blackmango.materials.MATERIALS[v]
                             m = material(x = x, y = y, 
                                     z = floor)
-                            self.blocks[floor][y][x] = m
+                        self.blocks[floor][y][x] = m
                         m.visible = floor == self.current_floor
                         m.translate()
+
+    def switch_floor(self, new_floor):
+        self.current_floor = new_floor
+        for f in [self.blocks, self.mobs]:
+            for floor, d in f.items():
+                for row in d:
+                    for m in row:
+                        if m:
+                            if floor != new_floor:
+                                m.visible = False
+                            else:
+                                m.visible = True
+
 
     
     def place_player(self, player, x = 0, y = 0, floor = 0):
@@ -61,9 +80,7 @@ class BasicLevel(object):
         self.set_mob(player, x, y, floor)
         player.world_location = (x, y, floor)
         player.translate()
-        player.current_level = self
 
-    
     def set_block(self, block, x, y, floor):
         """
         Set the location of a block for quick collision lookup.
@@ -83,6 +100,8 @@ class BasicLevel(object):
             return blackmango.materials.MATERIALS[-1]()
 
     def set_mob(self, mob, x, y, floor):
+        if mob:
+            mob.current_level = self
         self.mobs[floor][y][x] = mob
 
     def get_mob(self, x, y, floor):
