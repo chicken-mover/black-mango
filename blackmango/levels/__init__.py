@@ -1,6 +1,9 @@
+"""
+A simple level object for loading level data and tracking stuff that's
+happening inside the level.
+"""
 
 import blackmango.materials
-
 
 class BasicLevel(object):
 
@@ -11,10 +14,19 @@ class BasicLevel(object):
     previous_level = None
 
     floors = None
+
+    # Blocks and mobs are tracked seperately. I don't know if this is a good
+    # idea or a terrible one. It seems like it might not be super extensible in
+    # the future, because it means not having more than one mob at each world
+    # location, but we can always change it in the future.
     blocks = None
     mobs = None
 
     def __init__(self, level_data):
+        """
+        Read in the level data, and translate the lists of block ids in the
+        floor data into instances of materials classes.
+        """
 
         # This is lazy because it isn't doing any error checking, and is very
         # breakage-prone
@@ -24,7 +36,9 @@ class BasicLevel(object):
         self.current_floor = self.starting_location[2]
 
         # Load all of the materials objects by iterating the data for each
-        # floor
+        # floor and filling out the self.blocks object. As we work, we also
+        # fill out the self.mobs one with None values, so we don't have to
+        # init it seperately.
         self.blocks = {}
         self.mobs = {}
         for floor, floor_data in self.floors.items():
@@ -38,6 +52,8 @@ class BasicLevel(object):
                     self.mobs[floor][y].append(None)
                     if v:
                         if isinstance(v, tuple):
+                            # This is for portals, but might be useful for
+                            # other special cases in the future.
                             material = blackmango.materials.MATERIALS[v[0]]
                             kwargs = v[1]
                             kwargs.update({
@@ -47,6 +63,7 @@ class BasicLevel(object):
                             })
                             m = material(**kwargs)
                         else:
+                            # basic block init.
                             material = blackmango.materials.MATERIALS[v]
                             m = material(x = x, y = y, 
                                     z = floor)
@@ -55,9 +72,14 @@ class BasicLevel(object):
                         m.translate()
 
     def switch_floor(self, new_floor):
-        self.current_floor = new_floor
+        """
+        Set which floor we're on. This currently iterates every block and mob 
+        for the current and new floor, and re-sets their visibility flag as
+        appropriate.
+        """
         for f in [self.blocks, self.mobs]:
-            for floor, d in f.items():
+            for floor in [self.current_floor, new_floor]:
+                d = f[floor]
                 for row in d:
                     for m in row:
                         if m:
@@ -65,21 +87,7 @@ class BasicLevel(object):
                                 m.visible = False
                             else:
                                 m.visible = True
-
-
-    
-    def place_player(self, player, x = 0, y = 0, floor = 0):
-        """
-        Place the player in the game world, at position <x>, <y>, <floor>, or
-        (if coordinates aren't provided) at the starting location.
-        """
-        floor = floor or self.starting_location[2]
-        x = x or self.starting_location[0]
-        y = y or self.starting_location[1]
-
-        self.set_mob(player, x, y, floor)
-        player.world_location = (x, y, floor)
-        player.translate()
+        self.current_floor = new_floor
 
     def set_block(self, block, x, y, floor):
         """
@@ -100,11 +108,18 @@ class BasicLevel(object):
             return blackmango.materials.MATERIALS[-1]()
 
     def set_mob(self, mob, x, y, floor):
+        """
+        Set the location of a mob for quick collision lookup.
+        """
         if mob:
             mob.current_level = self
         self.mobs[floor][y][x] = mob
 
     def get_mob(self, x, y, floor):
+        """
+        Get the mob at <x>, <y>, <floor>. If the provided coordinates are
+        invalid, returns None.
+        """
         try:
             if x < 0 or y < 0 or floor < 0:
                 raise IndexError("Bad level coordinates")

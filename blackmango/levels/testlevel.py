@@ -1,3 +1,11 @@
+"""
+This should be pretty self-explanitory. This format may end up not being fit
+for purpose, but I'm gunning for something easy to write when it comes time to
+start doing intensive level building.
+
+Somehow we will need to work in level scripting as well, possibly as a seperate
+LevelBehavior class?
+"""
 
 TEST_LEVEL = {
         

@@ -1,9 +1,13 @@
+"""
+Sprites that move. Players and NPCs.
+"""
 
 import functools
 import pyglet
 
 import blackmango.configure
 import blackmango.sprites
+import blackmango.ui
 
 mobs_batch = pyglet.graphics.Batch()
 
@@ -30,6 +34,9 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
         self.animations = []
 
     def teleport(self, x, y, z):
+        """
+        Change the position of the sprite in the game world instantly.
+        """
         dest = (x, y, z)
         self.current_level.set_mob(None, *self.world_location)
         self.current_level.set_mob(self, *dest)
@@ -41,7 +48,12 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
         self.translate()
 
     def move(self, delta_x, delta_y, delta_z):
-
+        """
+        Move the sprite in the game world with an accompanying animation.
+        """
+        #TODO: Animate actual image frames
+        #TODO: Although you can provide a 'z', this doesn't actually handle
+        #      a change of floors correctly, so don't do that for now.
         if self.animations:
             return
 
@@ -72,11 +84,23 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
             self.smooth_translate(callback = callback)
 
     def scheduled_set_position(self, dt, *args):
+        """
+        A wrapper for self.set_position that has the write argspec for use
+        with the pyglet.clock.schedule* family of methods.
+        """
         self.set_position(*args)
 
     def smooth_translate(self, callback = None):
+        """
+        Like self.translate, but provides gradual movement between two 
+        positions.
 
-        w, h = blackmango.ui.window.game_window_size
+        The <callback> callable is called after the final animation frame.
+        """
+
+        # TODO: Somehow I feel like this shouldn't need the game_window_size
+        #       global. Consider this marked for a refactor.
+        w, h = blackmango.ui.game_window_size
         scale = blackmango.configure.GRID_SIZE
 
         cur_x, cur_y = self.x, self.y
@@ -99,6 +123,10 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
         pyglet.clock.schedule_once(self.animate, .001, callback)
 
     def animate(self, dt, callback = None, t = .025):
+        """
+        Iterate the animation queue for the current object and execute
+        everything we find there.
+        """
         
         frames = blackmango.configure.BASE_ANIMATION_FRAMES
         for idx, fargs in enumerate(self.animations):
@@ -113,27 +141,9 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
                 timer)
 
     def reset_animations(self, dt):
+        """
+        A wrapper to reset self.animations, with an argspec appropriate for the
+        pyglet.clock.schedule* family of methods.
+        """
         self.animations = []
-
-
-class Player(BasicMobileSprite):
-
-    current_level = None
-    
-    def __init__(self, x = 0, y = 0, z = 0):
-
-        color = (0,255,0, 255)
-        group = blackmango.configure.ORDERED_GROUPS.get('player')
-
-        super(Player, self).__init__(None, x, y, z,
-                color)
-
-    def teleport(self, x, y, z):
-        dest = (x, y, z)
-        self.current_level.set_mob(None, *self.world_location)
-        self.current_level.set_mob(self, *dest)
-        self.world_location = dest
-        if self.current_level.current_floor != z:
-            self.current_level.switch_floor(z)
-        self.translate()
 

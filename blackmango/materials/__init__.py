@@ -1,6 +1,9 @@
 """
 Materials are sprites that inherit from the BaseSprite class and are used as
 objects in a level.
+
+They can have behaviours, the interface for which is really rough at this
+point.
 """
 
 import pyglet
@@ -77,7 +80,7 @@ class VoidMaterial(BaseMaterial):
         self.is_portal = 0
         self.opacity = 0
 
-
+# Global dict for lookups by the levels module
 MATERIALS = {
     -1: VoidMaterial,
     0: None,
