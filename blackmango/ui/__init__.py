@@ -68,3 +68,4 @@ class GameWindow(pyglet.window.Window):
         elif self.mode == 'game':
 
             self.engine.input_tick(self.keyboard)
+            self.engine.game_tick()

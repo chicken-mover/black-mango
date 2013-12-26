@@ -13,14 +13,16 @@ class BasicLevel(object):
     next_level = None
     previous_level = None
 
-    floors = None
+    blocks = None
 
     # Blocks and mobs are tracked seperately. I don't know if this is a good
     # idea or a terrible one. It seems like it might not be super extensible in
     # the future, because it means not having more than one mob at each world
-    # location, but we can always change it in the future.
+    # location, but we can always change it in the future.but let's find out.
     blocks = None
     mobs = None
+
+    moblist = []
 
     def __init__(self, level_data):
         """
@@ -35,21 +37,16 @@ class BasicLevel(object):
 
         self.current_floor = self.starting_location[2]
 
+        # Important re-definition to prevent bugs
+        self.moblist = []
+
         # Load all of the materials objects by iterating the data for each
         # floor and filling out the self.blocks object. As we work, we also
         # fill out the self.mobs one with None values, so we don't have to
         # init it seperately.
-        self.blocks = {}
-        self.mobs = {}
-        for floor, floor_data in self.floors.items():
-            self.blocks[floor] = []
-            self.mobs[floor] = []
-            for y, row in enumerate(floor_data):
-                self.blocks[floor].append([])
-                self.mobs[floor].append([])
+        for floor, block_data in self.blocks.items():
+            for y, row in enumerate(block_data):
                 for x, v in enumerate(row):
-                    self.blocks[floor][y].append(None)
-                    self.mobs[floor][y].append(None)
                     if v:
                         if isinstance(v, tuple):
                             # This is for portals, but might be useful for
@@ -70,6 +67,20 @@ class BasicLevel(object):
                         self.blocks[floor][y][x] = m
                         m.visible = floor == self.current_floor
                         m.translate()
+                    # Check to see if there is a mob for this location
+                    try:
+                        m = self.mobs[floor][y][x]
+                    except IndexError:
+                        continue
+                    if m:
+                        mob = m()
+                        self.mobs[floor][y][x] = mob
+                        mob.visible = floor == self.current_floor
+                        mob.world_location = (x, y, floor)
+                        mob.current_level = self
+                        mob.translate()
+                        self.moblist.append(mob)
+
 
     def switch_floor(self, new_floor):
         """
@@ -126,3 +137,7 @@ class BasicLevel(object):
             return self.mobs[floor][y][x]
         except IndexError:
             return None
+
+    def tick(self):
+        for mob in self.moblist:
+            mob.behavior()

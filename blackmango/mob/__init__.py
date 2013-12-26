@@ -147,3 +147,8 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
         """
         self.animations = []
 
+
+class SimpleMob(BasicMobileSprite):
+
+    def behavior(self):
+        pass

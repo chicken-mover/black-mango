@@ -13,7 +13,7 @@ import pyglet
 
 import blackmango.configure
 import blackmango.levels
-import blackmango.levels.testlevel
+import blackmango.levels.test_level
 import blackmango.materials
 import blackmango.mob.player
 
@@ -37,7 +37,7 @@ class GameEngine(object):
         
         # Initialize level and player
         current_level = blackmango.levels.BasicLevel(
-            blackmango.levels.testlevel.TEST_LEVEL        
+            blackmango.levels.test_level.LEVEL_DATA        
         )
         player = blackmango.mob.player.Player()
 
@@ -94,3 +94,8 @@ class GameEngine(object):
                 self.player.move(-1, 0, 0)
             elif keyboard[pyglet.window.key.RIGHT]:
                 self.player.move(1, 0, 0)
+
+    def game_tick(self):
+
+        if self.current_level:
+            self.current_level.tick()
