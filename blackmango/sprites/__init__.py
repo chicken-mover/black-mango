@@ -4,6 +4,7 @@ Defines the BaseSprite class, from which mobs and materials inherit.
 
 import pyglet
 
+import blackmango.app
 import blackmango.configure
 import blackmango.ui
 
@@ -54,9 +55,7 @@ class BaseSprite(pyglet.sprite.Sprite):
         Translate the current game world coordinates into the screen position
         for the current sprite object.
         """
-        #TODO: Might change this to make a call to the main game window 
-        #      somehow, to avoid having to import a global from the ui?
-        w, h = blackmango.ui.game_window_size
+        w, h = blackmango.app.main_window.get_size()
 
         scale = blackmango.configure.GRID_SIZE
         self.set_position(

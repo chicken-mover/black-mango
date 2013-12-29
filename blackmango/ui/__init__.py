@@ -11,10 +11,6 @@ import sys
 import blackmango.configure
 import blackmango.engine
 
-# This is set as a global so that other modules can get to it easily. Still
-# hoping for a better way of dealing with this at some point
-game_window_size = None
-
 class GameWindow(pyglet.window.Window):
 
     def __init__(self, engine):
@@ -44,8 +40,7 @@ class GameWindow(pyglet.window.Window):
 
         self.mode = 'menu'
         self.engine = engine
-
-        game_window_size = self.get_size()
+        self.engine.game_window = self
         
         self.resizeable = False
         self.set_location(1, 1)

@@ -97,10 +97,7 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
 
         The <callback> callable is called after the final animation frame.
         """
-
-        # TODO: Somehow I feel like this shouldn't need the game_window_size
-        #       global. Consider this marked for a refactor.
-        w, h = blackmango.ui.game_window_size
+        w, h = blackmango.app.main_window.get_size()
         scale = blackmango.configure.GRID_SIZE
 
         cur_x, cur_y = self.x, self.y
