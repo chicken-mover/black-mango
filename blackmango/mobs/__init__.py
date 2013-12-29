@@ -57,6 +57,9 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
         if self.animations:
             return
 
+        assert delta_z == 0, 'This function doesn\'t actually handle '+\
+            'z changes yet'
+
         callback = None
 
         dest = (
