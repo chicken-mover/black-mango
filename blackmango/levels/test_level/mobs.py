@@ -1,7 +1,7 @@
 
-import blackmango.mob
+import blackmango.mobs
 
-class PatrollerV(blackmango.mob.SimpleMob):
+class PatrollerV(blackmango.mobs.SimpleMob):
 
     direction = (0,1,0)
 

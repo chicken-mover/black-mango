@@ -15,7 +15,7 @@ import blackmango.configure
 import blackmango.levels
 import blackmango.levels.test_level
 import blackmango.materials
-import blackmango.mob.player
+import blackmango.mobs.player
 
 class GameEngine(object):
 
@@ -39,7 +39,7 @@ class GameEngine(object):
         current_level = blackmango.levels.BasicLevel(
             blackmango.levels.test_level.LEVEL_DATA        
         )
-        player = blackmango.mob.player.Player()
+        player = blackmango.mobs.player.Player()
 
         # Place the player into the level
         starting_location = current_level.starting_location
@@ -59,7 +59,7 @@ class GameEngine(object):
         """
         # Fire the draw for material and mob batches.
         blackmango.materials.materials_batch.draw()
-        blackmango.mob.mobs_batch.draw()
+        blackmango.mobs.mobs_batch.draw()
 
     def input_tick(self, keyboard):
         """

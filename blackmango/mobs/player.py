@@ -5,7 +5,7 @@ The main player class, a subclass of the BasicMobileSprite class.
 import blackmango.configure
 import blackmango.mob
 
-class Player(blackmango.mob.BasicMobileSprite):
+class Player(blackmango.mobs.BasicMobileSprite):
 
     current_level = None
     
