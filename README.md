@@ -16,6 +16,10 @@ $ cd black-mango
 $ sudo python setup.py develop
 ```
 
+## Progress and notes
+
+Please see the [wiki](https://github.com/chicken-mover/black-mango/wiki).
+
 ## Build instructions
 
 Coming soon.
