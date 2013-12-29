@@ -7,7 +7,7 @@ Somehow we will need to work in level scripting as well, possibly as a seperate
 LevelBehavior class?
 """
 
-from blackmango.levels.test_level.mobs import *
+from blackmango.mobs import PatrollerV
 
 LEVEL_DATA = {
         
