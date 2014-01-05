@@ -1,6 +1,7 @@
 # Black Mango
 
-Please make sure to add docstrings to everything.
+Please make sure to add docstrings to everything and adhere to the
+[style guide](https://github.com/chicken-mover/black-mango/wiki/Style-guide).
 
 Git commit messages should follow 
 [the standard format](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
