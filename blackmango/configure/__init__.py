@@ -13,6 +13,9 @@ FULLSCREEN = False
 # Main game window size
 SCREEN_SIZE = (500, 500)
 
+# POSIX data dir (except Mac OS)
+DATA_DIR = '~/.blackmango'
+
 # Grid size. Used for translating world coordinates into screen coordinates.
 GRID_SIZE = 50
 
@@ -30,7 +33,8 @@ ORDERED_GROUPS = {
 # sprite animations, too.
 BASE_ANIMATION_FRAMES = 10
 
-# Set up console logging
-logging.basicConfig()
-logger = logging.getLogger('blackmango')
-logger.setLevel(DEBUG)
+def setup_logger(lvl = DEBUG):
+    # Set up console logging
+    logging.basicConfig()
+    logger = logging.getLogger('blackmango')
+    logger.setLevel(DEBUG)

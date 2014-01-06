@@ -36,21 +36,22 @@ class GameEngine(object):
         blackmango.configure.logger.info('Initializing new game')
         
         # Initialize level and player
-        current_level = blackmango.levels.BasicLevel(
+        self.current_level = blackmango.levels.BasicLevel(
             blackmango.levels.test_level.LEVEL_DATA        
         )
-        player = blackmango.mobs.player.Player()
+        self.player = blackmango.mobs.player.Player()
 
         # Place the player into the level
-        starting_location = current_level.starting_location
-        current_level.set_mob(player, *starting_location)
-        current_level.player = player
-        player.world_location = starting_location
-        player.translate()
+        starting_location = self.current_level.starting_location
+        self.current_level.set_mob(self.player, *starting_location)
+        self.current_level.player = self.player
+        self.player.world_location = starting_location
+        self.player.translate()
 
-        # Store the initialized objects
-        self.current_level = current_level
-        self.player = player
+
+    def save_game(self, filepath = 'autosave.blackmango'):
+
+        stored_level = self.current_level.serialize()
 
     def on_draw(self):
         """
