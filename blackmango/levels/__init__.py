@@ -1,9 +1,16 @@
 """
 A simple level object for loading level data and tracking stuff that's
 happening inside the level.
+
+This class also controls what part of the level we're looking at at any given
+moment, and keeps references to mobs and the player for quick collision lookup.
+
+The level's `tick` method is used to iterate and call the `behavior` method on
+each mob in the level.
 """
 
 import blackmango.materials
+import blackmango.mobs
 
 class BasicLevel(object):
 
@@ -23,6 +30,8 @@ class BasicLevel(object):
     mobs = None
 
     moblist = []
+    # Set by the GameEngine object when the level is initted
+    player = None
 
     def __init__(self, level_data):
         """
@@ -62,18 +71,29 @@ class BasicLevel(object):
                         else:
                             # basic block init.
                             material = blackmango.materials.MATERIALS[v]
-                            m = material(x = x, y = y, 
-                                    z = floor)
+                            m = material(x = x, y = y, z = floor)
                         self.blocks[floor][y][x] = m
                         m.visible = floor == self.current_floor
                         m.translate()
                     # Check to see if there is a mob for this location
                     try:
-                        m = self.mobs[floor][y][x]
+                        v = self.mobs[floor][y][x]
                     except IndexError:
                         continue
-                    if m:
-                        mob = m()
+                    if v:
+                        if isinstance(v, tuple):
+                            mob = blackmango.mobs.MOBS[v[0]]
+                            kwargs = v[1]
+                            kwargs.update({
+                                'x': x,
+                                'y': y,
+                                'z': floor,
+                            })
+                            m = mob(**kwargs)
+                        else:
+                            mob = blackmango.mobs.MOBS[v]
+                            m = mob(x = x, y = y, z = floor)
+                            mob = m()
                         self.mobs[floor][y][x] = mob
                         mob.visible = floor == self.current_floor
                         mob.world_location = (x, y, floor)
@@ -141,3 +161,24 @@ class BasicLevel(object):
     def tick(self):
         for mob in self.moblist:
             mob.behavior()
+
+    def serialize(self):
+        """
+        Return a cPickle-encodable object that represents the current level
+        state.
+
+        Saved levels look a lot like standard levels, with a couple of extra
+        attributes.
+        """
+
+        saved_level = {
+            'level_size': self.level_size,
+            'starting_location': self.starting_location,
+
+            'next_level': self.next_level,
+            'previous_level': self.previous_level,
+
+            'current_location': self.player.world_location,
+        }
+
+        # Now read the current block and mob states and record them

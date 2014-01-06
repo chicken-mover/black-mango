@@ -12,7 +12,6 @@ class Player(blackmango.mobs.BasicMobileSprite):
     def __init__(self, x = 0, y = 0, z = 0):
 
         color = (0,255,0, 255)
-        group = blackmango.configure.ORDERED_GROUPS.get('player')
 
         super(Player, self).__init__(None, x, y, z,
                 color)

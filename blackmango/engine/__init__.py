@@ -44,6 +44,7 @@ class GameEngine(object):
         # Place the player into the level
         starting_location = current_level.starting_location
         current_level.set_mob(player, *starting_location)
+        current_level.player = player
         player.world_location = starting_location
         player.translate()
 

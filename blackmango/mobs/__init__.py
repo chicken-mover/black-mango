@@ -128,7 +128,6 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
         everything we find there.
         """
         
-        frames = blackmango.configure.BASE_ANIMATION_FRAMES
         for idx, fargs in enumerate(self.animations):
             timer = t * idx
             args = [fargs[0], timer] + list(fargs[1:])
@@ -179,3 +178,9 @@ class PatrollerV(SimpleMob):
 
         self.move(*self.direction)
 
+
+MOBS = {
+    0: None,
+    1: SimpleMob,
+    2: PatrollerV,
+}
