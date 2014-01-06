@@ -16,6 +16,7 @@ import blackmango.levels
 import blackmango.levels.test_level
 import blackmango.materials
 import blackmango.mobs.player
+import blackmango.utils
 
 class GameEngine(object):
 
@@ -71,22 +72,6 @@ class GameEngine(object):
         """
 
         if self.player:
-
-            """
-            # Diagonal movement?
-            if keyboard[pyglet.window.key.UP] and \
-               keyboard[pyglet.window.key.LEFT]:
-                self.player.move(-1, -1, 0)
-            elif keyboard[pyglet.window.key.UP] and \
-               keyboard[pyglet.window.key.RIGHT]:
-                self.player.move(1, -1, 0)
-            elif keyboard[pyglet.window.key.DOWN] and \
-               keyboard[pyglet.window.key.LEFT]:
-                self.player.move(-1, 1, 0)
-            elif keyboard[pyglet.window.key.DOWN] and \
-               keyboard[pyglet.window.key.RIGHT]:
-                self.player.move(1, 1, 0)
-            """
             
             if keyboard[pyglet.window.key.UP]:
                 self.player.move(0, -1, 0)

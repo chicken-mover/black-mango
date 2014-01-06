@@ -47,25 +47,20 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
             self.visible = True
         self.translate()
 
-    def move(self, delta_x, delta_y, delta_z):
+    def move(self, delta_x, delta_y):
         """
         Move the sprite in the game world with an accompanying animation.
         """
         #TODO: Animate actual image frames
-        #TODO: Although you can provide a 'z', this doesn't actually handle
-        #      a change of floors correctly, so don't do that for now.
         if self.animations:
             return
-
-        assert delta_z == 0, 'This function doesn\'t actually handle '+\
-            'z changes yet'
 
         callback = None
 
         dest = (
             self.world_location[0] + delta_x,
             self.world_location[1] + delta_y,
-            self.world_location[2] + delta_z,
+            self.world_location[2],
         )
 
         if self.current_level:
