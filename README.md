@@ -10,6 +10,9 @@ Git commit messages should follow
 
 * Make sure you have Pyglet installed
 * In all commands, `python` refers to a Python 2.7 interpreter.
+
+## Build requirements
+
 * For building binary executables, you will need
   [PyInstaller](http://www.pyinstaller.org/):
 
@@ -18,6 +21,9 @@ $ git clone git://github.com/pyinstaller/pyinstaller.git
 $ cd pyinstaller
 $ sudo python setup.py install
 ```
+
+* You will also need access to a Bash interpreter. On Windows, Cygwin should
+  suffice.
 
 ## Setup instructions for development
 
