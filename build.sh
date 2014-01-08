@@ -41,6 +41,7 @@ function clean() {
     rm -rfv ./dist/
     rm -rfv ./build/
     rm -rfv ./spec/
+    rm -vf *.spec
 }
 
 function make-debug() {

@@ -1,4 +1,6 @@
-
+"""
+Basic setup file. Temporary.
+"""
 import setuptools
 
 setuptools.setup(
