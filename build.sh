@@ -33,8 +33,6 @@ NODEBUG_OPTIONS=(
 
 SCRIPTPATH=./blackmango/__init__.py
 
-
-
 function make() {
     $PROG ${ALL_OPTIONS[@]} ${NODEBUG_OPTIONS[@]} $STRIP_SYMBOLS $SCRIPTPATH
 }
