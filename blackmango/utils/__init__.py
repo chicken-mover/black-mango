@@ -9,6 +9,10 @@ import blackmango.configure
 ## game files in the correct place on the system.
 ##
 
+# '_MEIPASS2' is the PyInstaller temp directory when using --onefile. It is
+# nuked on shutdown, so don't rely on it having data from a previous run.
+DIR_ENV = os.environ.get('_MEIPASS2') or os.path.dirname(blackmango)
+
 DIR_APPDATA = None
 DIR_SAVEDGAMES = None
 
