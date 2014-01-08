@@ -157,7 +157,7 @@ class BasicLevel(object):
 
     def tick(self):
         for mob in self.moblist:
-            mob.behavior()
+            mob.behavior(self)
 
     def serialize(self):
         """

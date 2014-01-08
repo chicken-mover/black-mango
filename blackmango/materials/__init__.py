@@ -51,14 +51,14 @@ class BasePortalMaterial(BaseMaterial):
         self.is_portal = 1
         self.destination = destination
 
-    def interaction_callback(self, mob):
+    def interaction_callback(self, level, mob):
         """
         This is called by the mob object when it steps onto the material.
         Going forward, we might need to account for other kinds of interaction,
         like walking up to an object, or more complex ones that do things like
         interact with the level itself
         """
-        mob.teleport(*self.destination)
+        mob.teleport(level, *self.destination)
 
 
 class Wall(BaseMaterial):

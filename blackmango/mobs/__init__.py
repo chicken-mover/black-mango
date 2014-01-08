@@ -70,6 +70,7 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
                 return
             elif block and hasattr(block, 'interaction_callback'):
                 callback = functools.partial(block.interaction_callback,
+                        level,
                         self)
         
             mob = level.get_mob(*dest)
@@ -145,7 +146,7 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
 
 class SimpleMob(BasicMobileSprite):
 
-    def behavior(self):
+    def behavior(self, level):
         pass
 
 
@@ -157,7 +158,7 @@ class PatrollerV(SimpleMob):
     next_location = None
 
 
-    def behavior(self):
+    def behavior(self, level):
 
         if self.animations:
             return
@@ -172,7 +173,7 @@ class PatrollerV(SimpleMob):
         ]
         self.next_location = [sum(i) for i in zip(*l)]
 
-        self.move(*self.direction)
+        self.move(level, *self.direction)
 
 
 MOBS = {
