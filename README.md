@@ -11,7 +11,7 @@ Git commit messages should follow
 * Make sure you have Pyglet installed
 * In all commands, `python` refers to a Python 2.7 interpreter.
 
-## Build requirements
+### Build requirements
 
 * For building binary executables, you will need
   [PyInstaller](http://www.pyinstaller.org/):
