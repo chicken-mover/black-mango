@@ -74,13 +74,13 @@ class GameEngine(object):
         if self.player:
             
             if keyboard[pyglet.window.key.UP]:
-                self.player.move(0, -1, 0)
+                self.player.move(0, -1)
             elif keyboard[pyglet.window.key.DOWN]:
-                self.player.move(0, 1, 0)
+                self.player.move(0, 1)
             elif keyboard[pyglet.window.key.LEFT]:
-                self.player.move(-1, 0, 0)
+                self.player.move(-1, 0)
             elif keyboard[pyglet.window.key.RIGHT]:
-                self.player.move(1, 0, 0)
+                self.player.move(1, 0)
 
     def game_tick(self):
 

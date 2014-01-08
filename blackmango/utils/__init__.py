@@ -10,7 +10,7 @@ import blackmango.configure
 ##
 
 DIR_APPDATA = None
-DIR_SAVEGAMES = None
+DIR_SAVEDGAMES = None
 
 # Python will deal with pathsep issues correctly.
 _DIR_WIN_APPDATA = '%USERPROFILE%/Application Data/Black Mango'
@@ -34,10 +34,10 @@ try:
 
     if not 'Darwin' in uname:
         DIR_APPDATA = _DIR_POSIX_APPDATA
-        DIR_SAVEGAMES = _DIR_POSIX_SAVEDGAMES
+        DIR_SAVEDGAMES = _DIR_POSIX_SAVEDGAMES
     else:
         DIR_APPDATA = _DIR_MACOS_APPDATA
-        DIR_SAVEGAMES = _DIR_MACOS_SAVEDGAMES
+        DIR_SAVEDGAMES = _DIR_MACOS_SAVEDGAMES
 
 except AttibuteError:
     
@@ -55,7 +55,7 @@ except AttibuteError:
         path_expansion = _posix_expandfunc
 
         DIR_APPDATA = _DIR_POSIX_APPDATA
-        DIR_SAVEGAMES = _DIR_POSIX_SAVEDGAMES
+        DIR_SAVEDGAMES = _DIR_POSIX_SAVEDGAMES
 
 DIR_APPDATA = path_expansion(DIR_APPDATA)
 DIR_SAVEDGAMES = path_expansion(DIR_SAVEDGAMES)

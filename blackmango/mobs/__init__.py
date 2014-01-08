@@ -150,7 +150,7 @@ class SimpleMob(BasicMobileSprite):
 
 class PatrollerV(SimpleMob):
 
-    direction = (0,1,0)
+    direction = (0,1)
 
     previous_location = None
     next_location = None

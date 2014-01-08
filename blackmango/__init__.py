@@ -17,7 +17,7 @@ ARGUMENTS = (
                 'placed. The default value is ~/.blackmango.',
     }),
     ('--debug', {
-        'dest': 'debug_level',
+        'dest': 'debug',
         'help': 'Specify the debug level to use for logging output. This should'
                 ' match one of the log levels found in the built-in `logging` '
                 'module.',
@@ -28,7 +28,7 @@ ARGUMENTS = (
 parser = argparse.ArgumentParser(description=__doc__.strip())
 
 for name, argspec in ARGUMENTS:
-    parser.add_arguments(name, **argspec)
+    parser.add_argument(name, **argspec)
 
 args = parser.parse_args()
 
@@ -36,6 +36,8 @@ if args.debug:
     blackmango.configure.DEBUG = args.debug
 if args.data_dir:
     blackmango.configure.DATA_DIR = args.data_dir
+
+blackmango.configure.setup_logger(blackmango.configure.DEBUG)
 
 if __name__ == "__main__":
     

@@ -33,7 +33,10 @@ ORDERED_GROUPS = {
 # sprite animations, too.
 BASE_ANIMATION_FRAMES = 10
 
+logger = None
+
 def setup_logger(lvl = DEBUG):
+    global logger
     # Set up console logging
     logging.basicConfig()
     logger = logging.getLogger('blackmango')

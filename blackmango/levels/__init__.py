@@ -91,9 +91,8 @@ class BasicLevel(object):
                             })
                             m = mob(**kwargs)
                         else:
-                            mob = blackmango.mobs.MOBS[v]
-                            m = mob(x = x, y = y, z = floor)
-                            mob = m()
+                            m = blackmango.mobs.MOBS[v]
+                            mob = m(x = x, y = y, z = floor)
                         self.mobs[floor][y][x] = mob
                         mob.visible = floor == self.current_floor
                         mob.world_location = (x, y, floor)
