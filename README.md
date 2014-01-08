@@ -46,6 +46,10 @@ If `build.sh` isn't executable, fix the permissions with:
 $ chmod u+x build.sh
 ```
 
+Any extra options beyond the first will be passed directly to PyInstaller. See
+[the manual](http://www.pyinstaller.org/export/d3398dd79b68901ae1edd761f3fe0f4ff19cfb1a/project/doc/Manual.html)
+for more information, or do `pyinstaller --help` at the command line.
+
 ## Progress and notes
 
 Please see the [wiki](https://github.com/chicken-mover/black-mango/wiki).
