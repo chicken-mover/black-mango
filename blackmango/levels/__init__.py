@@ -184,25 +184,33 @@ class BasicLevel(object):
         }
 
         # Now read the current block and mob states and record them
-        for d in ('blocks', 'mobs'):
-            dm = getattr(self, d)
-            for floor, data in dm.items():
-                saved_level[floor] = []
-                for y, row in enumerate(data):
-                    saved_level[floor].append([])
-                    for x, v in enumerate(row):
-                        saved_level[floor].append(None)
+        for itemlist in ('blocklist', 'moblist'):
+            items = getattr(self, itemlist)
+            for item in items:
+                x, y, floor = item.world_location
+                v = 0
+                if d == 'blocklist':
+                    map = 'blocks'
+                    lookup_dict = blackmango.materials.MATERIALS
+                elif d == 'moblist':
+                    map = 'mobs'
+                    lookup_dict = blackmango.mobs.MOBS
+                for k, t in lookup_dict.items():
+                    if isinstance(v, t):
+                        v = k
 
-                        v = 0
-                        if d == 'blocks':
-                            lookup_dict = blackmango.materials.MATERIALS
-                        elif d == 'mobs':
-                            lookup_dict = blackmango.mobs.MOBS
-                        for k, t in lookup_dict.items():
-                            if isinstance(v, t):
-                                v = k
+                # Make sure the floor exists in the map
+                if not floor in saved_level[map]:
+                    saved_level[map][floor] = []
 
-                        saved_level[d][floor][x][y] = v
+                # Make sure the maps have enough slots
+                while len(saved_level[map][floor]) < x - 1:
+                    saved_level[map][floor].append([])
+                while len(saved_level[map][floor][x]) < y - 1:
+                    saved_level[map][floor][x].append(None)
+                    
+                # Save the item in the map
+                saved_level[d][floor][x][y] = v
 
         return saved_level
 
