@@ -12,6 +12,7 @@ Git commit messages should follow
 * In all commands, `python` refers to a Python 2.7 interpreter.
 * For building binary executables, you will need
   [PyInstaller](http://www.pyinstaller.org/):
+
 ```bash
 $ git clone git://github.com/pyinstaller/pyinstaller.git
 $ cd pyinstaller
