@@ -31,10 +31,10 @@ NODEBUG_OPTIONS=(
     --onefile
 )
 
-SCRIPTPATH=./blackmango/__init__.py
+SCRIPTPATH="blackmango/__init__.py"
 
 function make() {
-    $PROG ${ALL_OPTIONS[@]} ${NODEBUG_OPTIONS[@]} $STRIP_SYMBOLS $SCRIPTPATH
+    $PROG ${ALL_OPTIONS[@]} ${NODEBUG_OPTIONS[@]} $STRIP_SYMBOLS $SCRIPTPATH $@
 }
 
 function clean() {
@@ -45,7 +45,7 @@ function clean() {
 }
 
 function make-debug() {
-    $PROG ${ALL_OPTIONS[@]} ${DEBUG_OPTIONS[@]} $SCRIPTPATH
+    $PROG ${ALL_OPTIONS[@]} ${DEBUG_OPTIONS[@]} $SCRIPTPATH $@
 }
 
 function help() {
@@ -54,7 +54,8 @@ function help() {
 
 case "$1" in
     make)
-        make
+        shift
+        make $@
         exit
         ;;
     clean)
@@ -62,7 +63,8 @@ case "$1" in
         exit
         ;;
     make-debug)
-        make-debug
+        shift
+        make-debug $@
         exit
         ;;
     make-clean)

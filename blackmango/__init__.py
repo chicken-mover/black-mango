@@ -30,31 +30,32 @@ ARGUMENTS = (
     }),
 )
 
-parser = argparse.ArgumentParser(description=__doc__.strip())
-
-for name, argspec in ARGUMENTS:
-    parser.add_argument(name, **argspec)
-
-args = parser.parse_args()
-
-if args.debug:
-    blackmango.configure.DEBUG = args.debug
-if args.data_dir:
-    blackmango.configure.DATA_DIR = args.data_dir
-
-blackmango.configure.setup_logger(blackmango.configure.DEBUG)
-
-engine = blackmango.gameengine.GameEngine()
-main_window = blackmango.ui.GameWindow(engine)
-
-for f in [
-    blackmango.materials.materials_batch.draw,
-    blackmango.mobs.mobs_batch.draw,
-]:
-    engine.register_draw(f)
-
-blackmangoapp = blackmango.app.BlackMangoApp()
-blackmangoapp.schedule(main_window.tick)
-
 if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description=__doc__.strip())
+
+    for name, argspec in ARGUMENTS:
+        parser.add_argument(name, **argspec)
+
+    args = parser.parse_args()
+
+    if args.debug:
+        blackmango.configure.DEBUG = args.debug
+    if args.data_dir:
+        blackmango.configure.DATA_DIR = args.data_dir
+
+    blackmango.configure.setup_logger(blackmango.configure.DEBUG)
+
+    engine = blackmango.gameengine.GameEngine()
+    main_window = blackmango.ui.GameWindow(engine)
+
+    for f in [
+        blackmango.materials.materials_batch.draw,
+        blackmango.mobs.mobs_batch.draw,
+    ]:
+        engine.register_draw(f)
+
+    blackmangoapp = blackmango.app.BlackMangoApp()
+    blackmangoapp.schedule(main_window.tick)
+
     blackmangoapp.run()
