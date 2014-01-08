@@ -3,7 +3,7 @@ A simple level object for loading level data and tracking stuff that's
 happening inside the level.
 
 This class also controls what part of the level we're looking at at any given
-moment, and keeps references to mobs and the player for quick collision lookup.
+moment, and keeps references to mobs and blocks for quick collision lookup.
 
 The level's `tick` method is used to iterate and call the `behavior` method on
 each mob in the level.
@@ -30,8 +30,7 @@ class BasicLevel(object):
     mobs = None
 
     moblist = []
-    # Set by the GameEngine object when the level is initted
-    player = None
+    blocklist = []
 
     def __init__(self, level_data):
         """
@@ -48,6 +47,7 @@ class BasicLevel(object):
 
         # Important re-definition to prevent bugs
         self.moblist = []
+        self.blocklist = []
 
         # Load all of the materials objects by iterating the data for each
         # floor and filling out the self.blocks object. As we work, we also
@@ -67,14 +67,15 @@ class BasicLevel(object):
                                 'y': y,
                                 'z': floor,
                             })
-                            m = material(**kwargs)
+                            block = material(**kwargs)
                         else:
                             # basic block init.
                             material = blackmango.materials.MATERIALS[v]
-                            m = material(x = x, y = y, z = floor)
-                        self.blocks[floor][y][x] = m
-                        m.visible = floor == self.current_floor
-                        m.translate()
+                            block = material(x = x, y = y, z = floor)
+                        self.blocks[floor][y][x] = block
+                        block.visible = floor == self.current_floor
+                        block.translate()
+                        self.blocklist.append(block)
                     # Check to see if there is a mob for this location
                     try:
                         v = self.mobs[floor][y][x]
@@ -96,7 +97,6 @@ class BasicLevel(object):
                         self.mobs[floor][y][x] = mob
                         mob.visible = floor == self.current_floor
                         mob.world_location = (x, y, floor)
-                        mob.current_level = self
                         mob.translate()
                         self.moblist.append(mob)
 
@@ -141,8 +141,6 @@ class BasicLevel(object):
         """
         Set the location of a mob for quick collision lookup.
         """
-        if mob:
-            mob.current_level = self
         self.mobs[floor][y][x] = mob
 
     def get_mob(self, x, y, floor):
@@ -177,7 +175,9 @@ class BasicLevel(object):
             'next_level': self.next_level,
             'previous_level': self.previous_level,
 
-            'current_location': self.player.world_location,
+            # Get this by testing for instances of player when iterating the
+            # moblist? Or as an argument passed in
+            'current_location': None,
 
             'blocks': {},
             'mobs': {},

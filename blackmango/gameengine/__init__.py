@@ -14,9 +14,7 @@ import pyglet
 import blackmango.configure
 import blackmango.levels
 import blackmango.levels.test_level
-import blackmango.materials
 import blackmango.mobs.player
-import blackmango.utils
 
 class GameEngine(object):
 
@@ -24,7 +22,8 @@ class GameEngine(object):
     player = None
 
     def __init__(self):
-        pass
+
+        self.draw_events = set()
 
     def new_game(self):
         """
@@ -45,7 +44,6 @@ class GameEngine(object):
         # Place the player into the level
         starting_location = self.current_level.starting_location
         self.current_level.set_mob(self.player, *starting_location)
-        self.current_level.player = self.player
         self.player.world_location = starting_location
         self.player.translate()
 
@@ -54,15 +52,22 @@ class GameEngine(object):
 
         stored_level = self.current_level.serialize()
 
+    def register_draw(self, f):
+        """
+        Add a callable <f> to be called when the GameEngine's `on_draw` handler
+        is triggered.
+        """
+        self.draw_events.add(f)
+
     def on_draw(self):
         """
         To be called by the GameWindow object when it triggers the on_draw
         event. The GameEngine is delegated the task of calling draws for the
         sprites/sprite batches it is tracking.
         """
-        # Fire the draw for material and mob batches.
-        blackmango.materials.materials_batch.draw()
-        blackmango.mobs.mobs_batch.draw()
+        # Fire the registered draw events
+        for f in self.draw_events:
+            f()
 
     def input_tick(self, keyboard):
         """
@@ -74,13 +79,13 @@ class GameEngine(object):
         if self.player:
             
             if keyboard[pyglet.window.key.UP]:
-                self.player.move(0, -1)
+                self.player.move(self.current_level, 0, -1)
             elif keyboard[pyglet.window.key.DOWN]:
-                self.player.move(0, 1)
+                self.player.move(self.current_level, 0, 1)
             elif keyboard[pyglet.window.key.LEFT]:
-                self.player.move(-1, 0)
+                self.player.move(self.current_level, -1, 0)
             elif keyboard[pyglet.window.key.RIGHT]:
-                self.player.move(1, 0)
+                self.player.move(self.current_level, 1, 0)
 
     def game_tick(self):
 

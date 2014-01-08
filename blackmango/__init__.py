@@ -1,13 +1,18 @@
 """
 Black Mango is a puzzle game.
 
-(c) 2014 Chicken Mover
+(c) 2014 Chicken Mover.
 All rights reserved.
 """
 
 import argparse
 
+import blackmango.app
 import blackmango.configure
+import blackmango.gameengine
+import blackmango.materials
+import blackmango.mobs
+import blackmango.ui
 
 ARGUMENTS = (
     ('--data-dir', {
@@ -39,7 +44,17 @@ if args.data_dir:
 
 blackmango.configure.setup_logger(blackmango.configure.DEBUG)
 
+engine = blackmango.gameengine.GameEngine()
+main_window = blackmango.ui.GameWindow(engine)
+
+for f in [
+    blackmango.materials.materials_batch.draw,
+    blackmango.mobs.mobs_batch.draw,
+]:
+    engine.register_draw(f)
+
+blackmangoapp = blackmango.app.BlackMangoApp()
+blackmangoapp.schedule(main_window.tick)
+
 if __name__ == "__main__":
-    
-    import blackmango.app
-    blackmango.app.app.run()
+    blackmangoapp.run()

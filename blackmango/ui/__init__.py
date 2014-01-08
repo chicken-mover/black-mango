@@ -9,7 +9,7 @@ import pyglet
 import sys
 
 import blackmango.configure
-import blackmango.engine
+import blackmango.gameengine
 
 class GameWindow(pyglet.window.Window):
 
@@ -40,7 +40,6 @@ class GameWindow(pyglet.window.Window):
 
         self.mode = 'menu'
         self.engine = engine
-        self.engine.game_window = self
         
         self.resizeable = False
         self.set_location(1, 1)

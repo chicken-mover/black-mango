@@ -5,6 +5,7 @@ Sprites that move. Players and NPCs.
 import functools
 import pyglet
 
+import blackmango
 import blackmango.configure
 import blackmango.sprites
 import blackmango.ui
@@ -33,21 +34,21 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
 
         self.animations = []
 
-    def teleport(self, x, y, z):
+    def teleport(self, level, x, y, z):
         """
         Change the position of the sprite in the game world instantly.
         """
         dest = (x, y, z)
-        self.current_level.set_mob(None, *self.world_location)
-        self.current_level.set_mob(self, *dest)
+        level.set_mob(None, *self.world_location)
+        level.set_mob(self, *dest)
         self.world_location = dest
-        if self.current_level.current_floor != z:
+        if level.current_floor != z:
             self.visible = False
         else:
             self.visible = True
         self.translate()
 
-    def move(self, delta_x, delta_y):
+    def move(self, level, delta_x, delta_y):
         """
         Move the sprite in the game world with an accompanying animation.
         """
@@ -63,20 +64,20 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
             self.world_location[2],
         )
 
-        if self.current_level:
-            block = self.current_level.get_block(*dest)
+        if level:
+            block = level.get_block(*dest)
             if block and block.is_solid:
                 return
             elif block and hasattr(block, 'interaction_callback'):
                 callback = functools.partial(block.interaction_callback,
                         self)
         
-            mob = self.current_level.get_mob(*dest)
+            mob = level.get_mob(*dest)
             if mob and mob.is_solid:
                 return
             
-            self.current_level.set_mob(None, *self.world_location)
-            self.current_level.set_mob(self, *dest)
+            level.set_mob(None, *self.world_location)
+            level.set_mob(self, *dest)
 
             self.world_location = dest
             self.smooth_translate(callback = callback)
@@ -95,7 +96,7 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
 
         The <callback> callable is called after the final animation frame.
         """
-        w, h = blackmango.app.main_window.get_size()
+        w, h = blackmango.main_window.get_size()
         scale = blackmango.configure.GRID_SIZE
 
         cur_x, cur_y = self.x, self.y

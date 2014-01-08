@@ -7,18 +7,17 @@ class. They are both accessible as attributes of this class.
 
 import pyglet
 
-import blackmango.engine
-import blackmango.ui
-
-engine = blackmango.engine.GameEngine()
-main_window = blackmango.ui.GameWindow(engine)
-
 class BlackMangoApp(pyglet.app.EventLoop):
 
-    def __init__(self):
+    def __init__(self, *args):
 
         super(BlackMangoApp, self).__init__()
 
-        pyglet.clock.schedule(main_window.tick)
-
-app = BlackMangoApp()
+    def schedule(self, f):
+        """
+        Schedule a callable <f> to be called at every Pyglet clock tick, using
+        `pyglet.clock.schedule`. Any callable scheduled this way must accept a
+        single argument (the number of ticks that have passed since the previous
+        call).
+        """
+        pyglet.clock.schedule(f)
