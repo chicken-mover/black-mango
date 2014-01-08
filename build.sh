@@ -28,13 +28,13 @@ DEBUG_OPTIONS=(
 )
 
 NODEBUG_OPTIONS=(
-    --onefile
+    $STRIP_SYMBOLS
 )
 
 SCRIPTPATH="blackmango/__init__.py"
 
 function make() {
-    $PROG ${ALL_OPTIONS[@]} ${NODEBUG_OPTIONS[@]} $STRIP_SYMBOLS $SCRIPTPATH $@
+    $PROG ${ALL_OPTIONS[@]} ${NODEBUG_OPTIONS[@]} $SCRIPTPATH $@
 }
 
 function clean() {
@@ -52,11 +52,16 @@ function help() {
     echo "Usage: $0 [make|clean|make-debug]"
 }
 
+function this-exit() {
+    cd -
+    exit $1
+}
+
 case "$1" in
     make)
         shift
         make $@
-        exit
+        this-exit
         ;;
     clean)
         clean
@@ -65,13 +70,9 @@ case "$1" in
     make-debug)
         shift
         make-debug $@
-        exit
-        ;;
-    make-clean)
-        make-clean
-        exit
+        this-exit
         ;;
 esac
 
 help
-exit 1
+this-exit 1
