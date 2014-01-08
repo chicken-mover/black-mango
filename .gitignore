@@ -15,4 +15,6 @@ __pycache__
 
 # Build leftovers
 build/
-
+dist/
+spec/
+*.spec
