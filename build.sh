@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # cd to the directory of the build script
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -19,7 +19,7 @@ ALL_OPTIONS=(
     --log-level=INFO
     --specpath=./spec/
     --name=BlackMango
-    #--onefile
+    --onefile
     --windowed
 )
 
@@ -42,6 +42,9 @@ function clean() {
     rm -rfv ./build/
     rm -rfv ./spec/
     rm -vf *.spec
+    for f in $(find . -type f | grep -E "\.py(c|o)$"); do
+        rm -rv $f
+    done
 }
 
 function make-debug() {

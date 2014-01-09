@@ -60,7 +60,7 @@ class BasicLevel(object):
                         if isinstance(v, tuple):
                             # This is for portals, but might be useful for
                             # other special cases in the future.
-                            material = blackmango.materials.MATERIALS[v[0]]
+                            material = blackmango.materials.list.MATERIALS[v[0]]
                             kwargs = v[1]
                             kwargs.update({
                                 'x': x,
@@ -70,7 +70,7 @@ class BasicLevel(object):
                             block = material(**kwargs)
                         else:
                             # basic block init.
-                            material = blackmango.materials.MATERIALS[v]
+                            material = blackmango.materials.list.MATERIALS[v]
                             block = material(x = x, y = y, z = floor)
                         self.blocks[floor][y][x] = block
                         block.visible = floor == self.current_floor
@@ -83,7 +83,7 @@ class BasicLevel(object):
                         continue
                     if v:
                         if isinstance(v, tuple):
-                            mob = blackmango.mobs.MOBS[v[0]]
+                            mob = blackmango.mobs.list.MOBS[v[0]]
                             kwargs = v[1]
                             kwargs.update({
                                 'x': x,
@@ -92,7 +92,7 @@ class BasicLevel(object):
                             })
                             m = mob(**kwargs)
                         else:
-                            m = blackmango.mobs.MOBS[v]
+                            m = blackmango.mobs.list.MOBS[v]
                             mob = m(x = x, y = y, z = floor)
                         self.mobs[floor][y][x] = mob
                         mob.visible = floor == self.current_floor
@@ -135,7 +135,7 @@ class BasicLevel(object):
                 raise IndexError("Bad level coordinates")
             return self.blocks[floor][y][x]
         except IndexError:
-            return blackmango.materials.MATERIALS[-1]()
+            return blackmango.materials.list.MATERIALS[-1]()
 
     def set_mob(self, mob, x, y, floor):
         """
@@ -191,10 +191,10 @@ class BasicLevel(object):
                 v = 0
                 if d == 'blocklist':
                     map = 'blocks'
-                    lookup_dict = blackmango.materials.MATERIALS
+                    lookup_dict = blackmango.materials.list.MATERIALS
                 elif d == 'moblist':
                     map = 'mobs'
-                    lookup_dict = blackmango.mobs.MOBS
+                    lookup_dict = blackmango.mobs.list.MOBS
                 for k, t in lookup_dict.items():
                     if isinstance(v, t):
                         v = k

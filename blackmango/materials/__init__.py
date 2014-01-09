@@ -4,6 +4,9 @@ objects in a level.
 
 They can have behaviours, the interface for which is really rough at this
 point.
+
+This file should contain only the base material classes. Subclasses of the
+base materials should be divided out into logically appropriate submodules.
 """
 
 import pyglet
@@ -59,19 +62,7 @@ class BasePortalMaterial(BaseMaterial):
         interact with the level itself
         """
         mob.teleport(level, *self.destination)
-
-
-class Wall(BaseMaterial):
-   pass
-
-class StairUp(BasePortalMaterial):
-    pass
-
-class StairDown(BasePortalMaterial):
-    pass
-
-class Door(BasePortalMaterial):
-    pass
+        
 
 class VoidMaterial(BaseMaterial):
 
@@ -85,13 +76,3 @@ class VoidMaterial(BaseMaterial):
         self.is_mover = 0
         self.is_portal = 0
         self.opacity = 0
-
-# Global dict for lookups by the levels module
-MATERIALS = {
-    -1: VoidMaterial,
-    0: None,
-    1: Wall,
-    7: Door,
-    8: StairUp,
-    9: StairDown,
-}
