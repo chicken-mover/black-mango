@@ -45,7 +45,7 @@ $ chmod u+x hooks/*
 ```
 
 This will help with things like automatic validation of version numbers during
-commit,
+commit.
 
 ## Build instructions
 
@@ -66,7 +66,7 @@ $ chmod u+x build.sh
 ```
 
 Any extra options beyond the first will be passed directly to PyInstaller. See
-[the manual](http://www.pyinstaller.org/export/d3398dd79b68901ae1edd761f3fe0f4ff19cfb1a/project/doc/Manual.html)
+[the manual](http://www.pyinstaller.org/export/develop/project/doc/Manual.html)
 for more information, or do `pyinstaller --help` at the command line.
 
 ## Progress and notes
