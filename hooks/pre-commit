@@ -1,5 +1,13 @@
 #!/bin/sh
 
+BRANCH=$(git branch)
+
+# We don't care about version number validation if we aren't on the main master
+# branch.
+if [ "$BRANCH" != "* master" ]; then
+    exit 0
+fi
+
 LAST_TAG=$(git tag | head -n 1)
 SETUP_VERSION=$(python -c "import imp;s = imp.load_source('s', 'setup.py');print s.version")
 
