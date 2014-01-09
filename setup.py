@@ -22,5 +22,4 @@ if __name__ == "__main__":
             'mock>=1.0.1',
         ],
         test_suite = 'blackmango_tests.TestSuite',
-
     )
