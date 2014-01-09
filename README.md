@@ -35,6 +35,18 @@ $ cd black-mango
 $ sudo python setup.py develop
 ```
 
+If you want to activate the git hooks that come with the repository, you should
+also do the following, in the base directory of the project:
+
+```bash
+$ mv .git/hooks .git/hooks-backup
+$ ln -s ../hooks .git/hooks
+$ chmod u+x hooks/*
+```
+
+This will help with things like automatic validation of version numbers during
+commit,
+
 ## Build instructions
 
 After running the `setup.py develop` command above, you can run the `build.sh`

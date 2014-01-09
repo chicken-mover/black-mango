@@ -28,6 +28,11 @@ ARGUMENTS = (
                 'module.',
         'type': int,
     }),
+    ('--test', {
+        'dest': 'test',
+        'help': 'Run the test suite instead of the normal app.',
+        'action': 'store_true',
+    }),
 )
 
 if __name__ == "__main__":

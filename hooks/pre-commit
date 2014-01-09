@@ -1,0 +1,15 @@
+#!/bin/sh
+
+LAST_TAG=$(git tag | head -n 1)
+SETUP_VERSION=$(python -c "import imp;s = imp.load_source('s', 'setup.py');print s.version")
+
+if [ "$LAST_TAG" == "$SETUP_VERSION" ] && [ -n "$SETUP_VERSION" ] && [ "$SETUP_VERSION" != '0.0.0' ]; then
+    exit 0
+else
+    echo "Last version tag does not equal setup version:"
+    echo "Tag: " $LAST_TAG
+    echo "setup.py version: " $SETUP_VERSION
+    echo
+    echo "Aborting commit. Fix the version number tags or the version number in"
+    echo "setup.py to continue."
+fi
