@@ -8,7 +8,9 @@ Git commit messages should follow
 
 ## Requirements
 
-* Make sure you have Pyglet installed
+* `pyglet` for GUI/OpenGL support
+* `mock` for testing
+* `setuptools` to install all other dependencies automatically.
 * In all commands, `python` refers to a Python 2.7 interpreter.
 
 ### Build requirements
@@ -34,6 +36,9 @@ $ git clone git@github.com:chicken-mover/black-mango.git
 $ cd black-mango
 $ sudo python setup.py develop
 ```
+
+This should also install dependencies, assuming you have `setuptools` and `pip`
+installed correctly.
 
 If you want to activate the git hooks that come with the repository, you should
 also do the following, in the base directory of the project:
