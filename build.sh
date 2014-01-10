@@ -16,8 +16,8 @@ fi
 ALL_OPTIONS=(
     --distpath=./dist/
     --workpath=./build/
-    --log-level=INFO
     --specpath=./spec/
+    --log-level=INFO
     --name=BlackMango
     --onefile
     --windowed

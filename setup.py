@@ -1,6 +1,3 @@
-"""
-Basic setup file. Temporary.
-"""
 
 import setuptools
 
