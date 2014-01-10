@@ -9,7 +9,7 @@ Git commit messages should follow
 ## Requirements
 
 * `pyglet` for GUI/OpenGL support
-* `mock` for testing
+* `mock` and `nose` for testing
 * `setuptools` to install all other dependencies automatically.
 * In all commands, `python` refers to a Python 2.7 interpreter.
 
@@ -73,6 +73,10 @@ $ chmod u+x build.sh
 Any extra options beyond the first will be passed directly to PyInstaller. See
 [the manual](http://www.pyinstaller.org/export/develop/project/doc/Manual.html)
 for more information, or do `pyinstaller --help` at the command line.
+
+## Running tests
+
+Run `sudo python setup.py test` in the project root to run all unit tests.
 
 ## Progress and notes
 
