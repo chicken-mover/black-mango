@@ -63,4 +63,5 @@ for f in [
 blackmangoapp = blackmango.app.BlackMangoApp()
 blackmangoapp.schedule(main_window.tick)
 
-blackmangoapp.run()
+if __name__ == "__main__":
+    blackmangoapp.run()

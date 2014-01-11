@@ -127,7 +127,7 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
         Iterate the animation queue for the current object and execute
         everything we find there.
         """
-        
+
         for idx, fargs in enumerate(self.animations):
             timer = t * idx
             args = [fargs[0], timer] + list(fargs[1:])

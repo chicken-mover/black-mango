@@ -4,7 +4,15 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
 
-PROG=pyinstaller
+PROG=$(which pyinstaller)
+
+PYTHON="python"
+if hash python2 >/dev/null 2>&1; then
+    PYTHON=python2
+fi
+if hash python2.7 >/dev/null 2>&1; then
+    PYTHON=python2.7
+fi
 
 # This option is recommended under Windows, according to the PyInstaller docs.
 if [ "$(expr substr $(uname -s) 1 6 2>&1)" == "CYGWIN" ]; then
@@ -34,7 +42,7 @@ NODEBUG_OPTIONS=(
 SCRIPTPATH="blackmango/__init__.py"
 
 function make() {
-    $PROG ${ALL_OPTIONS[@]} ${NODEBUG_OPTIONS[@]} $SCRIPTPATH $@
+    $PYTHON -OO $PROG ${ALL_OPTIONS[@]} ${NODEBUG_OPTIONS[@]} $SCRIPTPATH $@
 }
 
 function clean() {
