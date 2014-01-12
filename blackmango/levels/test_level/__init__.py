@@ -7,7 +7,7 @@ Somehow we will need to work in level scripting as well, possibly as a seperate
 LevelBehavior class?
 """
 
-from blackmango.levels.test_level.behaviour import LevelBehavior
+#from blackmango.levels.test_level.behavior import LevelBehavior
 
 LEVEL_DATA = {
         

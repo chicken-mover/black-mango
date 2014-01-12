@@ -4,6 +4,8 @@ level-wide state change should call methods on the object that this class
 produces.
 """
 
+import blackmango.levels
+
 class LevelBehavior(blackmango.levels.BasicLevelBehaviour):
 
     pass

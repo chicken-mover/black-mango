@@ -11,8 +11,22 @@ on every commit.
 
 import unittest
 
-# Monkey patch any Pyglet imports to turn them into mocks
-import mock_pyglet
+# Global placeholder. Don't want to import this until setup is done.
+blackmango = None
+pyglet = None
 
 class TestSuite(unittest.TestCase):
-    pass
+    
+    def setUp(self):
+        global blackmango
+        global pyglet
+        import blackmango
+        import pyglet
+
+    def test_startup(self):
+        """
+        Test that the startup sequence occurred correctly.
+        """
+        self.assertIsInstance(blackmango.blackmangoapp, pyglet.app.EventLoop)
+        self.assertIsNotNone(blackmango.engine)
+        self.assertIsInstance(blackmango.main_window, pyglet.window.Window)
