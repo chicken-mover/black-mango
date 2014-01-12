@@ -8,7 +8,6 @@ base mobs should be divided out into logically appropriate submodules.
 import functools
 import pyglet
 
-import blackmango
 import blackmango.configure
 import blackmango.sprites
 import blackmango.ui

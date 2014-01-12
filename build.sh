@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # TODO: Turn this into a proper Makefile at some point.
 
@@ -29,7 +29,7 @@ ALL_OPTIONS=(
     --specpath=./spec/
     --log-level=INFO
     --name=BlackMango
-    --onefile
+    #--onefile
     --windowed
 )
 
@@ -41,10 +41,19 @@ NODEBUG_OPTIONS=(
     $STRIP_SYMBOLS
 )
 
-SCRIPTPATH="blackmango/__init__.py"
+RESOURCE_PATH='src/assets/'
+RESOURCES=()
+for resource in $(find $RESOURCE_PATH -type f); do
+    r="--resource=$resource,DATA,$(basename $resource)"
+    echo "Found resource $r"
+    RESOURCES+=($r)
+done
+
+SCRIPTPATH="src/blackmango/__init__.py"
 
 function make() {
-    $PYTHON -OO $PROG ${ALL_OPTIONS[@]} ${NODEBUG_OPTIONS[@]} $SCRIPTPATH $@
+    $PYTHON -OO $PROG ${ALL_OPTIONS[@]} ${NODEBUG_OPTIONS[@]} ${RESOURCES[@]} \
+        $SCRIPTPATH $@
 }
 
 function clean() {
@@ -58,7 +67,7 @@ function clean() {
 }
 
 function make-debug() {
-    $PROG ${ALL_OPTIONS[@]} ${DEBUG_OPTIONS[@]} $SCRIPTPATH $@
+    $PROG ${ALL_OPTIONS[@]} ${DEBUG_OPTIONS[@]} $SCRIPTPATH ${RESOURCES[@]} $@
 }
 
 function help() {

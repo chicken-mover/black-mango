@@ -1,12 +1,11 @@
 """
-Black Mango is a puzzle game.
-
-(c) 2014 Chicken Mover.
-All rights reserved.
+Sidestep certain import problems by keeping the startup logic out of the
+central __init__.py file.
 """
 
 import argparse
 
+#import blackmango
 import blackmango.app
 import blackmango.configure
 import blackmango.gameengine
@@ -51,17 +50,17 @@ if __name__ == "__main__":
 
 blackmango.configure.setup_logger(blackmango.configure.DEBUG)
 
-engine = blackmango.gameengine.GameEngine()
-main_window = blackmango.ui.GameWindow(engine)
+blackmango.engine = blackmango.gameengine.GameEngine()
+blackmango.main_window = blackmango.ui.GameWindow(blackmango.engine)
 
 for f in [
     blackmango.materials.materials_batch.draw,
     blackmango.mobs.mobs_batch.draw,
 ]:
-    engine.register_draw(f)
+    blackmango.engine.register_draw(f)
 
-blackmangoapp = blackmango.app.BlackMangoApp()
-blackmangoapp.schedule(main_window.tick)
+blackmango.blackmangoapp = blackmango.app.BlackMangoApp()
+blackmango.blackmangoapp.schedule(blackmango.main_window.tick)
 
-if __name__ == "__main__":
-    blackmangoapp.run()
+def main():
+    blackmango.blackmangoapp.run()

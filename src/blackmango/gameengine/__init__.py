@@ -11,6 +11,7 @@ initial load/save/new game/credits splash menu shouldn't be dealt with here.
 
 import pyglet
 
+import blackmango.assets
 import blackmango.configure
 import blackmango.levels
 import blackmango.levels.test_level
@@ -24,6 +25,8 @@ class GameEngine(object):
     def __init__(self):
 
         self.draw_events = set()
+
+        print blackmango.assets.load_image('placeholder_oracle.png')
 
     def new_game(self):
         """

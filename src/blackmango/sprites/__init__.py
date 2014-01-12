@@ -4,7 +4,6 @@ Defines the BaseSprite class, from which mobs and materials inherit.
 
 import pyglet
 
-import blackmango
 import blackmango.app
 import blackmango.configure
 import blackmango.ui

@@ -55,8 +55,6 @@ class GameWindow(pyglet.window.Window):
         if self.keyboard[pyglet.window.key.Q]:
             sys.exit(0)
 
-        print self.keyboard[pyglet.window.key.N]
-
         if self.mode == 'menu':
         
             if self.keyboard[pyglet.window.key.N]:
