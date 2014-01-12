@@ -5,6 +5,7 @@
 *.swp
 *.swo
 __pycache__
+*.swn
 
 # Python packaging junk
 *.egg*/
