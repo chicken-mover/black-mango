@@ -216,3 +216,6 @@ class BasicLevel(object):
 
         return saved_level
 
+class BasicLevelBehavior(object):
+
+    pass

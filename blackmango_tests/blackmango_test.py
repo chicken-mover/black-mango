@@ -9,8 +9,10 @@ The hope is to eventually start using something like TravisCI to automate tests
 on every commit.
 """
 
-import mock
 import unittest
+
+# Monkey patch any Pyglet imports to turn them into mocks
+import mock_pyglet
 
 class TestSuite(unittest.TestCase):
     pass
