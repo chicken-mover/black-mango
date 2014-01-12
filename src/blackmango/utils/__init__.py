@@ -44,7 +44,7 @@ try:
         DIR_APPDATA = _DIR_MACOS_APPDATA
         DIR_SAVEDGAMES = _DIR_MACOS_SAVEDGAMES
 
-except AttibuteError:
+except AttributeError:
     
     if sys.platform == 'win32':
 
