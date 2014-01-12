@@ -45,8 +45,8 @@ try:
         DIR_SAVEDGAMES = _DIR_MACOS_SAVEDGAMES
 
 except AttributeError:
-    
     if sys.platform == 'win32':
+        DIR_SAVEDGAMES = _DIR_WIN_SAVEDGAMES
 
         path_expansion = _win_expandfunc
 
