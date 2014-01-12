@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# TODO: Turn this into a proper Makefile at some point.
+
 # cd to the directory of the build script
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR

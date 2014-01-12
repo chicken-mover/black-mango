@@ -15,10 +15,14 @@ before any Pyglet imports are called.
 >>> a = pyglet.sprites.Sprite()
 >>> print repr(a)
 <Mock name='mock.sprites.Sprite()' id='167050604'>
+
+The patch() function is aware of whether it has been called before, and
+will return immediately if Pyglet has already been mocked.
 """
 
 import ctypes
 import importlib
+import inspect
 import mock
 import pkgutil
 import pyglet
@@ -27,6 +31,20 @@ import sys
 import time
 
 def patch(print_debug = False):
+    """
+    Obtain a spec of the `pyglet` package recursively, and replace it with a
+    series of `mock.create_autospec()`-generated Mock objects.
+
+    May be called as many times as desired, as this function will return
+    immediately if it detects that Pyglet has already been mocked.
+    """
+    global pyglet
+
+    if isinstance(pyglet, mock.Mock):
+        if print_debug:
+            print "Pyglet has already been mocked, skipping patch."
+        return
+
     if print_debug:
         print "Generating a mocked Pyglet module, please be patient ..."
         time.sleep(2)
@@ -38,7 +56,7 @@ def patch(print_debug = False):
         Image = None
 
     # Fix error thrown on non-Windows systems when we iterate pyglet
-    #ctypes.oledll = mock.Mock()
+    ctypes.oledll = mock.Mock()
 
     mocks = {
         'pyglet': mock.Mock()        
@@ -78,10 +96,21 @@ def patch(print_debug = False):
             # Don't mock 'private' props or 'constant' props
             if prop.startswith('_'):
                 continue
-            if re.match(r'[A-Z_]+', prop):
+            if re.match(r'[A-Z_]+', prop) or prop.startswith('c_') or \
+               prop.startswith('struct_'):
+                if print_debug:
+                    print "    (Skipping c/const/struct prop %s)" % prop
                 continue
             # There are eight bajillion glSometing props, none of which need a mock
             if re.match(r'gl[A-Za-z0-9]+', prop):
+                continue
+            p = getattr(m, prop)
+            # Pyglet submodules will get loaded as we iterate. Builtins and
+            # foreign modules shouldn't be mocked, as they won't be accessed
+            # by our program via this package.
+            if inspect.isbuiltin(p) or inspect.ismodule(p):
+                if print_debug:
+                    print "    (Skipping builtin or module %s)" % prop
                 continue
             if print_debug:
                 print '  -',prop
@@ -101,3 +130,4 @@ def patch(print_debug = False):
 
     mock_pyglet = mocks['pyglet']
     sys.modules['pyglet'] = mock_pyglet
+    pyglet = mock_pyglet
