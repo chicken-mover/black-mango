@@ -19,3 +19,6 @@ build/
 dist/
 spec/
 *.spec
+
+# Test leftovers
+blackmango_tests/mock_pyglet.cPickle
