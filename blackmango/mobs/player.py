@@ -3,6 +3,7 @@ The main player class, a subclass of the BasicMobileSprite class.
 """
 
 import blackmango.configure
+import blackmango.masks.masklist
 import blackmango.mobs
 
 class Player(blackmango.mobs.BasicMobileSprite):
@@ -13,6 +14,17 @@ class Player(blackmango.mobs.BasicMobileSprite):
 
         super(Player, self).__init__(None, x, y, z,
                 color)
+
+        self.current_mask = None
+
+    def activate_mask(self, id):
+
+        if self.current_mask:
+            self.current_mask.on_deactivate()
+        mask = blackmango.masks.masklist.MASKS[id]
+        # TODO: Animate mask change
+        self.current_mask(mask)
+        mask.on_activate(self)
 
     def teleport(self, level, x, y, z):
         """

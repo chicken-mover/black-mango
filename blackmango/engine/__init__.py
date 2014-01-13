@@ -17,6 +17,13 @@ import blackmango.levels
 import blackmango.levels.test_level
 import blackmango.mobs.player
 
+game_engine = None
+
+# There is only one GameEngine object active at any one time.
+def init(*args, **kwargs):
+    global game_engine
+    game_engine = GameEngine(*args, **kwargs)
+
 class GameEngine(object):
 
     current_level = None
@@ -26,7 +33,7 @@ class GameEngine(object):
 
         self.draw_events = set()
 
-        print blackmango.assets.load_image('placeholder_oracle.png')
+        #print blackmango.assets.load_image('placeholder_oracle.png')
 
     def new_game(self):
         """

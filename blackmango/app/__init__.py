@@ -7,6 +7,12 @@ class. They are both accessible as attributes of this class.
 
 import pyglet
 
+game_app = None
+
+def init(*args, **kwargs):
+    global game_app
+    game_app = BlackMangoApp(*args, **kwargs)
+
 class BlackMangoApp(pyglet.app.EventLoop):
 
     def __init__(self, *args):

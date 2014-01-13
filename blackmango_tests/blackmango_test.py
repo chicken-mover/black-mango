@@ -42,7 +42,7 @@ class AppTestSuite(unittest.TestCase):
 
         self.assertIsInstance(blackmango.blackmangoapp, pyglet.app.EventLoop)
         self.assertIsNotNone(blackmango.engine)
-        self.assertIsInstance(blackmango.main_window, pyglet.window.Window)
+        self.assertIsInstance(blackmango.ui.game_window, pyglet.window.Window)
 
     def tearDown(self):
         blackmango.blackmangoapp._run = False
@@ -52,7 +52,7 @@ class AppTestSuite(unittest.TestCase):
         """
         Run the user input for starting a new game
         """
-        blackmango.main_window.keyboard[pyglet.window.key.N] = True
+        blackmango.ui.game_window.keyboard[pyglet.window.key.N] = True
         time.sleep(1)
-        blackmango.main_window.keyboard[pyglet.window.key.N] = False
-        self.assertEqual(blackmango.main_window.mode, 'game')
+        blackmango.ui.game_window.keyboard[pyglet.window.key.N] = False
+        self.assertEqual(blackmango.ui.game_window.mode, 'game')

@@ -110,7 +110,7 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
 
         The <callback> callable is called after the final animation frame.
         """
-        w, h = blackmango.main_window.get_size()
+        w, h = blackmango.ui.game_window.get_size()
         scale = blackmango.configure.GRID_SIZE
 
         cur_x, cur_y = self.x, self.y
@@ -131,30 +131,6 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
             ))
         
         pyglet.clock.schedule_once(self.animate, .001, callback)
-
-    def animate(self, dt, callback = None, t = .025):
-        """
-        Iterate the animation queue for the current object and execute
-        everything we find there.
-        """
-
-        for idx, fargs in enumerate(self.animations):
-            timer = t * idx
-            args = [fargs[0], timer] + list(fargs[1:])
-            pyglet.clock.schedule_once(*args)
-        
-        if callback:
-            pyglet.clock.schedule_once(lambda dt: callback(), timer)
-
-        pyglet.clock.schedule_once(self.reset_animations,
-                timer)
-
-    def reset_animations(self, dt):
-        """
-        A wrapper to reset self.animations, with an argspec appropriate for the
-        pyglet.clock.schedule* family of methods.
-        """
-        self.animations = []
 
 
 class SimpleMob(BasicMobileSprite):

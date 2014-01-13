@@ -55,10 +55,34 @@ class BaseSprite(pyglet.sprite.Sprite):
         Translate the current game world coordinates into the screen position
         for the current sprite object.
         """
-        w, h = blackmango.main_window.get_size()
+        w, h = blackmango.ui.game_window.get_size()
 
         scale = blackmango.configure.GRID_SIZE
         self.set_position(
             self.world_location[0] * scale,
             h - (self.world_location[1] + 1) * scale,
         )
+
+    def animate(self, dt, callback = None, t = .025):
+        """
+        Iterate the animation queue for the current object and execute
+        everything we find there.
+        """
+
+        for idx, fargs in enumerate(self.animations):
+            timer = t * idx
+            args = [fargs[0], timer] + list(fargs[1:])
+            pyglet.clock.schedule_once(*args)
+
+        if callback:
+            pyglet.clock.schedule_once(lambda dt: callback(), timer)
+
+        pyglet.clock.schedule_once(self.reset_animations,
+                timer)
+
+    def reset_animations(self, dt):
+        """
+        A wrapper to reset self.animations, with an argspec appropriate for the
+        pyglet.clock.schedule* family of methods.
+        """
+        self.animations = []

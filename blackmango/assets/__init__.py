@@ -11,7 +11,7 @@ def load_image(fname):
 
 def load(asset_type, filename):
     path = os.path.join(blackmango.utils.DIR_ASSETS, asset_type, filename)
-    print path
+    #print path
     if os.path.exists(path):
         return path
     else:

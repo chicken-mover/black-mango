@@ -9,11 +9,18 @@ import pyglet
 import sys
 
 import blackmango.configure
-import blackmango.gameengine
+import blackmango.engine
+
+game_window = None
+
+# There is only one GameWindow object active at any one time.
+def init(*args, **kwargs):
+    global game_window
+    game_window = GameWindow(*args, **kwargs)
 
 class GameWindow(pyglet.window.Window):
 
-    def __init__(self, engine):
+    def __init__(self):
 
         global game_window_size
 
@@ -39,7 +46,6 @@ class GameWindow(pyglet.window.Window):
         self.logger = blackmango.configure.logger
 
         self.mode = 'menu'
-        self.engine = engine
         
         self.resizeable = False
         self.set_location(1, 1)
@@ -48,12 +54,11 @@ class GameWindow(pyglet.window.Window):
         
     def on_draw(self):
         self.clear()
-        self.engine.on_draw()
-        self.fps_display.draw()
+        blackmango.engine.game_engine.on_draw()
+        if blackmango.configure.DEBUG:
+            self.fps_display.draw()
         
     def tick(self, dt):
-
-        print self.keyboard[pyglet.window.key.Q]
 
         if self.keyboard[pyglet.window.key.Q]:
             sys.exit(0)
@@ -61,10 +66,10 @@ class GameWindow(pyglet.window.Window):
         if self.mode == 'menu':
         
             if self.keyboard[pyglet.window.key.N]:
-                self.engine.new_game()
+                blackmango.engine.game_engine.new_game()
                 self.mode = 'game'
         
         elif self.mode == 'game':
 
-            self.engine.input_tick(self.keyboard)
-            self.engine.game_tick()
+            blackmango.engine.game_engine.input_tick(self.keyboard)
+            blackmango.engine.game_engine.game_tick()

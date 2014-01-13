@@ -81,7 +81,7 @@ class BasicLevel(object):
                     # Check to see if there is a mob for this location
                     try:
                         v = self.mobs[floor][y][x]
-                    except IndexError:
+                    except (IndexError, KeyError):
                         continue
                     if v:
                         if isinstance(v, tuple):
@@ -143,6 +143,12 @@ class BasicLevel(object):
         """
         Set the location of a mob for quick collision lookup.
         """
+        if not floor in self.mobs:
+            self.mobs[floor] = []
+        while y + 1 > len(self.mobs[floor]):
+            self.mobs[floor].append([])
+        while x + 1 > len(self.mobs[floor][y]):
+            self.mobs[floor][y].append(None)
         self.mobs[floor][y][x] = mob
 
     def get_mob(self, x, y, floor):
