@@ -62,5 +62,5 @@ for f in [
 blackmango.blackmangoapp = blackmango.app.BlackMangoApp()
 blackmango.blackmangoapp.schedule(blackmango.main_window.tick)
 
-def main():
+def start():
     blackmango.blackmangoapp.run()

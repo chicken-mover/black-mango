@@ -11,6 +11,7 @@ main_window = None
 
 def main():
     import blackmango.startup
-    blackmango.startup.main()
+    blackmango.startup.start()
 
-main()
+if __name__ == "__main__":
+    main()

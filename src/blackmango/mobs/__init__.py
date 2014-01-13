@@ -41,13 +41,25 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
         Change the position of the sprite in the game world instantly.
         """
         dest = (x, y, z)
+
+        block = level.get_block(*dest)
+        # Don't check interaction callbacks during teleport (otherwise you'll
+        # get endless loops on teleporters).
+        if block and block.is_solid:
+            return
+        mob = level.get_mob(*dest)
+        if mob and mob.is_solid:
+            return
+
         level.set_mob(None, *self.world_location)
         level.set_mob(self, *dest)
         self.world_location = dest
+        
         if level.current_floor != z:
             self.visible = False
         else:
             self.visible = True
+            
         self.translate()
 
     def move(self, level, delta_x, delta_y):
@@ -66,24 +78,23 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
             self.world_location[2],
         )
 
-        if level:
-            block = level.get_block(*dest)
-            if block and block.is_solid:
-                return
-            elif block and hasattr(block, 'interaction_callback'):
-                callback = functools.partial(block.interaction_callback,
-                        level,
-                        self)
-        
-            mob = level.get_mob(*dest)
-            if mob and mob.is_solid:
-                return
-            
-            level.set_mob(None, *self.world_location)
-            level.set_mob(self, *dest)
+        block = level.get_block(*dest)
+        if block and block.is_solid:
+            return
+        elif block and hasattr(block, 'interaction_callback'):
+            callback = functools.partial(block.interaction_callback,
+                    level,
+                    self)
 
-            self.world_location = dest
-            self.smooth_translate(callback = callback)
+        mob = level.get_mob(*dest)
+        if mob and mob.is_solid:
+            return
+
+        level.set_mob(None, *self.world_location)
+        level.set_mob(self, *dest)
+
+        self.world_location = dest
+        self.smooth_translate(callback = callback)
 
     def scheduled_set_position(self, dt, *args):
         """
