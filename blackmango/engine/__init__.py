@@ -28,6 +28,14 @@ def init(*args, **kwargs):
     global game_engine
     game_engine = GameEngine(*args, **kwargs)
 
+def loading_pause(f):
+    def wrapped(self, *args, **kwargs):
+        if self.loading:
+            return
+        else:
+            return f(self, *args, **kwargs)
+    return wrapped
+
 class GameEngine(object):
 
     current_level = None
@@ -35,9 +43,14 @@ class GameEngine(object):
 
     draw_events = set()
 
+    # During loading events, we don't want to tick the game or perform certain
+    # other actions on running event loops
+    loading = False
+
     def __init__(self):
         pass
     
+    @loading_pause
     def new_game(self):
         """
         Start a new game. (Update this documentation when the function is more
@@ -45,14 +58,19 @@ class GameEngine(object):
 
         Right now this just initializes a test level.
         """
-        blackmango.configure.logger.info('Initializing new game')
+        blackmango.configure.logger.info("Starting new game...")
         self.start_game(blackmango.levels.test_level.LEVEL_DATA)
 
+    @loading_pause
     def save_game(self, filepath = 'autosave.blackmango'):
 
         stored_level = self.current_level.serialize(self.player)
+
         file = os.path.join(blackmango.system.DIR_SAVEDGAMES, filepath)
         dir = os.path.dirname(file)
+        
+        blackmango.configure.logger.info("Saving game: %s" % file)
+        
         try:
             os.makedirs(dir)
         except OSError as exc:
@@ -66,23 +84,41 @@ class GameEngine(object):
             f.write(cPickle.dumps(stored_level))
         return True
 
+    @loading_pause
     def load_game(self, filepath = 'autosave.blackmango'):
 
-        file = os.path.join(blackmango.system.DIR_SAVEDGAMES, filepath)
-        with open(file) as f:
-            version, _, leveldata = f.read().partition('\n')
-            if version != blackmango.configure.SAVE_GAME_VERSION:
-                raise IOError("Version mismatch trying to load saved game data:"
-                   " %s %s" % (version, blackmango.configure.SAVE_GAME_VERSION))
-            stored_level = cPickle.loads(leveldata)
-        self.start_game(stored_level)
+        self.loading = True
+        blackmango.configure.logger.info("Scheduling load game...")
 
+        def loader(dt):
+            file = os.path.join(blackmango.system.DIR_SAVEDGAMES, filepath)
+            blackmango.configure.logger.info("Loading game: %s" % file)
+            with open(file) as f:
+                version, _, leveldata = f.read().partition('\n')
+                if version != blackmango.configure.SAVE_GAME_VERSION:
+                    raise IOError("Version mismatch trying to load saved game data:"
+                       " %s %s" % (version, blackmango.configure.SAVE_GAME_VERSION))
+                stored_level = cPickle.loads(leveldata)
+            import pprint
+            print pprint.pprint(stored_level)
+            self.loading = False
+            self.start_game(stored_level)
+
+        # Don't load the next level until the current update has completed
+        # (otherwise Pyglet will barf when you start to tear down Sprites that
+        # it is in the middle of updating).
+        pyglet.clock.schedule_once(loader, 1)
+
+    @loading_pause
     def start_game(self, level_data):
+
+        self.loading = True
 
         if self.current_level:
             oldlevel = self.current_level
             self.current_level = None
             oldlevel.destroy()
+            self.player.delete()
 
         # Initialize level and player
         self.current_level = blackmango.levels.BasicLevel(
@@ -96,6 +132,10 @@ class GameEngine(object):
         self.player.world_location = starting_location
         self.player.translate()
 
+        self.loading = False
+
+        blackmango.configure.logger.info("Game started: %s" % 
+                repr(self.current_level))
 
     def register_draw(self, f):
         """
@@ -104,6 +144,7 @@ class GameEngine(object):
         """
         self.draw_events.add(f)
 
+    @loading_pause
     def on_draw(self):
         """
         To be called by the GameWindow object when it triggers the on_draw
@@ -114,13 +155,14 @@ class GameEngine(object):
         for f in self.draw_events:
             f()
 
+    @loading_pause
     def input_tick(self, keyboard):
         """
         On each input tick, pass the current keyboard state in for the engine
         to handle (obviously, only if the engine should be dealing with that
         sort of thing at the time).
         """
-            
+
         if keyboard[pyglet.window.key.UP]:
             self.player.move(self.current_level, 0, -1)
         elif keyboard[pyglet.window.key.DOWN]:
@@ -135,6 +177,7 @@ class GameEngine(object):
         elif keyboard[pyglet.window.key.L]:
             self.load_game()
 
+    @loading_pause        
     def game_tick(self):
 
         if self.current_level:

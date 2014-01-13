@@ -54,6 +54,10 @@ class BasePortalMaterial(BaseMaterial):
         self.is_portal = 1
         self.destination = destination
 
+        self.kwargs = {
+            'destination': destination,        
+        }
+
     def interaction_callback(self, level, mob):
         """
         This is called by the mob object when it steps onto the material.

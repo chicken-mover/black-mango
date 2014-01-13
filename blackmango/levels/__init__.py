@@ -62,6 +62,11 @@ class BasicLevel(object):
         for floor, block_data in self.blocks.items():
             for y, row in enumerate(block_data):
                 for x, v in enumerate(row):
+                    # Check for a block for this location
+                    try:
+                        v = self.blocks[floor][y][x]
+                    except (IndexError, ValueError):
+                        v = None
                     if v:
                         if isinstance(v, tuple):
                             # This is for portals, but might be useful for
@@ -78,15 +83,15 @@ class BasicLevel(object):
                             # basic block init.
                             material = blackmango.materials.materiallist.MATERIALS[v]
                             block = material(x = x, y = y, z = floor)
-                        self.blocks[floor][y][x] = block
                         block.visible = floor == self.current_floor
                         block.translate()
                         self.blocklist.append(block)
+                        self.set_block(block, x, y, floor)
                     # Check to see if there is a mob for this location
                     try:
                         v = self.mobs[floor][y][x]
                     except (IndexError, KeyError):
-                        continue
+                        v = None
                     if v:
                         if isinstance(v, tuple):
                             mob = blackmango.mobs.moblist.MOBS[v[0]]
@@ -100,11 +105,11 @@ class BasicLevel(object):
                         else:
                             m = blackmango.mobs.moblist.MOBS[v]
                             mob = m(x = x, y = y, z = floor)
-                        self.mobs[floor][y][x] = mob
                         mob.visible = floor == self.current_floor
                         mob.world_location = (x, y, floor)
                         mob.translate()
                         self.moblist.append(mob)
+                        self.set_mob(mob, x, y, floor)
 
 
     def switch_floor(self, new_floor):
@@ -141,7 +146,10 @@ class BasicLevel(object):
                 raise IndexError("Bad level coordinates")
             return self.blocks[floor][y][x]
         except IndexError:
-            return blackmango.materials.materiallist.MATERIALS[-1]()
+            if x < self.level_size[0] and y < self.level_size[1]:
+                return None
+            else:
+                return blackmango.materials.materiallist.MATERIALS[-1]()
 
     def set_mob(self, mob, x, y, floor):
         """
@@ -149,9 +157,9 @@ class BasicLevel(object):
         """
         if not floor in self.mobs:
             self.mobs[floor] = []
-        while y + 1 > len(self.mobs[floor]):
+        while len(self.mobs[floor]) < y + 1:
             self.mobs[floor].append([])
-        while x + 1 > len(self.mobs[floor][y]):
+        while len(self.mobs[floor][y]) < x + 1:
             self.mobs[floor][y].append(None)
         self.mobs[floor][y][x] = mob
 
@@ -164,7 +172,7 @@ class BasicLevel(object):
             if x < 0 or y < 0 or floor < 0:
                 raise IndexError("Bad level coordinates")
             return self.mobs[floor][y][x]
-        except IndexError:
+        except (IndexError, KeyError):
             return None
 
     def tick(self):
@@ -208,32 +216,45 @@ class BasicLevel(object):
                     map = 'mobs'
                     lookup_dict = blackmango.mobs.moblist.MOBS
                 for k, t in lookup_dict.items():
-                    if t and isinstance(v, t):
+                    if t and isinstance(item, t):
                         v = k
 
                 # Make sure the floor exists in the map
                 if not floor in saved_level[map]:
                     saved_level[map][floor] = []
 
-                # Make sure the maps have enough slots
+                # Make sure the maps have enough slots to insert our next value
                 while len(saved_level[map][floor]) < y + 1:
                     saved_level[map][floor].append([])
                 while len(saved_level[map][floor][y]) < x + 1:
                     saved_level[map][floor][y].append(None)
+
+                # For re-initializing blocks later. Retrieve the stored kwargs
+                # that they were intialized with.
+                if hasattr(item, 'kwargs'):
+                    v = (v, getattr(item, 'kwargs'))
                     
                 # Save the item in the map
                 saved_level[map][floor][y][x] = v
+
+            # For hackity-hack reasons, make sure that each map contains
+            # all possible squares.
+            for floor in saved_level[map]:
+                while len(saved_level[map][floor]) < self.level_size[1] + 1:
+                    saved_level[map][floor].append([])
+                while len(saved_level[map][floor][y]) < self.level_size[0] + 1:
+                    saved_level[map][floor][y].append(None)
 
         return saved_level
 
     def destroy(self):
         self.scheduled_destroy = True
         for mob in self.moblist:
-            #mob.delete()
-            mob.visible = False
+            mob.delete()
+            #mob.visible = False
         for block in self.blocklist:
-            #block.delete()
-            block.visible = False
+            block.delete()
+            #block.visible = False
             
 
 class BasicLevelTriggers(object):
