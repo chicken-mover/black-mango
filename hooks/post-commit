@@ -2,7 +2,6 @@
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-#read -p "push? [y/N] " val
-#if [ "$val" == "y" ]; then
-    git push origin $BRANCH
-#fi
+echo "Performing automatic push to origin/$BRANCH (CTL-C to abort)"
+sleep 2
+git push origin $BRANCH
