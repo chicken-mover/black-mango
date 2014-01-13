@@ -17,13 +17,6 @@ if __name__ == "__main__":
             'blackmango',
             'blackmango_tests',
         ],
-        #packages = setuptools.find_packages('src'),
-        #package_dir = {'':'src'},
-        #package_data = {
-        #    'blackmango': [
-        #        'assets/images/*',
-        #    ]
-        #},
         install_requires = [
             'pyglet>=1.1.4',
         ],
@@ -31,10 +24,5 @@ if __name__ == "__main__":
             'mock>=1.0.1',
             'nose>=1.3.0',
         ],
-#        entry_points = {
-#            'setuptools.installation': [
-#                'eggsecutable=blackmango:startup.main'
-#            ]
-#        },
         test_suite = 'nose.collector',
     )
