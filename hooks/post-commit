@@ -2,7 +2,7 @@
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-read -p "push? [y/N]" val
-if [ "$val" == "y" ]; then
+#read -p "push? [y/N] " val
+#if [ "$val" == "y" ]; then
     git push origin $BRANCH
-fi
+#fi
