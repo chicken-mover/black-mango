@@ -36,6 +36,8 @@ class BasicLevel(object):
     moblist = []
     blocklist = []
 
+    scheduled_destroy = False
+
     def __init__(self, level_data):
         """
         Read in the level data, and translate the lists of block ids in the
@@ -166,6 +168,8 @@ class BasicLevel(object):
             return None
 
     def tick(self):
+        if self.scheduled_destroy:
+            return
         for mob in self.moblist:
             mob.behavior(self)
 
@@ -197,14 +201,14 @@ class BasicLevel(object):
             for item in items:
                 x, y, floor = item.world_location
                 v = 0
-                if d == 'blocklist':
+                if itemlist == 'blocklist':
                     map = 'blocks'
                     lookup_dict = blackmango.materials.materiallist.MATERIALS
-                elif d == 'moblist':
+                elif itemlist == 'moblist':
                     map = 'mobs'
                     lookup_dict = blackmango.mobs.moblist.MOBS
                 for k, t in lookup_dict.items():
-                    if isinstance(v, t):
+                    if t and isinstance(v, t):
                         v = k
 
                 # Make sure the floor exists in the map
@@ -212,21 +216,24 @@ class BasicLevel(object):
                     saved_level[map][floor] = []
 
                 # Make sure the maps have enough slots
-                while len(saved_level[map][floor]) < x - 1:
+                while len(saved_level[map][floor]) < y + 1:
                     saved_level[map][floor].append([])
-                while len(saved_level[map][floor][x]) < y - 1:
-                    saved_level[map][floor][x].append(None)
+                while len(saved_level[map][floor][y]) < x + 1:
+                    saved_level[map][floor][y].append(None)
                     
                 # Save the item in the map
-                saved_level[d][floor][x][y] = v
+                saved_level[map][floor][y][x] = v
 
         return saved_level
 
     def destroy(self):
-        for mob in self.mobs:
-            mob.delete()
-        for block in self.blocks:
-            block.delete()
+        self.scheduled_destroy = True
+        for mob in self.moblist:
+            #mob.delete()
+            mob.visible = False
+        for block in self.blocklist:
+            #block.delete()
+            block.visible = False
             
 
 class BasicLevelTriggers(object):

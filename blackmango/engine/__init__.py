@@ -10,6 +10,8 @@ initial load/save/new game/credits splash menu shouldn't be dealt with here.
 """
 
 import cPickle
+import errno
+import os
 import pyglet
 
 import blackmango.assets
@@ -44,12 +46,21 @@ class GameEngine(object):
         Right now this just initializes a test level.
         """
         blackmango.configure.logger.info('Initializing new game')
-        self.start_game(blackmango.levels.test_level)
+        self.start_game(blackmango.levels.test_level.LEVEL_DATA)
 
     def save_game(self, filepath = 'autosave.blackmango'):
 
         stored_level = self.current_level.serialize(self.player)
         file = os.path.join(blackmango.system.DIR_SAVEDGAMES, filepath)
+        dir = os.path.dirname(file)
+        try:
+            os.makedirs(dir)
+        except OSError as exc:
+            if exc.errno == errno.EEXIST and os.path.isdir(dir):
+                pass
+            else:
+                raise
+
         with open(file, 'w') as f:
             f.write(blackmango.configure.SAVE_GAME_VERSION + '\n')
             f.write(cPickle.dumps(stored_level))
@@ -58,21 +69,24 @@ class GameEngine(object):
     def load_game(self, filepath = 'autosave.blackmango'):
 
         file = os.path.join(blackmango.system.DIR_SAVEDGAMES, filepath)
-        with open(file, 'w') as f:
+        with open(file) as f:
             version, _, leveldata = f.read().partition('\n')
             if version != blackmango.configure.SAVE_GAME_VERSION:
-                raise IOError("Version mismatch trying to load saved game data")
+                raise IOError("Version mismatch trying to load saved game data:"
+                   " %s %s" % (version, blackmango.configure.SAVE_GAME_VERSION))
             stored_level = cPickle.loads(leveldata)
-        return stored_level
+        self.start_game(stored_level)
 
-    def start_game(self, level):
+    def start_game(self, level_data):
 
         if self.current_level:
-            self.current_level.destroy()
+            oldlevel = self.current_level
+            self.current_level = None
+            oldlevel.destroy()
 
         # Initialize level and player
         self.current_level = blackmango.levels.BasicLevel(
-            level.LEVEL_DATA
+            level_data
         )
         self.player = blackmango.mobs.player.Player()
 
@@ -115,6 +129,11 @@ class GameEngine(object):
             self.player.move(self.current_level, -1, 0)
         elif keyboard[pyglet.window.key.RIGHT]:
             self.player.move(self.current_level, 1, 0)
+
+        elif keyboard[pyglet.window.key.S]:
+            self.save_game()
+        elif keyboard[pyglet.window.key.L]:
+            self.load_game()
 
     def game_tick(self):
 
