@@ -1,154 +1,151 @@
 """
-This module's patch() function will cause all subsequent Pyglet imports in the
-process to return a mocked version of Pyglet. This is to allow for testing,
-when we might want to inspect how Pyglet is being called, but we don't want it
-to actually draw any graphics or do any work.
+A mocked Pyglet module for use with unit testing.
 
-In order for this to work, mock_pyglet must be imported and patch() called
-before any Pyglet imports are called.
-
->>> import mock_pyglet
->>> mock_pyglet.patch()
->>> import pyglet
->>> print repr(pyglet)
-<Mock id='167071564'>
-
-The patch() function is aware of whether it has been called before, and
-will return immediately if Pyglet has already been mocked.
+We have to mock certain internals for the app to run.
 """
 
-import ctypes
+import copy
 import importlib
-import inspect
 import mock
-import pkgutil
 import pyglet
-import re
 import sys
 import time
 
-__all__ = ['__patch__']
+mock_classes = [
+    'pyglet.clock.ClockDisplay',
+    'pyglet.graphics.Batch',
+    'pyglet.graphics.OrderedGroup',
+    'pyglet.image.SolidColorImagePattern',
+    'pyglet.sprite.Sprite',
+    #'pyglet.window.Window',
+]
 
-class ExtendedMagicMock(mock.MagicMock):
+mock_functions = [
+    'pyglet.clock.schedule_once',
+]
+
+automock_modules = [
+    #'pyglet.window.key',
+]
+
+mocks = {
+    'pyglet': pyglet,
+    'pyglet.app': pyglet.app,
+    'pyglet.clock': pyglet.clock,
+    'pyglet.graphics': pyglet.graphics,
+    'pyglet.image': pyglet.image,
+    'pyglet.sprite': pyglet.sprite,
+    #'pyglet.window': pyglet.window,
+}
+
+scheduled = set()
+
+class EventLoopMock(object):
+
+    def __init__(self):
+        self._run = True
+
+    def run(self):
+        global scheduled
+        while self._run:
+            for f in scheduled:
+                f(1)
+            time.sleep(.5)
+
+class WindowMock(mock.MagicMock):
+
+    WINDOW_STYLE_BORDERLESS = 1
 
     def __init__(self, *args, **kwargs):
-        # Absorb whatever weird args and kwargs the app will try to instatiate
-        # these classes with.
-        super(ExtendedMagicMock, self).__init__()
-        
+        super(WindowMock, self).__init__()
 
-def patch(print_debug = False):
+    def get_size(self):
+        return (800, 800)
+
+    def push_handlers(self, *args, **kwargs):
+        pass
+
+def schedule(f):
+    global scheduled
+    scheduled.add(f)
+
+pyglet.clock.schedule = schedule
+
+pyglet.app.EventLoop = EventLoopMock
+pyglet.window.Window = WindowMock
+
+class ExtendedMagicMock(mock.MagicMock):
+    pass
+
+def create_subclassable_mock(cls):
     """
-    Obtain a spec of the `pyglet` package recursively, and replace it with a
-    series of `mock.create_autospec()`-generated Mock objects.
-
-    May be called as many times as desired, as this function will return
-    immediately if it detects that Pyglet has already been mocked.
+    Given a class <cls>, create a mock that can be subclassed and instantiated.
     """
-    global pyglet
-
-    if isinstance(pyglet, mock.Mock):
-        if print_debug:
-            print "Pyglet has already been mocked, skipping patch."
-        return
-
-    if print_debug:
-        print "Generating a mocked Pyglet module, please be patient ..."
-        time.sleep(2)
-
-    try:
-        # If we come to rely on PIL we should take this out
-        import Image
-    except ImportError:
-        Image = None
-
-    # Fix error thrown on non-Windows systems when we iterate pyglet
-    ctypes.oledll = mock.Mock()
-
-    mocks = {
-        'pyglet': mock.Mock()        
-    }
-
-    for i in pkgutil.walk_packages(pyglet.__path__, pyglet.__name__ + '.'):
-        loader, name, ispkg = i
-        if print_debug:
-            print name
-
-        # Platform-specific stuff will, naturally, fail across platforms as we try
-        # to blindly import it with pkgutil. Instead, skip the platform specific
-        # stuff that the app shouldn't be calling anyway.
-        #
-        # This module will have to be run on several different setups before this
-        # list is definitive, because I'm too lazy to dig through all of Pyglet's
-        # code to do it in advance.
-        #
-        # If we end up needing some of these missing, unmocked modules for testing,
-        # probably best to put them back in manually.
-        #
-        if 'win32' in name or 'carbon' in name or \
-           'media.drivers' in name or \
-           name.startswith('pyglet.gl.') or \
-           name.startswith('pyglet.com') or \
-           name.endswith('.gdiplus') or \
-           name.endswith('.quicktime') or \
-           name.endswith('.avbin') or \
-           (not Image and '.pil' in name):
-            if print_debug:
-                print "  (Skipping", name, ")"
+    mockcls = copy.deepcopy(ExtendedMagicMock)
+    proplist = dir(cls)
+    for prop in proplist:
+        # Ignore magic methods and 'protected' props.
+        if prop.startswith('_'):
             continue
+        p = mock.create_autospec(getattr(cls, prop))
+        setattr(mockcls, prop, p)
+    return mockcls
 
-        m = importlib.import_module(name)
+def set_mockobj(module_name, parent_name, mock_name, mockobj):
+    global mocks
+    if module_name in mocks:
+        mockedmod = mocks[module_name]
+    else:
+        mockedmod = mock.Mock()
+        mocks[module_name] = mockedmod
+    setattr(mockedmod, mock_name, mockobj)
+    setattr(mocks[parent_name], module_name, mockedmod)
+
+
+def patch():
+    """
+    Replace parts of the Pyglet module with mocks for testing.
+    """
+    global mocks, pyglet
+
+    for name in mock_classes:
+        parts = name.split('.')
+        parent = '.'.join(parts[:-2])
+        module = '.'.join(parts[:-1])
+        clsname = parts[-1]
+
+        m = importlib.import_module(module)
+        cls = getattr(m, clsname)
+        mockedcls = create_subclassable_mock(cls)
+
+        set_mockobj(module, parent, clsname, mockedcls)
+
+    for name in mock_functions:
+        parts = name.split('.')
+        parent = '.'.join(parts[:-2])
+        module = '.'.join(parts[:-1])
+        fname = parts[-1]
+
+        m = importlib.import_module(module)
+        fn = getattr(m, fname)
+        mockedfn = mock.create_autospec(fn)
+
+        set_mockobj(module, parent, fname, mockedfn)
+
+    for name in automock_modules:
+
+        parts = name.split('.')
+        parent = '.'.join(parts[:-1])
+        thisname = parts[-1]
+        module = name
+
+        m = importlib.import_module(module)
         mockedmod = mock.create_autospec(m)
-        c = 0
-        for prop in dir(m):
-            # Don't mock 'private' props or 'constant' props
-            if prop.startswith('_'):
-                continue
-            if re.match(r'^[A-Z_]+$', prop) or prop.startswith('c_') or \
-               prop.startswith('struct_'):
-                if print_debug:
-                    print "    (Skipping c/const/struct prop %s)" % prop
-                continue
-            # There are eight bajillion glSometing props, none of which need a mock
-            if re.match(r'gl[A-Za-z0-9]+', prop):
-                continue
-            p = getattr(m, prop)
-            # Pyglet submodules will get loaded as we iterate. Builtins and
-            # foreign modules shouldn't be mocked, as they won't be accessed
-            # by our program via this package.
-            if inspect.isbuiltin(p) or inspect.ismodule(p):
-                if print_debug:
-                    print "    (Skipping builtin or module %s)" % prop
-                continue
-            if print_debug:
-                print '  -',prop
-            if inspect.isclass(p):
-                # If it's a class, don't instantiate a mock
-                mockedprop = ExtendedMagicMock
-                # We still have to mock individual properties if they aren't
-                # callables
-                for subprop in dir(p):
-                    if subprop.startswith('_'):
-                        continue
-                    sp = getattr(p, subprop)
-                    if callable(sp):
-                        continue
-                    setattr(mockedprop, subprop, mock.create_autospec(sp))
-            else:
-                mockedprop = mock.create_autospec(p)
-            setattr(mockedmod, prop, mockedprop)
-            c += 1
-        if print_debug:
-            print "  Set %s mocked props" % c
 
         mocks[name] = mockedmod
+        setattr(mocks[parent], thisname, mockedmod)
 
-        hierarchy = name.split('.')
-        thisname = hierarchy[-1]
-        parent = '.'.join(hierarchy[:-1])
-        if parent in mocks:
-            setattr(mocks[parent], thisname, mockedmod)
-
-    mock_pyglet = mocks['pyglet']
-    sys.modules['pyglet'] = mock_pyglet
-    pyglet = mock_pyglet
+    sys.modules['pyglet'] = mocks['pyglet']
+    pyglet = mocks['pyglet']
+    
+    return mocks['pyglet']

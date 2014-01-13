@@ -29,19 +29,24 @@ class AppTestSuite(unittest.TestCase):
         """
         global pyglet, blackmango
         blackmango_tests.mock_pyglet.patch()
-        import blackmango.app
-        patcher = mock.patch.object(blackmango.app.BlackMangoApp, '__bases__', (mock.Mock,))
-        patcher.is_local = True
         import pyglet
         import blackmango
+        #blackmango.main()
+        #return
+        self.appthread = threading.Thread(target = blackmango.main)
+        self.appthread.start()
+
+        time.sleep(2)
+
+        self.assertTrue(self.appthread.is_alive())
+
         self.assertIsInstance(blackmango.blackmangoapp, pyglet.app.EventLoop)
         self.assertIsNotNone(blackmango.engine)
         self.assertIsInstance(blackmango.main_window, pyglet.window.Window)
-        blackmango.blackmangoapp.run()
-        #self.appthread = threading.Thread(
-        #        target = blackmango.blackmangoapp.run)
-        self.appthread.start()
-        self.assertTrue(self.appthread.is_alive())
+
+    def tearDown(self):
+        blackmango.blackmangoapp._run = False
+
 
     def test_game_start(self):
         """

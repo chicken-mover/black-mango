@@ -45,12 +45,15 @@ class GameWindow(pyglet.window.Window):
         self.set_location(1, 1)
 
         self.fps_display = pyglet.clock.ClockDisplay()
+        
     def on_draw(self):
         self.clear()
         self.engine.on_draw()
         self.fps_display.draw()
         
     def tick(self, dt):
+
+        print self.keyboard[pyglet.window.key.Q]
 
         if self.keyboard[pyglet.window.key.Q]:
             sys.exit(0)
