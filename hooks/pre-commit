@@ -1,10 +1,10 @@
 #!/bin/sh
 
-BRANCH=$(git branch)
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 # We don't care about version number validation if we aren't on the main master
 # branch.
-if [ "$BRANCH" != "* master" ]; then
+if [ "$BRANCH" != "master" ]; then
     exit 0
 fi
 
