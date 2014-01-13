@@ -5,11 +5,8 @@ Black Mango is a puzzle game.
 All rights reserved.
 """
 
-
-
 import argparse
 
-#import blackmango
 import blackmango.app
 import blackmango.configure
 import blackmango.engine
@@ -30,11 +27,6 @@ ARGUMENTS = (
                 ' match one of the log levels found in the built-in `logging` '
                 'module.',
         'type': int,
-    }),
-    ('--test', {
-        'dest': 'test',
-        'help': 'Run the test suite instead of the normal app.',
-        'action': 'store_true',
     }),
 )
 

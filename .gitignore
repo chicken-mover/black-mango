@@ -4,8 +4,8 @@
 *.pyo
 *.swp
 *.swo
-__pycache__
 *.swn
+__pycache__
 
 # Python packaging junk
 *.egg*/
@@ -19,7 +19,7 @@ __pycache__
 build/
 dist/
 spec/
+# Just in case the build directory is leaking
 *.spec
-
-# Test leftovers
-blackmango_tests/mock_pyglet.cPickle
+*.o
+*.so
