@@ -31,12 +31,11 @@ class GameEngine(object):
     current_level = None
     player = None
 
+    draw_events = set()
+
     def __init__(self):
-
-        self.draw_events = set()
-
-        #print blackmango.assets.load_image('placeholder_oracle.png')
-
+        pass
+    
     def new_game(self):
         """
         Start a new game. (Update this documentation when the function is more
@@ -46,7 +45,6 @@ class GameEngine(object):
         """
         blackmango.configure.logger.info('Initializing new game')
         self.start_game(blackmango.levels.test_level)
-
 
     def save_game(self, filepath = 'autosave.blackmango'):
 
