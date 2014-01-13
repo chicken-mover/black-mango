@@ -9,6 +9,8 @@ The level's `tick` method is used to iterate and call the `behavior` method on
 each mob in the level.
 """
 
+import cPickle
+
 import blackmango.materials
 import blackmango.materials.materiallist
 import blackmango.mobs
@@ -167,7 +169,7 @@ class BasicLevel(object):
         for mob in self.moblist:
             mob.behavior(self)
 
-    def serialize(self):
+    def serialize(self, player):
         """
         Return a cPickle-encodable object that represents the current level
         state.
@@ -178,17 +180,15 @@ class BasicLevel(object):
 
         saved_level = {
             'level_size': self.level_size,
-            'starting_location': self.starting_location,
+            'starting_location': player.world_location,
 
             'next_level': self.next_level,
             'previous_level': self.previous_level,
 
-            # Get this by testing for instances of player when iterating the
-            # moblist? Or as an argument passed in
-            'current_location': None,
-
             'blocks': {},
             'mobs': {},
+
+            'triggers': self.triggers,
         }
 
         # Now read the current block and mob states and record them
@@ -222,6 +222,13 @@ class BasicLevel(object):
 
         return saved_level
 
-class BasicLevelBehavior(object):
+    def destroy(self):
+        for mob in self.mobs:
+            mob.delete()
+        for block in self.blocks:
+            block.delete()
+            
+
+class BasicLevelTriggers(object):
 
     pass

@@ -6,6 +6,6 @@ produces.
 
 import blackmango.levels
 
-class LevelBehavior(blackmango.levels.BasicLevelBehaviour):
+class LevelTriggers(blackmango.levels.BasicLevelTriggers):
 
     pass

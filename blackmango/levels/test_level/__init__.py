@@ -7,7 +7,7 @@ Somehow we will need to work in level scripting as well, possibly as a seperate
 LevelBehavior class?
 """
 
-#from blackmango.levels.test_level.behavior import LevelBehavior
+from blackmango.levels.test_level.triggers import LevelTriggers
 
 LEVEL_DATA = {
         
@@ -17,6 +17,8 @@ LEVEL_DATA = {
 
     'next_level': None,
     'previous_level': None,
+
+    'triggers': LevelTriggers(),
 
     'blocks': {
 

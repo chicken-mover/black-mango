@@ -9,6 +9,7 @@ GameEngine does NOT handle anything outside of the ongoing game. So the
 initial load/save/new game/credits splash menu shouldn't be dealt with here.
 """
 
+import cPickle
 import pyglet
 
 import blackmango.assets
@@ -16,6 +17,7 @@ import blackmango.configure
 import blackmango.levels
 import blackmango.levels.test_level
 import blackmango.mobs.player
+import blackmango.system
 
 game_engine = None
 
@@ -42,12 +44,37 @@ class GameEngine(object):
 
         Right now this just initializes a test level.
         """
-
         blackmango.configure.logger.info('Initializing new game')
-        
+        self.start_game(blackmango.levels.test_level)
+
+
+    def save_game(self, filepath = 'autosave.blackmango'):
+
+        stored_level = self.current_level.serialize(self.player)
+        file = os.path.join(blackmango.system.DIR_SAVEDGAMES, filepath)
+        with open(file, 'w') as f:
+            f.write(blackmango.configure.SAVE_GAME_VERSION + '\n')
+            f.write(cPickle.dumps(stored_level))
+        return True
+
+    def load_game(self, filepath = 'autosave.blackmango'):
+
+        file = os.path.join(blackmango.system.DIR_SAVEDGAMES, filepath)
+        with open(file, 'w') as f:
+            version, _, leveldata = f.read().partition('\n')
+            if version != blackmango.configure.SAVE_GAME_VERSION:
+                raise IOError("Version mismatch trying to load saved game data")
+            stored_level = cPickle.loads(leveldata)
+        return stored_level
+
+    def start_game(self, level):
+
+        if self.current_level:
+            self.current_level.destroy()
+
         # Initialize level and player
         self.current_level = blackmango.levels.BasicLevel(
-            blackmango.levels.test_level.LEVEL_DATA        
+            level.LEVEL_DATA
         )
         self.player = blackmango.mobs.player.Player()
 
@@ -57,10 +84,6 @@ class GameEngine(object):
         self.player.world_location = starting_location
         self.player.translate()
 
-
-    def save_game(self, filepath = 'autosave.blackmango'):
-
-        stored_level = self.current_level.serialize()
 
     def register_draw(self, f):
         """
@@ -85,17 +108,15 @@ class GameEngine(object):
         to handle (obviously, only if the engine should be dealing with that
         sort of thing at the time).
         """
-
-        if self.player:
             
-            if keyboard[pyglet.window.key.UP]:
-                self.player.move(self.current_level, 0, -1)
-            elif keyboard[pyglet.window.key.DOWN]:
-                self.player.move(self.current_level, 0, 1)
-            elif keyboard[pyglet.window.key.LEFT]:
-                self.player.move(self.current_level, -1, 0)
-            elif keyboard[pyglet.window.key.RIGHT]:
-                self.player.move(self.current_level, 1, 0)
+        if keyboard[pyglet.window.key.UP]:
+            self.player.move(self.current_level, 0, -1)
+        elif keyboard[pyglet.window.key.DOWN]:
+            self.player.move(self.current_level, 0, 1)
+        elif keyboard[pyglet.window.key.LEFT]:
+            self.player.move(self.current_level, -1, 0)
+        elif keyboard[pyglet.window.key.RIGHT]:
+            self.player.move(self.current_level, 1, 0)
 
     def game_tick(self):
 

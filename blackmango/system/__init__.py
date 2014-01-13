@@ -65,4 +65,3 @@ except AttributeError:
 
 DIR_APPDATA = path_expansion(DIR_APPDATA)
 DIR_SAVEDGAMES = path_expansion(DIR_SAVEDGAMES)
-
