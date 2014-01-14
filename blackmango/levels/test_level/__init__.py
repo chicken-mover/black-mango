@@ -12,7 +12,7 @@ from blackmango.levels.test_level.triggers import LevelTriggers
 LEVEL_DATA = {
         
     # X, Y, Z
-    'level_size': (10, 10, 1),
+    'level_size': (10, 10, 4),
     'starting_location': (5, 5, 3),
 
     'next_level': None,
