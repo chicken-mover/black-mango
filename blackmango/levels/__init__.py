@@ -106,8 +106,8 @@ class BasicLevel(object):
         """
         for f in [self.blocks, self.mobs]:
             for floor in [self.current_floor, new_floor]:
-                d = f[floor]
-                for coords, m in d.items():
+                items = filter(lambda x: x[0][2] == floor, f.items())
+                for k, m in items:
                     if floor != new_floor:
                         m.visible = False
                     else:
@@ -120,9 +120,7 @@ class BasicLevel(object):
         """
         block.visible = floor == self.current_floor
         block.translate()
-        if not floor in self.blocks:
-            self.blocks[floor] = {}
-        self.blocks[floor][(x, y)] = block
+        self.blocks[(x, y, floor)] = block
 
     def get_block(self, x, y, floor):
         """
@@ -130,7 +128,7 @@ class BasicLevel(object):
         invalid, returns an instance of VoidMaterial.
         """
         try:
-            return self.blocks[floor][(x, y)]
+            return self.blocks[(x, y, floor)]
         except (IndexError, KeyError):
             return None
 
@@ -140,9 +138,7 @@ class BasicLevel(object):
         """
         mob.visible = floor == self.current_floor
         mob.translate()
-        if not floor in self.mobs:
-            self.mobs[floor] = {}
-        self.mobs[floor][(x, y)] = mob
+        self.mobs[(x, y, floor)] = mob
 
     def get_mob(self, x, y, floor):
         """
@@ -150,7 +146,7 @@ class BasicLevel(object):
         invalid, returns None.
         """
         try:
-            return self.mobs[floor][(x, y)]
+            return self.mobs[(x, y, floor)]
         except (IndexError, KeyError):
             return None
 
@@ -197,37 +193,33 @@ class BasicLevel(object):
                             map[floor][y].append(None)
 
         # Now read the current block and mob states and record them
-        for itemlist in ('blocks', 'mobs'):
-            items = getattr(self, itemlist)
-            for floor, spritelist in items.items():
-                for item in spritelist:
-                    x, y, floor = item.world_location
-                    if itemlist == 'blocks':
-                        lookup_dict = blackmango.materials.materiallist.MATERIALS
-                        v = self.get_block(x, y, floor) or 0
-                    elif itemlist == 'mobs':
-                        lookup_dict = blackmango.mobs.moblist.MOBS
-                        v = self.get_mob(x, y, floor) or 0
-                    for k, t in lookup_dict.items():
-                        if t and isinstance(item, t):
-                            v = k
+        for lookuplist in ('blocks', 'mobs'):
+            lookuplist = getattr(self, lookuplist)
+            for coords, item in lookuplist.items():
+                v = 0
+                if itemlist == 'blocks':
+                    lookup_dict = blackmango.materials.materiallist.MATERIALS
+                elif itemlist == 'mobs':
+                    lookup_dict = blackmango.mobs.moblist.MOBS
+                for k, t in lookup_dict.items():
+                    if t and isinstance(item, t):
+                        v = k
 
-                # For re-initializing blocks later. Retrieve the stored kwargs
-                # that they were intialized with.
-                if hasattr(item, 'kwargs'):
-                    v = (v, getattr(item, 'kwargs'))
-                    
-                # Save the item in the map
-                saved_level[itemlist][floor][y][x] = v
+            # For re-initializing blocks later. Retrieve the stored kwargs
+            # that they were intialized with.
+            if hasattr(item, 'kwargs'):
+                v = (v, getattr(item, 'kwargs'))
+
+            # Save the item in the map
+            saved_level[itemlist][floor][y][x] = v
 
         return saved_level
 
     def destroy(self):
         self.scheduled_destroy = True
         for lookuplist in [self.mobs, self.blocks]:
-            for floor, listitems in lookuplist.items():
-                for coords, sprite in listitems.items():
-                    sprite.delete()
+            for coords, sprite in lookuplist.items():
+                sprite.delete()
             
 
 class BasicLevelTriggers(object):
