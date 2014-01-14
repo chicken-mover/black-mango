@@ -17,7 +17,7 @@ import blackmango.ui
 ARGUMENTS = (
     ('--data-dir', {
         'dest': 'data_dir',
-        'help': 'On Linux and non-Mac OS POSIX systems, this specifies the '
+        'help': 'On Linux and non-Darwin POSIX systems, this specifies the '
                 'directory into which application data and saved games are '
                 'placed. The default value is ~/.blackmango.',
     }),
@@ -42,10 +42,10 @@ if __name__ == "__main__":
     if args.debug:
         blackmango.configure.DEBUG = args.debug
     if args.data_dir:
-        blackmango.configure.DATA_DIR = args.data_dir
+        blackmango.configure.POSIX_DATA_DIR = args.data_dir
 
     blackmango.configure.setup_logger(blackmango.configure.DEBUG)
-    
+
     blackmango.engine.init()
     blackmango.ui.init()
     blackmango.app.init()

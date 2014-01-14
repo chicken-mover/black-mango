@@ -15,7 +15,11 @@ game_window = None
 
 # There is only one GameWindow object active at any one time.
 def init(*args, **kwargs):
+    """
+    Called by the central startup routine during initialization.
+    """
     global game_window
+    blackmango.configure.logger.info("Initializing GameWindow as game_window")
     game_window = GameWindow(*args, **kwargs)
 
 class GameWindow(pyglet.window.Window):

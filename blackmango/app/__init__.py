@@ -7,10 +7,16 @@ class. They are both accessible as attributes of this class.
 
 import pyglet
 
+import blackmango.configure
+
 game_app = None
 
 def init(*args, **kwargs):
+    """
+    Called by the central startup routine during initialization.
+    """
     global game_app
+    blackmango.configure.logger.info("Initializing BlackMangoApp as game_app")
     game_app = BlackMangoApp(*args, **kwargs)
 
 class BlackMangoApp(pyglet.app.EventLoop):

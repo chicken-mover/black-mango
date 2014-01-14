@@ -22,13 +22,23 @@ import blackmango.mobs.player
 import blackmango.system
 
 game_engine = None
+logger = blackmango.configure.logger
 
 # There is only one GameEngine object active at any one time.
 def init(*args, **kwargs):
+    """
+    Called by the central startup routine during initialization.
+    """
     global game_engine
+    blackmango.configure.logger.info("Initializing GameEngine as game_engine")
     game_engine = GameEngine(*args, **kwargs)
 
 def loading_pause(f):
+    """
+    Certain GameEngine methods need to be ignored while some loading operations
+    take place, otherwise Pyglet will try to do things like redraw deleted
+    sprites.
+    """
     def wrapped(self, *args, **kwargs):
         if self.loading:
             return
@@ -44,11 +54,10 @@ class GameEngine(object):
     draw_events = set()
 
     # During loading events, we don't want to tick the game or perform certain
-    # other actions on running event loops
+    # other actions on running event loops. See the @loading_pause decorator.
     loading = False
 
-    def __init__(self):
-        pass
+    def __init__(self): pass
     
     @loading_pause
     def new_game(self):
@@ -58,7 +67,7 @@ class GameEngine(object):
 
         Right now this just initializes a test level.
         """
-        blackmango.configure.logger.info("Starting new game...")
+        logger.info("Starting new game...")
         self.start_game(blackmango.levels.test_level.LEVEL_DATA)
 
     @loading_pause
@@ -69,7 +78,7 @@ class GameEngine(object):
         file = os.path.join(blackmango.system.DIR_SAVEDGAMES, filepath)
         dir = os.path.dirname(file)
         
-        blackmango.configure.logger.info("Saving game: %s" % file)
+        logger.info("Saving game: %s" % file)
         
         try:
             os.makedirs(dir)
@@ -88,19 +97,19 @@ class GameEngine(object):
     def load_game(self, filepath = 'autosave.blackmango'):
 
         self.loading = True
-        blackmango.configure.logger.info("Scheduling load game...")
+        logger.info("Scheduling load game...")
+
+        current_save_vesion = blackmango.configure.SAVE_GAME_VERSION
 
         def loader(dt):
             file = os.path.join(blackmango.system.DIR_SAVEDGAMES, filepath)
-            blackmango.configure.logger.info("Loading game: %s" % file)
+            logger.info("Loading game: %s" % file)
             with open(file) as f:
                 version, _, leveldata = f.read().partition('\n')
-                if version != blackmango.configure.SAVE_GAME_VERSION:
-                    raise IOError("Version mismatch trying to load saved game data:"
-                       " %s %s" % (version, blackmango.configure.SAVE_GAME_VERSION))
+                if version != current_save_vesion:
+                    raise IOError("Version mismatch trying to load saved game"
+                       " data: %s:%s" % (version, current_save_vesion))
                 stored_level = cPickle.loads(leveldata)
-            import pprint
-            print pprint.pprint(stored_level)
             self.loading = False
             self.start_game(stored_level)
 
@@ -121,9 +130,7 @@ class GameEngine(object):
             self.player.delete()
 
         # Initialize level and player
-        self.current_level = blackmango.levels.BasicLevel(
-            level_data
-        )
+        self.current_level = blackmango.levels.BasicLevel(level_data)
         self.player = blackmango.mobs.player.Player()
 
         # Place the player into the level
@@ -134,7 +141,7 @@ class GameEngine(object):
 
         self.loading = False
 
-        blackmango.configure.logger.info("Game started: %s" % 
+        logger.info("Game started: %s" % 
                 repr(self.current_level))
 
     def register_draw(self, f):
@@ -142,6 +149,7 @@ class GameEngine(object):
         Add a callable <f> to be called when the GameEngine's `on_draw` handler
         is triggered.
         """
+        logger.info('Registering draw event: %s' % repr(f))
         self.draw_events.add(f)
 
     @loading_pause

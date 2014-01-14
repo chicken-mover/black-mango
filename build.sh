@@ -16,7 +16,8 @@ if hash python2.7 >/dev/null 2>&1; then
     PYTHON=python2.7
 fi
 
-# This option is recommended under Windows, according to the PyInstaller docs.
+# This option is not recommended under Windows, according to the PyInstaller
+# docs.
 if [ "$(expr substr $(uname -s) 1 6 2>&1)" == "CYGWIN" ]; then
     STRIP_SYMBOLS=''
 else
@@ -29,7 +30,7 @@ ALL_OPTIONS=(
     --specpath=./spec/
     --log-level=INFO
     --name=BlackMango
-    #--onefile
+    --onefile
     --windowed
 )
 
@@ -41,7 +42,7 @@ NODEBUG_OPTIONS=(
     $STRIP_SYMBOLS
 )
 
-RESOURCE_PATH='src/assets/'
+RESOURCE_PATH='assets/'
 RESOURCES=()
 for resource in $(find $RESOURCE_PATH -type f); do
     r="--resource=$resource,DATA,$(basename $resource)"
@@ -49,7 +50,7 @@ for resource in $(find $RESOURCE_PATH -type f); do
     RESOURCES+=($r)
 done
 
-SCRIPTPATH="src/blackmango/__init__.py"
+SCRIPTPATH="blackmango/__init__.py"
 
 function make() {
     $PYTHON -OO $PROG ${ALL_OPTIONS[@]} ${NODEBUG_OPTIONS[@]} ${RESOURCES[@]} \
