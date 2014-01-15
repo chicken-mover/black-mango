@@ -13,6 +13,7 @@ import blackmango.engine
 import blackmango.materials
 import blackmango.mobs
 import blackmango.ui
+import blackmango.ui.labels
 
 ARGUMENTS = (
     ('--data-dir', {
@@ -51,6 +52,7 @@ if __name__ == "__main__":
     blackmango.app.init()
 
     for f in [
+        blackmango.ui.lables.titles_batch.draw,
         blackmango.materials.materials_batch.draw,
         blackmango.mobs.mobs_batch.draw,
     ]:

@@ -10,7 +10,9 @@ LevelBehavior class?
 from blackmango.levels.test_level.triggers import LevelTriggers
 
 LEVEL_DATA = {
-        
+
+    'title_card': 'The Outer Court',
+
     # X, Y, Z
     'level_size': (10, 10, 4),
     'starting_location': (5, 5, 3),

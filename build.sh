@@ -62,7 +62,7 @@ function clean() {
     rm -rfv ./build/
     rm -rfv ./spec/
     rm -vf *.spec
-    for f in $(find . -type f | grep -E "\.py(c|o)$"); do
+    for f in $(find . -type f -name '*.py[co]'); do
         rm -rv $f
     done
 }

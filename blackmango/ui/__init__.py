@@ -26,8 +26,6 @@ class GameWindow(pyglet.window.Window):
 
     def __init__(self):
 
-        global game_window_size
-
         if blackmango.configure.FULLSCREEN:
             super(GameWindow, self).__init__(
                     fullscreen = blackmango.configure.FULLSCREEN,
