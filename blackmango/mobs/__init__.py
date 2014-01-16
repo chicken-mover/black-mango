@@ -51,7 +51,7 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
         if mob and mob.is_solid:
             return
 
-        level.set_mob(None, *self.world_location)
+        level.unset_mob(*self.world_location)
         level.set_mob(self, *dest)
         self.world_location = dest
         
@@ -90,7 +90,7 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
         if mob and mob.is_solid:
             return
 
-        level.set_mob(None, *self.world_location)
+        level.unset_mob(*self.world_location)
         level.set_mob(self, *dest)
 
         self.world_location = dest

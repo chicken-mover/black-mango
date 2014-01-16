@@ -32,7 +32,7 @@ class Player(blackmango.mobs.BasicMobileSprite):
         want to move the currently viewed level floor, too.
         """
         dest = (x, y, z)
-        level.set_mob(None, *self.world_location)
+        level.unset_mob(*self.world_location)
         level.set_mob(self, *dest)
         self.world_location = dest
         if level.current_floor != z:

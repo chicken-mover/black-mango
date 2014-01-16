@@ -20,6 +20,7 @@ import blackmango.levels
 import blackmango.levels.test_level
 import blackmango.mobs.player
 import blackmango.system
+import blackmango.ui.labels
 
 game_engine = None
 logger = blackmango.configure.logger
@@ -67,8 +68,13 @@ class GameEngine(object):
 
         Right now this just initializes a test level.
         """
-        logger.info("Starting new game...")
+        blackmango.configure.logger.info("Starting new game...")
         self.start_game(blackmango.levels.test_level.LEVEL_DATA)
+
+        self.main_title = blackmango.ui.labels.TitleCard('BLACK MANGO')
+        self.register_draw(
+            blackmango.ui.labels.titles_batch.draw
+        )
 
     @loading_pause
     def save_game(self, filepath = 'autosave.blackmango'):
@@ -78,7 +84,7 @@ class GameEngine(object):
         file = os.path.join(blackmango.system.DIR_SAVEDGAMES, filepath)
         dir = os.path.dirname(file)
         
-        logger.info("Saving game: %s" % file)
+        blackmango.configure.logger.info("Saving game: %s" % file)
         
         try:
             os.makedirs(dir)
@@ -97,13 +103,13 @@ class GameEngine(object):
     def load_game(self, filepath = 'autosave.blackmango'):
 
         self.loading = True
-        logger.info("Scheduling load game...")
+        blackmango.configure.logger.info("Scheduling load game...")
 
         current_save_vesion = blackmango.configure.SAVE_GAME_VERSION
 
         def loader(dt):
             file = os.path.join(blackmango.system.DIR_SAVEDGAMES, filepath)
-            logger.info("Loading game: %s" % file)
+            blackmango.configure.logger.info("Loading game: %s" % file)
             with open(file) as f:
                 version, _, leveldata = f.read().partition('\n')
                 if version != current_save_vesion:
@@ -141,7 +147,7 @@ class GameEngine(object):
 
         self.loading = False
 
-        logger.info("Game started: %s" % 
+        blackmango.configure.logger.info("Game started: %s" % 
                 repr(self.current_level))
 
     def register_draw(self, f):
@@ -149,8 +155,15 @@ class GameEngine(object):
         Add a callable <f> to be called when the GameEngine's `on_draw` handler
         is triggered.
         """
-        logger.info('Registering draw event: %s' % repr(f))
+        blackmango.configure.logger.info('Registering draw event: %s' % repr(f))
         self.draw_events.add(f)
+
+    def unregister_draw(self, f):
+        """
+        Remove a callable <f> from the pool of draw events.
+        """
+        blackmango.configure.logger.info('Unregistering draw event: %s' % repr(f))
+        self.draw_events.remove(f)
 
     @loading_pause
     def on_draw(self):

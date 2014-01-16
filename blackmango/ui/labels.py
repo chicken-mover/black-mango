@@ -1,6 +1,6 @@
 
 import pyglet
-
+        
 import blackmango.ui
 
 titles_batch = pyglet.graphics.Batch()
@@ -18,8 +18,8 @@ class TitleCard(pyglet.text.Label):
 
         super(TitleCard, self).__init__(
             title,
-            font_name = FONT_NAME,
-            font_size = FONT_SIZE,
+            font_name = TITLE_FONT_NAME,
+            font_size = TITLE_FONT_SIZE,
             x = x // 2,
             y = y // 2,
             anchor_x = 'center',

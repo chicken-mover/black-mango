@@ -122,6 +122,11 @@ class BasicLevel(object):
         block.translate()
         self.blocks[(x, y, floor)] = block
 
+    def unset_block(self, x, y, floor):
+        k = (x, y, floor)
+        if k in self.blocks:
+            del self.blocks[k]
+
     def get_block(self, x, y, floor):
         """
         Get the material at <x>, <y>, <floor>. If the provided coordinates are
@@ -140,6 +145,11 @@ class BasicLevel(object):
         mob.translate()
         self.mobs[(x, y, floor)] = mob
 
+    def unset_mob(self, x, y, floor):
+        k = (x, y, floor)
+        if k in self.mobs:
+            del self.mobs[k]
+
     def get_mob(self, x, y, floor):
         """
         Get the mob at <x>, <y>, <floor>. If the provided coordinates are
@@ -153,8 +163,9 @@ class BasicLevel(object):
     def tick(self):
         if self.scheduled_destroy:
             return
-        for mob in self.moblist:
-            mob.behavior(self)
+        for _, mob in self.mobs.items():
+            if hasattr(mob, 'behavior'):
+                mob.behavior(self)
 
     def serialize(self, player):
         """
