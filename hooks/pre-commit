@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-BRANCH=$(git rev-parse --abbrev-ref HEAD)
+source bashutils.sh
 
 # We don't care about version number validation if we aren't on the main master
 # branch.
@@ -9,7 +9,7 @@ if [ "$BRANCH" != "master" ]; then
 fi
 
 LAST_TAG=$(git tag | head -n 1)
-SETUP_VERSION=$(python -c "import imp;s = imp.load_source('s', 'setup.py');print s.version")
+SETUP_VERSION=$($PYTHON -c "import imp;s = imp.load_source('s', 'setup.py');print s.version")
 
 if [ "$SETUP_VERSION" == '0.0.0' ] || [ "$LAST_TAG" == "$SETUP_VERSION" ] && [ -n "$SETUP_VERSION" ]; then
     exit 0

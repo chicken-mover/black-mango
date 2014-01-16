@@ -6,15 +6,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
 
-PROG=$(which pyinstaller)
-
-PYTHON="python"
-if hash python2 >/dev/null 2>&1; then
-    PYTHON=python2
-fi
-if hash python2.7 >/dev/null 2>&1; then
-    PYTHON=python2.7
-fi
+source bashutils.sh
 
 # This option is not recommended under Windows, according to the PyInstaller
 # docs.
@@ -53,7 +45,7 @@ done
 SCRIPTPATH="blackmango/__init__.py"
 
 function make() {
-    $PYTHON -OO $PROG ${ALL_OPTIONS[@]} ${NODEBUG_OPTIONS[@]} ${RESOURCES[@]} \
+    $PYTHON -OO $PYINSTALLER ${ALL_OPTIONS[@]} ${NODEBUG_OPTIONS[@]} ${RESOURCES[@]} \
         $SCRIPTPATH $@
 }
 
@@ -68,7 +60,7 @@ function clean() {
 }
 
 function make-debug() {
-    $PROG ${ALL_OPTIONS[@]} ${DEBUG_OPTIONS[@]} $SCRIPTPATH ${RESOURCES[@]} $@
+    $PYINSTALLER ${ALL_OPTIONS[@]} ${DEBUG_OPTIONS[@]} $SCRIPTPATH ${RESOURCES[@]} $@
 }
 
 function help() {
