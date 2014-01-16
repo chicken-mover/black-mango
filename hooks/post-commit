@@ -1,5 +1,5 @@
 #!/bin/sh
-
+pwd
 source bashutils.sh
 
 echo "Performing automatic push to origin/$BRANCH (CTL-C to abort)"
