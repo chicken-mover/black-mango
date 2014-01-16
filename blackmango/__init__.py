@@ -52,10 +52,12 @@ if __name__ == "__main__":
     blackmango.app.init()
 
     for f in [
-        blackmango.materials.materials_batch.draw,
-        blackmango.mobs.mobs_batch.draw,
+        blackmango.materials.materials_batch,
+        blackmango.mobs.mobs_batch,
     ]:
         blackmango.engine.game_engine.register_draw(f)
+
+    blackmango.engine.game_engine.show_menu()
 
     blackmango.app.game_app.schedule(blackmango.ui.game_window.tick)
     blackmango.app.game_app.run()

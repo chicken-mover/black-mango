@@ -52,13 +52,20 @@ class GameEngine(object):
     current_level = None
     player = None
 
-    draw_events = set()
+    draw_events = []
 
     # During loading events, we don't want to tick the game or perform certain
     # other actions on running event loops. See the @loading_pause decorator.
     loading = False
 
     def __init__(self): pass
+
+    def show_menu(self):
+
+        self.main_title = blackmango.ui.labels.TitleCard('BLACK MANGO')
+        self.register_draw(
+            blackmango.ui.labels.titles_batch
+        )
     
     @loading_pause
     def new_game(self):
@@ -70,11 +77,6 @@ class GameEngine(object):
         """
         blackmango.configure.logger.info("Starting new game...")
         self.start_game(blackmango.levels.test_level.LEVEL_DATA)
-
-        self.main_title = blackmango.ui.labels.TitleCard('BLACK MANGO')
-        self.register_draw(
-            blackmango.ui.labels.titles_batch.draw
-        )
 
     @loading_pause
     def save_game(self, filepath = 'autosave.blackmango'):
@@ -126,6 +128,10 @@ class GameEngine(object):
 
     @loading_pause
     def start_game(self, level_data):
+        
+        self.unregister_draw(
+            blackmango.ui.labels.titles_batch
+        )
 
         self.loading = True
 
@@ -150,20 +156,20 @@ class GameEngine(object):
         blackmango.configure.logger.info("Game started: %s" % 
                 repr(self.current_level))
 
-    def register_draw(self, f):
+    def register_draw(self, b):
         """
-        Add a callable <f> to be called when the GameEngine's `on_draw` handler
+        Add a batch <b> to be called when the GameEngine's `on_draw` handler
         is triggered.
         """
-        blackmango.configure.logger.info('Registering draw event: %s' % repr(f))
-        self.draw_events.add(f)
+        blackmango.configure.logger.info('Registering draw: %s' % repr(b))
+        self.draw_events.append(b)
 
-    def unregister_draw(self, f):
+    def unregister_draw(self, b):
         """
-        Remove a callable <f> from the pool of draw events.
+        Remove a batch <b> from the pool of draw events.
         """
-        blackmango.configure.logger.info('Unregistering draw event: %s' % repr(f))
-        self.draw_events.remove(f)
+        blackmango.configure.logger.info('Unregistering draw: %s' % repr(b))
+        self.draw_events = filter(lambda x: x is not b, self.draw_events)
 
     @loading_pause
     def on_draw(self):
@@ -173,8 +179,8 @@ class GameEngine(object):
         sprites/sprite batches it is tracking.
         """
         # Fire the registered draw events
-        for f in self.draw_events:
-            f()
+        for b in self.draw_events:
+            b.draw()
 
     @loading_pause
     def input_tick(self, keyboard):
