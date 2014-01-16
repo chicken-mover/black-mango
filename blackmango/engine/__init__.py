@@ -62,8 +62,27 @@ class GameEngine(object):
 
     def show_menu(self):
 
-        self.main_title = blackmango.ui.labels.TitleCard('BLACK MANGO')
+        self.main_title = blackmango.ui.labels.MainTitleCard('BLACK MANGO')
+        self.sub_title = blackmango.ui.labels.SubTitleCard(
+                'press N to start a new game')
         self.register_draw(
+            blackmango.ui.labels.titles_batch
+        )
+
+    def hide_menu(self):
+        self.unregister_draw(blackmango.ui.labels.titles_batch)
+        self.main_title.delete()
+        self.sub_title.delete()
+
+    def show_titlecard(self, text):
+        self.titlecard = blackmango.ui.labels.MainTitleCard(text)
+        self.register_draw(
+            blackmango.ui.labels.titles_batch
+        )
+
+    def hide_titlecard(self):
+        self.titlecard.delete()
+        self.unregister_draw(
             blackmango.ui.labels.titles_batch
         )
     
@@ -129,10 +148,9 @@ class GameEngine(object):
     @loading_pause
     def start_game(self, level_data):
         
-        self.unregister_draw(
-            blackmango.ui.labels.titles_batch
-        )
-
+        self.hide_menu()
+        self.show_titlecard(level_data.get('title_card'))
+                
         self.loading = True
 
         if self.current_level:
@@ -152,6 +170,8 @@ class GameEngine(object):
         self.player.translate()
 
         self.loading = False
+
+        pyglet.clock.schedule_once(lambda dt: self.hide_titlecard(), 3)
 
         blackmango.configure.logger.info("Game started: %s" % 
                 repr(self.current_level))
