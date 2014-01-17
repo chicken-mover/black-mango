@@ -35,15 +35,19 @@ NODEBUG_OPTIONS=(
 )
 
 RESOURCES=()
-for resource in $(find $RESOURCE_PATH -type f); do
-    r="--resource=$resource,DATA,$(basename $resource)"
-    echo "Found resource $r"
-    RESOURCES+=($r)
-done
+
+function load-resources() {
+    for resource in $(find $RESOURCE_PATH -type f); do
+        r="--resource=$resource,DATA,$(basename $resource)"
+        echo "Found resource $r"
+        RESOURCES+=($r)
+    done
+}
 
 SCRIPTPATH="blackmango/__init__.py"
 
 function make() {
+    load-resources
     $PYTHON -OO $PYINSTALLER ${ALL_OPTIONS[@]} ${NODEBUG_OPTIONS[@]} ${RESOURCES[@]} \
         $SCRIPTPATH $@
 }
@@ -54,11 +58,12 @@ function clean() {
     rm -rfv ./spec/
     rm -vf *.spec
     for f in $(find . -type f -name '*.py[co]'); do
-        rm -rv $f
+        echo "rm" $(rm -rv $f)
     done
 }
 
 function make-debug() {
+    load-resources
     $PYINSTALLER ${ALL_OPTIONS[@]} ${DEBUG_OPTIONS[@]} $SCRIPTPATH ${RESOURCES[@]} $@
 }
 
