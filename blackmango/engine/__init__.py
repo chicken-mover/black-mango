@@ -14,7 +14,6 @@ import errno
 import os
 import pyglet
 
-import blackmango.assets
 import blackmango.configure
 import blackmango.levels
 import blackmango.levels.test_level

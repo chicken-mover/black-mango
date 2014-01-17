@@ -20,7 +20,8 @@ ARGUMENTS = (
         'dest': 'data_dir',
         'help': 'On Linux and non-Darwin POSIX systems, this specifies the '
                 'directory into which application data and saved games are '
-                'placed. The default value is ~/.blackmango.',
+                'placed. The default value is %s.' % \
+                    blackmango.configure.POSIX_DATA_DIR,
     }),
     ('--debug', {
         'dest': 'debug',
