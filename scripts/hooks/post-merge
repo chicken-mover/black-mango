@@ -1,0 +1,6 @@
+#!/bin/bash
+
+source scripts/vars.sh
+
+echo "Merge complete, running githook installer"
+bash scripts/install-hooks.sh

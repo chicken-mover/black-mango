@@ -6,7 +6,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
 
-source bashutils.sh
+source scripts/vars.sh
 
 # This option is not recommended under Windows, according to the PyInstaller
 # docs.
@@ -34,7 +34,6 @@ NODEBUG_OPTIONS=(
     $STRIP_SYMBOLS
 )
 
-RESOURCE_PATH='assets/'
 RESOURCES=()
 for resource in $(find $RESOURCE_PATH -type f); do
     r="--resource=$resource,DATA,$(basename $resource)"

@@ -9,7 +9,6 @@ import pyglet
 import sys
 
 import blackmango.configure
-import blackmango.engine
 
 game_window = None
 
@@ -18,11 +17,17 @@ def init(*args, **kwargs):
     """
     Called by the central startup routine during initialization.
     """
+    global blackmango
     global game_window
+    # Prevent circular imports
+    import blackmango.engine
     blackmango.configure.logger.info("Initializing GameWindow as game_window")
     game_window = GameWindow(*args, **kwargs)
 
 class GameWindow(pyglet.window.Window):
+
+    draw_events = []
+    dispatch_engine_draw = False
 
     def __init__(self):
 
@@ -53,12 +58,56 @@ class GameWindow(pyglet.window.Window):
         self.set_location(1, 1)
 
         self.fps_display = pyglet.clock.ClockDisplay()
+
+    def show_menu(self):
+
+        self.main_title = blackmango.ui.labels.MainTitleCard('BLACK MANGO')
+        self.sub_title = blackmango.ui.labels.SubTitleCard(
+                'press N to start a new game')
+        self.register_draw(
+            blackmango.ui.labels.titles_batch
+        )
+
+    def hide_menu(self):
+        self.unregister_draw(blackmango.ui.labels.titles_batch)
+        self.main_title.delete()
+        self.sub_title.delete()
+
+    def show_titlecard(self, text):
+        self.titlecard = blackmango.ui.labels.MainTitleCard(text)
+        self.register_draw(
+            blackmango.ui.labels.titles_batch
+        )
+
+    def hide_titlecard(self):
+        self.titlecard.delete()
+        self.unregister_draw(
+            blackmango.ui.labels.titles_batch
+        )
+
+    def register_draw(self, b):
+        """
+        Add a batch <b> to be called when the GameEngine's `on_draw` handler
+        is triggered.
+        """
+        blackmango.configure.logger.info('Registering ui draw: %s' % repr(b))
+        self.draw_events.append(b)
+
+    def unregister_draw(self, b):
+        """
+        Remove a batch <b> from the pool of draw events.
+        """
+        blackmango.configure.logger.info('Unregistering ui draw: %s' % repr(b))
+        self.draw_events = filter(lambda x: x is not b, self.draw_events)
         
     def on_draw(self):
         self.clear()
-        blackmango.engine.game_engine.on_draw()
-        if blackmango.configure.DEBUG:
-            self.fps_display.draw()
+        for b in self.draw_events:
+            b.draw()
+        if self.dispatch_engine_draw:
+            blackmango.engine.game_engine.on_draw()
+            if blackmango.configure.DEBUG:
+                self.fps_display.draw()
         
     def tick(self, dt):
 
@@ -73,5 +122,6 @@ class GameWindow(pyglet.window.Window):
         
         elif self.mode == 'game':
 
+            self.dispatch_engine_draw = True
             blackmango.engine.game_engine.input_tick(self.keyboard)
             blackmango.engine.game_engine.game_tick()

@@ -20,7 +20,6 @@ import blackmango.levels
 import blackmango.levels.test_level
 import blackmango.mobs.player
 import blackmango.system
-import blackmango.ui.labels
 
 game_engine = None
 logger = blackmango.configure.logger
@@ -31,6 +30,9 @@ def init(*args, **kwargs):
     Called by the central startup routine during initialization.
     """
     global game_engine
+    global blackmango
+    # Prevent circular imports
+    import blackmango.ui
     blackmango.configure.logger.info("Initializing GameEngine as game_engine")
     game_engine = GameEngine(*args, **kwargs)
 
@@ -59,32 +61,6 @@ class GameEngine(object):
     loading = False
 
     def __init__(self): pass
-
-    def show_menu(self):
-
-        self.main_title = blackmango.ui.labels.MainTitleCard('BLACK MANGO')
-        self.sub_title = blackmango.ui.labels.SubTitleCard(
-                'press N to start a new game')
-        self.register_draw(
-            blackmango.ui.labels.titles_batch
-        )
-
-    def hide_menu(self):
-        self.unregister_draw(blackmango.ui.labels.titles_batch)
-        self.main_title.delete()
-        self.sub_title.delete()
-
-    def show_titlecard(self, text):
-        self.titlecard = blackmango.ui.labels.MainTitleCard(text)
-        self.register_draw(
-            blackmango.ui.labels.titles_batch
-        )
-
-    def hide_titlecard(self):
-        self.titlecard.delete()
-        self.unregister_draw(
-            blackmango.ui.labels.titles_batch
-        )
     
     @loading_pause
     def new_game(self):
@@ -181,14 +157,16 @@ class GameEngine(object):
         Add a batch <b> to be called when the GameEngine's `on_draw` handler
         is triggered.
         """
-        blackmango.configure.logger.info('Registering draw: %s' % repr(b))
+        blackmango.configure.logger.info('Registering engine draw: %s' % \
+                                            repr(b))
         self.draw_events.append(b)
 
     def unregister_draw(self, b):
         """
         Remove a batch <b> from the pool of draw events.
         """
-        blackmango.configure.logger.info('Unregistering draw: %s' % repr(b))
+        blackmango.configure.logger.info('Unregistering engine draw: %s' % \
+                                            repr(b))
         self.draw_events = filter(lambda x: x is not b, self.draw_events)
 
     @loading_pause

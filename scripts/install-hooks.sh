@@ -1,13 +1,15 @@
 #!/bin/bash
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd $DIR
+cd $DIR/..
 
-source bashutils.sh
+source scripts/vars.sh
 
 cd .git
 if [ -d hooks ]; then
     mv hooks hooks-backup
+elif [ -L hooks ]; then
+    rm hooks
 fi
-ln -s ../hooks hooks
+ln -s ../scripts/hooks hooks
 

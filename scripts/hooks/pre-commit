@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source bashutils.sh
+source scripts/vars.sh
 
 # We don't care about version number validation if we aren't on the main master
 # branch.
