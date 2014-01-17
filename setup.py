@@ -1,5 +1,7 @@
 
+import commands
 import setuptools
+import sys
 
 version = '0.0.0'
 
@@ -26,3 +28,11 @@ if __name__ == "__main__":
         ],
         test_suite = 'nose.collector',
     )
+
+    if len(sys.argv) > 1 and sys.argv[1] == 'develop':
+
+        print "\nInstalling git hooks"
+        stat, output = commands.getstatusoutput('bash scripts/install-hooks.sh')
+        print output
+        if stat != 0:
+            print >>sys.stderr, "Git hook installation failed!"
