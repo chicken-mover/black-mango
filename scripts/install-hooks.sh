@@ -12,4 +12,5 @@ elif [ -L hooks ]; then
     rm hooks
 fi
 ln -s ../scripts/hooks hooks
+chmod u+x hooks/*
 
