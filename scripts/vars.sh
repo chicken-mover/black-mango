@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BASEDIR="$( cd "$( dirname "${BASH_SOURCE[0]}"/.. )" && pwd )"
+BASEDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 
 PYTHON="python"
 if hash python2 >/dev/null 2>&1; then

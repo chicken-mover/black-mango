@@ -9,9 +9,11 @@ if [ "$BRANCH" != "master" ]; then
 fi
 
 LAST_TAG=$(git tag | head -n 1)
-SETUP_VERSION=$($PYTHON -c "import imp;s = imp.load_source('s', 'setup.py');print s.version")
+PYVER="import imp;s = imp.load_source('s', 'setup.py');print s.version"
+SETUP_VERSION=$($PYTHON -c "$PYVER")
 
-if [ "$SETUP_VERSION" == '0.0.0' ] || [ "$LAST_TAG" == "$SETUP_VERSION" ] && [ -n "$SETUP_VERSION" ]; then
+if [ "$SETUP_VERSION" == '0.0.0' ] || [ "$LAST_TAG" == "$SETUP_VERSION" ] && \
+   [ -n "$SETUP_VERSION" ]; then
     exit 0
 else
     echo "Last version tag does not equal setup version:"
