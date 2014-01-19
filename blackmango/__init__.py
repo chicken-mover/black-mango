@@ -17,6 +17,7 @@ import blackmango.materials
 import blackmango.mobs
 import blackmango.ui
 import blackmango.ui.labels
+import blackmango.ui.views.main_menu
 
 ARGUMENTS = (
     ('--data-dir', {
@@ -61,13 +62,7 @@ if __name__ == "__main__":
     ]:
         blackmango.engine.game_engine.register_draw(f)
 
-    for f in [
-        blackmango.ui.labels.titles_batch,
-        blackmango.ui.labels.labels_batch,
-    ]:
-        blackmango.ui.game_window.register_draw(f)
-
-    blackmango.ui.game_window.show_menu()
+    blackmango.ui.game_window.set_view(blackmango.ui.views.main_menu.MainMenu())
 
     blackmango.app.game_app.schedule(blackmango.ui.game_window.tick)
 

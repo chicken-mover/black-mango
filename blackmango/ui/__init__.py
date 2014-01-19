@@ -26,8 +26,7 @@ def init(*args, **kwargs):
 
 class GameWindow(pyglet.window.Window):
 
-    draw_events = []
-    dispatch_engine_draw = False
+    view = None
 
     def __init__(self):
 
@@ -59,6 +58,9 @@ class GameWindow(pyglet.window.Window):
 
         self.fps_display = pyglet.clock.ClockDisplay()
 
+    def set_view(self, view):
+        self.view = view
+
     def show_menu(self):
         self.main_title = blackmango.ui.labels.MainTitleCard('BLACK MANGO')
         self.sub_title = blackmango.ui.labels.SubTitleCard(
@@ -73,35 +75,28 @@ class GameWindow(pyglet.window.Window):
 
     def hide_titlecard(self):
         self.titlecard.delete()
-
-    def register_draw(self, b):
-        """
-        Add a batch <b> to be called when the GameEngine's `on_draw` handler
-        is triggered.
-        """
-        blackmango.configure.logger.info('Registering ui draw: %s' % repr(b))
-        self.draw_events.append(b)
-
-    def unregister_draw(self, b):
-        """
-        Remove a batch <b> from the pool of draw events.
-        """
-        blackmango.configure.logger.info('Unregistering ui draw: %s' % repr(b))
-        self.draw_events = filter(lambda x: x is not b, self.draw_events)
         
     def on_draw(self):
         self.clear()
-        if self.dispatch_engine_draw:
-            blackmango.engine.game_engine.on_draw()
-            if blackmango.configure.DEBUG:
-                self.fps_display.draw()
-        for b in self.draw_events:
-            b.draw()
+        if self.view:
+            self.view.on_draw()
+        if blackmango.configure.DEBUG:
+            self.fps_display.draw()
+
+    def on_mouse_press(self, x, y, button, modifiers):
+
+        if self.view and hasattr(self.view, 'on_mouse_press'):
+            self.view.on_mouse_press(x, y, button, modifiers)
         
     def tick(self, dt):
 
         if self.keyboard[pyglet.window.key.Q]:
             sys.exit(0)
+
+        if self.view:
+            self.view.tick(self.keyboard)
+
+        return
 
         if self.mode == 'menu':
         

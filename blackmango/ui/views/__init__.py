@@ -14,6 +14,12 @@ class BaseView(object):
         """
         pass
 
+    def on_mouse_press(self, x, y, button, modifiers):
+        """
+        Called by the window on mouse clicks.
+        """
+        pass
+
     def tick(self, keyboard):
         """
         Called on every window tick
