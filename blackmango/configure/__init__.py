@@ -6,12 +6,15 @@ Also contains a logger for use throughout the app.
 
 import logging
 
+VERSION = '0.0.0'
+
 MAIN_WINDOW_TITLE = 'BLACK MANGO'
 
 DEBUG = logging.DEBUG
 FULLSCREEN = False
-# Main game window size
-SCREEN_SIZE = (500, 500)
+# Main game window size.
+# TODO: Set this appropriately dynamically
+SCREEN_SIZE = (900, 550)
 
 SAVE_GAME_VERSION='BLACKMANGO-0.0.0'
 

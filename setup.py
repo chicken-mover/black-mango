@@ -3,7 +3,9 @@ import commands
 import setuptools
 import sys
 
-version = '0.0.0'
+import blackmango.configure
+
+version = blackmango.configure.VERSION
 
 if __name__ == "__main__":
 

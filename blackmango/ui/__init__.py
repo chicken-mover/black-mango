@@ -12,6 +12,10 @@ import blackmango.configure
 
 game_window = None
 
+game_platform = pyglet.window.get_platform()
+game_display = game_platform.get_default_display()
+game_screen = game_display.get_default_screen()
+
 # There is only one GameWindow object active at any one time.
 def init(*args, **kwargs):
     """
@@ -59,6 +63,9 @@ class GameWindow(pyglet.window.Window):
         self.fps_display = pyglet.clock.ClockDisplay()
 
     def set_view(self, view):
+        # make sure __del__ gets called now
+        if self.view:
+            self.view.destroy()
         self.view = view
 
     def show_menu(self):
@@ -84,13 +91,21 @@ class GameWindow(pyglet.window.Window):
             self.fps_display.draw()
 
     def on_mouse_press(self, x, y, button, modifiers):
-
-        if self.view and hasattr(self.view, 'on_mouse_press'):
+        if self.view:
             self.view.on_mouse_press(x, y, button, modifiers)
+
+    def on_mouse_motion(self, x, y, dx, dy):
+        if self.view:
+            self.view.on_mouse_motion(x, y, dx, dy)
+
+    def on_key_press(self, key, modifiers):
+
+        if self.view and hasattr(self.view, 'on_key_press'):
+            self.view.on_key_press(key, modifiers, self.keyboard)
         
     def tick(self, dt):
 
-        if self.keyboard[pyglet.window.key.Q]:
+        if blackmango.configure.DEBUG and self.keyboard[pyglet.window.key.Q]:
             sys.exit(0)
 
         if self.view:
