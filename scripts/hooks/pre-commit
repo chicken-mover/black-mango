@@ -11,7 +11,6 @@ fi
 LAST_TAG=$(git tag | head -n 1)
 PYVER="import imp;s = imp.load_source('s', 'setup.py');print s.version"
 SETUP_VERSION=$($PYTHON -c "$PYVER")
-echo $PYTHON
 
 if [ "$SETUP_VERSION" == '0.0.0' ] || [ "$LAST_TAG" == "$SETUP_VERSION" ] && \
    [ -n "$SETUP_VERSION" ]; then
