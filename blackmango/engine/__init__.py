@@ -123,16 +123,14 @@ class GameEngine(object):
     @loading_pause
     def start_game(self, level_data):
         
-        self.hide_menu()
-        self.show_titlecard(level_data.get('title_card'))
+        blackmango.ui.game_window.hide_menu()
+        blackmango.ui.game_window.show_titlecard(level_data.get('title_card'))
                 
         self.loading = True
 
         if self.current_level:
-            oldlevel = self.current_level
+            self.current_level.destroy()
             self.current_level = None
-            oldlevel.destroy()
-            self.player.delete()
 
         # Initialize level and player
         self.current_level = blackmango.levels.BasicLevel(level_data)
@@ -146,7 +144,8 @@ class GameEngine(object):
 
         self.loading = False
 
-        pyglet.clock.schedule_once(lambda dt: self.hide_titlecard(), 3)
+        pyglet.clock.schedule_once(lambda dt: \
+                blackmango.ui.game_window.hide_titlecard(), 3)
 
         blackmango.configure.logger.info("Game started: %s" % 
                 repr(self.current_level))

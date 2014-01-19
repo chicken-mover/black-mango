@@ -6,6 +6,9 @@ All rights reserved.
 """
 
 import argparse
+import os
+import sys
+import traceback
 
 import blackmango.app
 import blackmango.configure
@@ -51,14 +54,27 @@ if __name__ == "__main__":
     blackmango.engine.init()
     blackmango.ui.init()
     blackmango.app.init()
-
+        
     for f in [
         blackmango.materials.materials_batch,
         blackmango.mobs.mobs_batch,
     ]:
         blackmango.engine.game_engine.register_draw(f)
 
-    blackmango.engine.game_engine.show_menu()
+    for f in [
+        blackmango.ui.labels.titles_batch,
+        blackmango.ui.labels.labels_batch,
+    ]:
+        blackmango.ui.game_window.register_draw(f)
+
+    blackmango.ui.game_window.show_menu()
 
     blackmango.app.game_app.schedule(blackmango.ui.game_window.tick)
-    blackmango.app.game_app.run()
+
+    try:
+        blackmango.app.game_app.run()
+    except Exception as e:
+        # TODO implement crash logs/reporting
+        print >>sys.stderr, traceback.format_exc()
+        sys.exit(os.EX_SOFTWARE)
+    sys.exit(blackmango.app.game_app.returncode)

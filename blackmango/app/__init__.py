@@ -21,6 +21,8 @@ def init(*args, **kwargs):
 
 class BlackMangoApp(pyglet.app.EventLoop):
 
+    returncode = None
+
     def __init__(self, *args):
 
         super(BlackMangoApp, self).__init__()
@@ -33,3 +35,10 @@ class BlackMangoApp(pyglet.app.EventLoop):
         call).
         """
         pyglet.clock.schedule(f)
+
+    def user_quit(self):
+        """
+        Should be called whenever the user asks the app to quit.
+        """
+        self.exit()
+        self.returncode = 0

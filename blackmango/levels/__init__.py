@@ -41,6 +41,7 @@ class BasicLevel(object):
         floor data into instances of materials classes.
         """
 
+        self.title_card = level_data['title_card']
         self.starting_location = level_data['starting_location']
         self.current_floor = self.starting_location[2]
         self.level_size = level_data['level_size']
@@ -177,6 +178,7 @@ class BasicLevel(object):
         """
 
         saved_level = {
+            'title_card': self.title_card,
             'level_size': self.level_size,
             'starting_location': player.world_location,
 
@@ -186,43 +188,44 @@ class BasicLevel(object):
             'blocks': {},
             'mobs': {},
 
-            'triggers': self.triggers,
+            ##'triggers': self.triggers,
         }
 
         # Fill out the blocks and mobs dicts. This is in the LEVEL_DATA format,
         # not in the internally stored format.
-        x, y, floor = self.level_size
+        lx, ly, lfloor = self.level_size
         for map in (saved_level['blocks'], saved_level['mobs']):
-            for floor in xrange(floor):
+            for floor in xrange(lfloor):
                 if not floor in map:
                     map[floor] = []
-                for y in xrange(y):
+                for y in xrange(ly):
                     while len(map[floor]) < y + 1:
                         map[floor].append([])
-                    for x in xrange(x):
+                    for x in xrange(lx):
                         while len(map[floor][y]) < x + 1:
                             map[floor][y].append(None)
 
         # Now read the current block and mob states and record them
-        for lookuplist in ('blocks', 'mobs'):
-            lookuplist = getattr(self, lookuplist)
+        for lookup in ('blocks', 'mobs'):
+            lookuplist = getattr(self, lookup)
             for coords, item in lookuplist.items():
                 v = 0
-                if itemlist == 'blocks':
+                if lookuplist is self.blocks:
                     lookup_dict = blackmango.materials.materiallist.MATERIALS
-                elif itemlist == 'mobs':
+                elif lookuplist is self.mobs:
                     lookup_dict = blackmango.mobs.moblist.MOBS
                 for k, t in lookup_dict.items():
                     if t and isinstance(item, t):
                         v = k
 
-            # For re-initializing blocks later. Retrieve the stored kwargs
-            # that they were intialized with.
-            if hasattr(item, 'kwargs'):
-                v = (v, getattr(item, 'kwargs'))
+                # For re-initializing blocks later. Retrieve the stored kwargs
+                # that they were intialized with.
+                if hasattr(item, 'kwargs'):
+                    v = (v, getattr(item, 'kwargs'))
 
-            # Save the item in the map
-            saved_level[itemlist][floor][y][x] = v
+                # Save the item in the map
+                x, y, floor = coords
+                saved_level[lookup][floor][y][x] = v
 
         return saved_level
 

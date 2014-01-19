@@ -60,30 +60,19 @@ class GameWindow(pyglet.window.Window):
         self.fps_display = pyglet.clock.ClockDisplay()
 
     def show_menu(self):
-
         self.main_title = blackmango.ui.labels.MainTitleCard('BLACK MANGO')
         self.sub_title = blackmango.ui.labels.SubTitleCard(
                 'press N to start a new game')
-        self.register_draw(
-            blackmango.ui.labels.titles_batch
-        )
 
     def hide_menu(self):
-        self.unregister_draw(blackmango.ui.labels.titles_batch)
         self.main_title.delete()
         self.sub_title.delete()
 
     def show_titlecard(self, text):
         self.titlecard = blackmango.ui.labels.MainTitleCard(text)
-        self.register_draw(
-            blackmango.ui.labels.titles_batch
-        )
 
     def hide_titlecard(self):
         self.titlecard.delete()
-        self.unregister_draw(
-            blackmango.ui.labels.titles_batch
-        )
 
     def register_draw(self, b):
         """
@@ -102,12 +91,12 @@ class GameWindow(pyglet.window.Window):
         
     def on_draw(self):
         self.clear()
-        for b in self.draw_events:
-            b.draw()
         if self.dispatch_engine_draw:
             blackmango.engine.game_engine.on_draw()
             if blackmango.configure.DEBUG:
                 self.fps_display.draw()
+        for b in self.draw_events:
+            b.draw()
         
     def tick(self, dt):
 
