@@ -3,8 +3,8 @@ import pyglet
         
 import blackmango.ui
 
-TITLE_FONT_NAME = 'Times New Roman'
-TITLE_FONT_SIZE = 12
+TITLE_FONT_NAME = 'Menuetto'
+TITLE_FONT_SIZE = 48
 TITLE_COLOR = (255, 255, 255, 255)
 
 class MainTitleCard(pyglet.text.Label):
@@ -18,7 +18,7 @@ class MainTitleCard(pyglet.text.Label):
             font_name = TITLE_FONT_NAME,
             font_size = TITLE_FONT_SIZE,
             x = x // 2,
-            y = y // 2 - offset,
+            y = y - (y // 4) - offset,
             anchor_x = 'center',
             anchor_y = 'center',
             batch = batch,
@@ -33,8 +33,8 @@ class SubTitleCard(pyglet.text.Label):
 
         super(SubTitleCard, self).__init__(
             title,
-            font_name = TITLE_FONT_NAME,
-            font_size = TITLE_FONT_SIZE / 2,
+            font_name = 'Chapbook',
+            font_size = 12,
             x = x // 2,
             y = y // 2 - (y // 4),
             anchor_x = 'center',

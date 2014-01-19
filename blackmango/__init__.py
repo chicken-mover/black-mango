@@ -11,6 +11,7 @@ import sys
 import traceback
 
 import blackmango.app
+import blackmango.assetloader
 import blackmango.configure
 import blackmango.engine
 import blackmango.materials
@@ -52,9 +53,13 @@ if __name__ == "__main__":
 
     blackmango.configure.setup_logger(blackmango.configure.DEBUG)
 
+    blackmango.configure.logger.info("Initializing engine, ui, and app")
     blackmango.engine.init()
     blackmango.ui.init()
     blackmango.app.init()
+    
+    blackmango.configure.logger.info("Loading fonts")
+    blackmango.assetloader.load_fonts()
         
     for f in [
         blackmango.materials.materials_batch,

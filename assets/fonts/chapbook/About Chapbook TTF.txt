@@ -1,0 +1,35 @@
+W Chapbook W
+Chapbo ok Italic
+typefaces by Feòrag NicBhrìde
+
+The Chapbook family of typefaces is based on the type used in the 17th century equivalent of pulp literature. It
+includes regular and italic fonts, and a set of period dingbats.
+Version 3 has been radically reworked. The glyphs are more balanced, and the italics consistent. There are many
+more characters and a few more illustrations have been added to the separate dingbats font. It is now an OpenType
+font using Unicode—the long-s and various ligatures have moved accordingly. They can be found using the Glyphs/
+Special Characters menu item in most MacOS X applications.
+A number of special ligatures can be found in the Private Use area, and these can be accessed the same way.
+This archive contains the TTF versions of the font, which can be used on MacOS X, Linux and Windows. It includes the following ﬁles:
+• About Chapbook TTF.pdf - this ﬁle.
+• Chapbook.ttf, Chapbook-Italic.ttf and Chapbook-dingbats.ttf - the font ﬁles In MacOS X, double click on
+these to see a preview. Click on the “Install Font” button to install.
+A PostScript ﬂavoured OpenType version is also available.
+
+License and Notes
+This typeface is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike License. To view a copy of
+this license, visit http://creativecommons.org/licenses/by-nc-sa/2.0/ or send a letter to Creative Commons, 559 Nathan Abbott
+Way, Stanford, California 94305, USA.
+Note that the license includes the provision “Any of these conditions can be waived if you get permission from the copyright
+holder”. You already have my permission to use this font for commercial purposes, such as in a magazine or advertising, and do
+not need to ask (though a copy of whatever you used it for would be nice). If you wish to redistribute this font commercially,
+including on a website with paid advertising, you must still get my permission to do so and “you must make clear to others the
+license terms of this work”.
+Feòrag
+e-mail: feorag@antipope.org
+http://www.antipope.org/feorag/freestuﬀ/
+Snail Mail:
+c/o P.O. Box 666,
+Edinburgh EH7 5YW
+Scotland
+
+
