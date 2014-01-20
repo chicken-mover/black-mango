@@ -1,8 +1,5 @@
 """
 The user interface for the game.
-
-Defines the GameWindow class, which delegates events to the rest of the app,
-including the GameEngine.
 """
 
 import pyglet
@@ -21,10 +18,8 @@ def init(*args, **kwargs):
     """
     Called by the central startup routine during initialization.
     """
-    global blackmango
     global game_window
     # Prevent circular imports
-    import blackmango.engine
     blackmango.configure.logger.info("Initializing GameWindow as game_window")
     game_window = GameWindow(*args, **kwargs)
 
@@ -54,8 +49,6 @@ class GameWindow(pyglet.window.Window):
         self.push_handlers(self.keyboard)
 
         self.logger = blackmango.configure.logger
-
-        self.mode = 'menu'
         
         self.resizeable = False
         self.set_location(1, 1)
@@ -94,17 +87,3 @@ class GameWindow(pyglet.window.Window):
 
         if self.view:
             self.view.tick(self.keyboard)
-
-        return
-
-        if self.mode == 'menu':
-        
-            if self.keyboard[pyglet.window.key.N]:
-                blackmango.engine.game_engine.new_game()
-                self.mode = 'game'
-        
-        elif self.mode == 'game':
-
-            self.dispatch_engine_draw = True
-            blackmango.engine.game_engine.input_tick(self.keyboard)
-            blackmango.engine.game_engine.game_tick()

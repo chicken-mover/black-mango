@@ -29,9 +29,6 @@ def init(*args, **kwargs):
     Called by the central startup routine during initialization.
     """
     global game_engine
-    global blackmango
-    # Prevent circular imports
-    import blackmango.ui
     blackmango.configure.logger.info("Initializing GameEngine as game_engine")
     game_engine = GameEngine(*args, **kwargs)
 

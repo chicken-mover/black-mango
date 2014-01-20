@@ -28,7 +28,6 @@ def load_fonts():
 
 def load(asset_type, filename):
     path = os.path.join(blackmango.system.DIR_ASSETS, asset_type, filename)
-    #print path
     if os.path.exists(path):
         return path
     else:

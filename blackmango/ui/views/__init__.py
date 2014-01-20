@@ -1,5 +1,7 @@
 """
-Base view class
+Base view class. Should be inherited and methods overridden, rather than copied
+out when creating view modules, in case the spec changes or new view methods
+are added universally.
 """
 
 class BaseView(object):
