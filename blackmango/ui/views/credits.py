@@ -1,3 +1,6 @@
+"""
+Scrolling credits.
+"""
 
 import pyglet
 

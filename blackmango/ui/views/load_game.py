@@ -1,3 +1,6 @@
+"""
+View for the 'Load game' screen.
+"""
 
 import os
 import pyglet

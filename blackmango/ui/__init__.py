@@ -56,6 +56,10 @@ class GameWindow(pyglet.window.Window):
         self.fps_display = pyglet.clock.ClockDisplay()
 
     def set_view(self, view):
+        """
+        Set the current view to an instance of a view object from the module
+        blackmango.ui.views.
+        """
         if self.view:
             self.logger.debug("Tearing down view %s" %  repr(self.view))
             self.view.destroy()
@@ -63,6 +67,10 @@ class GameWindow(pyglet.window.Window):
         self.view = view
         
     def on_draw(self):
+        """
+        Triggered by the application event loop, this method delegates further
+        draws to the current view.
+        """
         self.clear()
         if self.view:
             self.view.on_draw()
@@ -70,22 +78,39 @@ class GameWindow(pyglet.window.Window):
             self.fps_display.draw()
 
     def on_mouse_press(self, x, y, button, modifiers):
+        """
+        Triggered by the application event loop, this method delegates further
+        event calls to the current view.
+        """
         if self.view:
             self.view.on_mouse_press(x, y, button, modifiers)
 
     def on_mouse_motion(self, x, y, dx, dy):
+        """
+        Triggered by the application event loop, this method delegates further
+        event calls to the current view.
+        """
         if self.view:
             self.view.on_mouse_motion(x, y, dx, dy)
 
     def on_key_press(self, key, modifiers):
-
+        """
+        Triggered by the application event loop, this method delegates further
+        event calls to the current view. The delegated calls are additionally
+        passed the `keyboard` property of this object, which gives all current
+        key presses.
+        """
         if self.view and hasattr(self.view, 'on_key_press'):
             self.view.on_key_press(key, modifiers, self.keyboard)
         
     def tick(self, dt):
-
+        """
+        Triggered by the application event loop, this method delegates further
+        event calls to the current view. The delegated calls are additionally
+        passed the `keyboard` property of this object, which gives all current
+        key presses.
+        """
         if blackmango.configure.DEBUG and self.keyboard[pyglet.window.key.Q]:
             sys.exit(0)
-
         if self.view:
             self.view.tick(self.keyboard)

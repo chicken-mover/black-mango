@@ -1,5 +1,5 @@
 """
-Initial title menu view
+Initial title menu view.
 """
 
 import pyglet

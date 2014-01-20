@@ -10,13 +10,22 @@ import blackmango.configure
 import blackmango.system
 
 def load_image(fname):
+    """
+    Return the path to an image file.
+    """
     return load('images', fname)
 
 def load_text(fname):
+    """
+    Load a text file and return its contents.
+    """
     p = load('text', fname)
     return open(p).read()
 
 def load_fonts():
+    """
+    Install fonts so that Pyglet can use them.
+    """
     fontsdir = os.path.join(blackmango.system.DIR_ASSETS, 'fonts')
     for dirpath, dirnames, filenames in os.walk(fontsdir):
         for f in filenames:
@@ -27,6 +36,10 @@ def load_fonts():
             pyglet.font.add_file(fontfile)
 
 def load_colordata():
+    """
+    Parse the colorscheme.xml asset and return the colors as a simplified Python
+    dict.
+    """
     f = os.path.join(blackmango.system.DIR_ASSETS, 'colorscheme.xml')
     blackmango.configure.logger.debug(" - loading %s" % f)
     outcolors = {}
@@ -45,6 +58,9 @@ def load_colordata():
     return outcolors
 
 def load(asset_type, filename):
+    """
+    Generic load function to simplify grabbing file paths by asset type.
+    """
     path = os.path.join(blackmango.system.DIR_ASSETS, asset_type, filename)
     if os.path.exists(path):
         return path

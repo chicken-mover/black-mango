@@ -1,3 +1,6 @@
+"""
+Active view during gameplay.
+"""
 
 import cPickle
 import errno
