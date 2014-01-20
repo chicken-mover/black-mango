@@ -58,8 +58,8 @@ $ bash scripts/run-setup.sh
 **Note that the build process is still being worked out, so the instructions
 below should be considered highly experimental.**
 
-After running the `setup.py develop` command above, you can run the `build.sh`
-script from the project directory like so:
+After running the setup command above, you can run the `build.sh` script from
+the project directory like so:
 ```bash
 $ ./scripts/build.sh make-debug
 ```
