@@ -35,44 +35,17 @@ def init(*args, **kwargs):
     blackmango.configure.logger.info("Initializing GameEngine as game_engine")
     game_engine = GameEngine(*args, **kwargs)
 
-def loading_pause(f):
-    """
-    Certain GameEngine methods need to be ignored while some loading operations
-    take place, otherwise Pyglet will try to do things like redraw deleted
-    sprites.
-    """
-    def wrapped(self, *args, **kwargs):
-        if self.loading:
-            return
-        else:
-            return f(self, *args, **kwargs)
-    return wrapped
-
 class GameEngine(object):
 
     current_level = None
     player = None
-
-    draw_events = []
 
     # During loading events, we don't want to tick the game or perform certain
     # other actions on running event loops. See the @loading_pause decorator.
     loading = False
 
     def __init__(self): pass
-    
-    @loading_pause
-    def new_game(self):
-        """
-        Start a new game. (Update this documentation when the function is more
-        meaningful.)
 
-        Right now this just initializes a test level.
-        """
-        blackmango.configure.logger.info("Starting new game...")
-        self.start_game(blackmango.levels.test_level.LEVEL_DATA)
-
-    @loading_pause
     def save_game(self, filepath = 'autosave.blackmango'):
 
         stored_level = self.current_level.serialize(self.player)
@@ -95,7 +68,6 @@ class GameEngine(object):
             f.write(cPickle.dumps(stored_level))
         return True
 
-    @loading_pause
     def load_game(self, filepath = 'autosave.blackmango'):
 
         self.loading = True
@@ -120,12 +92,8 @@ class GameEngine(object):
         # it is in the middle of updating).
         pyglet.clock.schedule_once(loader, 1)
 
-    @loading_pause
     def start_game(self, level_data):
         
-        blackmango.ui.game_window.hide_menu()
-        blackmango.ui.game_window.show_titlecard(level_data.get('title_card'))
-                
         self.loading = True
 
         if self.current_level:
@@ -144,41 +112,9 @@ class GameEngine(object):
 
         self.loading = False
 
-        pyglet.clock.schedule_once(lambda dt: \
-                blackmango.ui.game_window.hide_titlecard(), 3)
-
         blackmango.configure.logger.info("Game started: %s" % 
                 repr(self.current_level))
 
-    def register_draw(self, b):
-        """
-        Add a batch <b> to be called when the GameEngine's `on_draw` handler
-        is triggered.
-        """
-        blackmango.configure.logger.info('Registering engine draw: %s' % \
-                                            repr(b))
-        self.draw_events.append(b)
-
-    def unregister_draw(self, b):
-        """
-        Remove a batch <b> from the pool of draw events.
-        """
-        blackmango.configure.logger.info('Unregistering engine draw: %s' % \
-                                            repr(b))
-        self.draw_events = filter(lambda x: x is not b, self.draw_events)
-
-    @loading_pause
-    def on_draw(self):
-        """
-        To be called by the GameWindow object when it triggers the on_draw
-        event. The GameEngine is delegated the task of calling draws for the
-        sprites/sprite batches it is tracking.
-        """
-        # Fire the registered draw events
-        for b in self.draw_events:
-            b.draw()
-
-    @loading_pause
     def input_tick(self, keyboard):
         """
         On each input tick, pass the current keyboard state in for the engine
@@ -200,7 +136,6 @@ class GameEngine(object):
         elif keyboard[pyglet.window.key.L]:
             self.load_game()
 
-    @loading_pause        
     def game_tick(self):
 
         if self.current_level:

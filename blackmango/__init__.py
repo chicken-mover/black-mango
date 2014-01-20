@@ -14,8 +14,6 @@ import blackmango.app
 import blackmango.assetloader
 import blackmango.configure
 import blackmango.engine
-import blackmango.materials
-import blackmango.mobs
 import blackmango.ui
 import blackmango.ui.labels
 import blackmango.ui.views.main_menu
@@ -60,21 +58,22 @@ if __name__ == "__main__":
     
     blackmango.configure.logger.info("Loading fonts")
     blackmango.assetloader.load_fonts()
-        
-    for f in [
-        blackmango.materials.materials_batch,
-        blackmango.mobs.mobs_batch,
-    ]:
-        blackmango.engine.game_engine.register_draw(f)
 
-    blackmango.ui.game_window.set_view(blackmango.ui.views.main_menu.MainMenu())
+    blackmango.configure.logger.info("Initializing starting view")
+    starting_view = blackmango.ui.views.main_menu.MainMenu()
+    blackmango.ui.game_window.set_view(starting_view)
 
+    blackmango.configure.logger.info("Scheduling tick handler")
     blackmango.app.game_app.schedule(blackmango.ui.game_window.tick)
 
     try:
+        blackmango.configure.logger.info("Starting event loop")
         blackmango.app.game_app.run()
+        blackmango.configure.logger.info("Exited event loop")
     except Exception as e:
+        blackmango.configure.logger.debug("Exited event loop due to error")
         # TODO implement crash logs/reporting
         print >>sys.stderr, traceback.format_exc()
         sys.exit(os.EX_SOFTWARE)
+
     sys.exit(blackmango.app.game_app.returncode)

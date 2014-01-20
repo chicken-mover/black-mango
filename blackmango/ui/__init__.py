@@ -63,25 +63,9 @@ class GameWindow(pyglet.window.Window):
         self.fps_display = pyglet.clock.ClockDisplay()
 
     def set_view(self, view):
-        # make sure __del__ gets called now
         if self.view:
             self.view.destroy()
         self.view = view
-
-    def show_menu(self):
-        self.main_title = blackmango.ui.labels.MainTitleCard('BLACK MANGO')
-        self.sub_title = blackmango.ui.labels.SubTitleCard(
-                'press N to start a new game')
-
-    def hide_menu(self):
-        self.main_title.delete()
-        self.sub_title.delete()
-
-    def show_titlecard(self, text):
-        self.titlecard = blackmango.ui.labels.MainTitleCard(text)
-
-    def hide_titlecard(self):
-        self.titlecard.delete()
         
     def on_draw(self):
         self.clear()

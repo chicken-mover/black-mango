@@ -11,6 +11,10 @@ import blackmango.system
 def load_image(fname):
     return load('images', fname)
 
+def load_text(fname):
+    p = load('text', fname)
+    return open(p).read()
+
 def load_fonts():
     fontsdir = os.path.join(blackmango.system.DIR_ASSETS, 'fonts')
     for dirpath, dirnames, filenames in os.walk(fontsdir):
