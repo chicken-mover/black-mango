@@ -55,6 +55,9 @@ $ bash scripts/run-setup.sh
 
 ## Build instructions
 
+**Note that the build process is still being worked out, so the instructions
+below should be considered highly experimental.**
+
 After running the `setup.py develop` command above, you can run the `build.sh`
 script from the project directory like so:
 ```bash
