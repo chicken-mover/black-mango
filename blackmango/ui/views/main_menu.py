@@ -156,7 +156,8 @@ class MainMenuLabel(pyglet.text.Label):
 
         super(MainMenuLabel, self).__init__(
             title,
-            font_name = 'Prociono TT',
+            #font_name = 'Prociono TT',
+            font_name = 'Chapbook',
             font_size = 18, 
             x = x - 140,
             y = y - 180 - 100*offset,
