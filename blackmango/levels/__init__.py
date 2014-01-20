@@ -41,6 +41,7 @@ class BasicLevel(object):
         self.starting_location = level_data['starting_location']
         self.current_floor = self.starting_location[2]
         self.level_size = level_data['level_size']
+        self.triggers = level_data['triggers']
 
         blockdata = level_data['blocks']
         mobdata = level_data['mobs']
@@ -157,12 +158,13 @@ class BasicLevel(object):
         except (IndexError, KeyError):
             return None
 
-    def tick(self):
+    def tick(self, player):
         if self.scheduled_destroy:
             return
         for _, mob in self.mobs.items():
-            if hasattr(mob, 'behavior'):
+            if mob is not player:
                 mob.behavior(self)
+        self.triggers.tick(self, player)
 
     def serialize(self, player):
         """
@@ -176,12 +178,11 @@ class BasicLevel(object):
             'starting_location': player.world_location,
 
             'next_level': self.next_level,
-            'previous_level': self.previous_level,
 
             'blocks': {},
             'mobs': {},
 
-            ##'triggers': self.triggers,
+            'triggers': self.triggers,
         }
 
         # Fill out the blocks and mobs dicts. This is in the LEVEL_DATA format,
@@ -231,4 +232,7 @@ class BasicLevel(object):
 
 class BasicLevelTriggers(object):
 
-    pass
+    def __init__(self): pass
+
+    def tick(self, level, player):
+        pass

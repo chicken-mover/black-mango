@@ -10,6 +10,8 @@ import blackmango.mobs
 from blackmango.masks.masklist import MASKS
 
 class Player(blackmango.mobs.BasicMobileSprite):
+
+    logger = blackmango.configure.logger
     
     def __init__(self, x = 0, y = 0, z = 0):
 
@@ -23,8 +25,10 @@ class Player(blackmango.mobs.BasicMobileSprite):
     def activate_mask(self, id):
 
         if self.current_mask:
+            self.logger.debug('Deactivate mask: %s' % self.current_mask)
             self.current_mask.on_deactivate()
-        mask = blackmango.masks.masklist.MASKS[id]
+        self.logger.debug('Activate mask: %s' % id)
+        mask = MASKS[id]
         # TODO: Animate mask change
         self.current_mask(mask)
         mask.on_activate(self)

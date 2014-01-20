@@ -62,7 +62,15 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
             
         self.translate()
 
-    def move(self, level, delta_x, delta_y):
+    def turn(self, direction):
+        """
+        Set the turn direction in degrees, where 'direction' is [1, 2, 3, 4],
+        with '1' being 'north' and proceeding clockwise.
+        """
+        # TODO: Reflect turn in sprite image
+        self.direction = direction
+
+    def move(self, level, delta_x = 0, delta_y = 0):
         """
         Move the sprite in the game world with an accompanying animation.
         """
@@ -77,6 +85,11 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
             self.world_location[1] + delta_y,
             self.world_location[2],
         )
+
+        if delta_y:
+            self.turn(1 if delta_y > 0 else 2)
+        elif delta_x:
+            self.turn(3 if delta_x > 0 else 4)
 
         block = level.get_block(*dest)
         if block and block.is_solid:

@@ -13,6 +13,7 @@ import blackmango.mobs.player
 import blackmango.system
 import blackmango.ui
 
+from blackmango.levels.levellist import LEVELS
 from blackmango.ui.views import BaseView
 
 def loading_halt(f):
@@ -34,12 +35,13 @@ class GameView(BaseView):
 
         self.loading = False
 
-        if level == 'new':
-            import blackmango.levels.test_level
-            self.logger.debug("Starting new game...")
-            self.start_game(
-                    blackmango.levels.test_level.LEVEL_DATA)
+        level_data = LEVELS.get(level)
+        
+        if level_data:
+            self.logger.debug("Starting new game at level %s" % level)
+            self.start_game(level_data)
         elif level.endswith('.blackmango'):
+            self.logger.debug("Loading game from file %s" % level)
             self.load_game(level)
         else:
             raise ValueError("Invalid argument passed to GameView.__init__: %s"\
@@ -48,7 +50,7 @@ class GameView(BaseView):
     def destroy(self):
         self.game_teardown()
 
-    def game_teardown(self):
+    def level_teardown(self):
         if self.current_level:
             self.current_level.destroy()
             self.current_level = None
@@ -56,7 +58,7 @@ class GameView(BaseView):
         if self.player and hasattr(self.player, 'delete'):
             self.player.delete()
 
-    def save_game(self, filepath = 'autosave.blackmango'):
+    def save_level(self, filepath = 'autosave.blackmango'):
         stored_level = self.current_level.serialize(self.player)
         f = os.path.join(blackmango.system.DIR_SAVEDGAMES, filepath)
         d = os.path.dirname(f)
@@ -73,7 +75,7 @@ class GameView(BaseView):
             fp.write(cPickle.dumps(stored_level))
         return True
 
-    def load_game(self, filepath = 'autosave.blackmango'):
+    def load_level(self, filepath = 'autosave.blackmango'):
         self.loading = True
         self.logger.debug("Scheduling load game...")
         current_save_vesion = blackmango.configure.SAVE_GAME_VERSION
@@ -88,14 +90,14 @@ class GameView(BaseView):
                        " data: %s:%s" % (version, current_save_vesion))
                 stored_level = cPickle.loads(leveldata)
             self.loading = False
-            self.start_game(stored_level)
+            self.start_level(stored_level)
 
         # Don't load the next level until the current update has completed
         # (otherwise Pyglet will barf when you start to tear down Sprites that
         # it is in the middle of updating).
         pyglet.clock.schedule_once(loader, 1)
 
-    def start_game(self, level_data):
+    def start_level(self, level_data):
 
         self.loading = True
         self.game_teardown()
@@ -112,6 +114,13 @@ class GameView(BaseView):
 
         self.loading = False
         self.logger.debug("Game started: %s" % repr(self.current_level))
+
+    def next_level(self):
+        next_level_str = self.current_level.next_level
+        self.logger("Loading next level: %s" % next_level_str)
+        level_data = LEVELS.get(self.current_level.next_level)
+        if level_data:
+            self.start_level(level_data)
 
     @loading_halt
     def on_draw(self):
@@ -154,12 +163,12 @@ class GameView(BaseView):
         # View-level actions. These should go into some sort of overlay menu
         # that pauses the game when active.
         if keyboard[key.S]:
-            self.save_game()
+            self.save_level()
         elif keyboard[key.L]:
-            self.load_game()
+            self.load_level()
         elif keyboard[key.ESC]:
             from blackmango.ui.views.main_menu import MainMenuView
             blackmango.ui.game_window.set_view(MainMenuView())
 
         if self.current_level:
-            self.current_level.tick()
+            self.current_level.tick(self.player)

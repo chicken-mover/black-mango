@@ -22,7 +22,7 @@ ALL_OPTIONS=(
     --specpath=./spec/
     --log-level=INFO
     --name=BlackMango
-    --onefile
+    --one-dir
     --windowed
 )
 

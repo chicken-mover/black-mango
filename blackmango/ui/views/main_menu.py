@@ -15,6 +15,8 @@ TITLE_COLOR = (110, 25, 71, 255)
 MENU_ITEM_COLOR = (80, 30, 102, 255)
 SELECTED_COLOR = (86, 117, 26, 255)
 
+NEW_GAME_LEVEL = 'test_level'
+
 class MainMenuView(BaseView):
     
     def __init__(self):
@@ -50,7 +52,7 @@ class MainMenuView(BaseView):
 
     def new_game_action(self):
         from blackmango.ui.views.game import GameView
-        blackmango.ui.game_window.set_view(GameView('new'))
+        blackmango.ui.game_window.set_view(GameView(NEW_GAME_LEVEL))
 
     def settings_action(self):
         from blackmango.ui.views.settings import SettingsView
