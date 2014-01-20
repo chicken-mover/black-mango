@@ -6,7 +6,7 @@ import blackmango.mobs
 
 class PatrollerV(blackmango.mobs.SimpleMob):
 
-    direction = (0,1)
+    move_direction = (0,1)
 
     previous_location = None
     next_location = None
@@ -18,13 +18,13 @@ class PatrollerV(blackmango.mobs.SimpleMob):
             return
 
         if self.world_location == self.previous_location:
-            self.direction = [-1*i for i in self.direction]
+            self.move_direction = [-1*i for i in self.move_direction]
 
         self.previous_location = self.world_location
         l = [
             self.world_location,
-            self.direction,
+            self.move_direction,
         ]
         self.next_location = [sum(i) for i in zip(*l)]
 
-        self.move(level, *self.direction)
+        self.move(level, *self.move_direction)

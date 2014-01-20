@@ -1,8 +1,8 @@
 
-from blackmango.levels import test_level
-from blackmango.levels import test_level2
+import blackmango.levels.test_level
+import blackmango.levels.test_level2
 
 LEVELS = {
-    'test_level': test_level.LEVEL_DATA,
-    'test_level2': test_level2.LEVEL_DATA,
+    'test_level': blackmango.levels.test_level.LEVEL_DATA,
+    'test_level2': blackmango.levels.test_level2.LEVEL_DATA,
 }

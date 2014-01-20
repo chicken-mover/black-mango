@@ -42,6 +42,7 @@ class BasicLevel(object):
         self.current_floor = self.starting_location[2]
         self.level_size = level_data['level_size']
         self.triggers = level_data['triggers']
+        self.next_level = level_data['next_level']
 
         blockdata = level_data['blocks']
         mobdata = level_data['mobs']

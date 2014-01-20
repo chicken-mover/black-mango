@@ -145,7 +145,7 @@ class MainMenuTitle(pyglet.text.Label):
             y = y - (y // 4),
             anchor_x = 'right',
             anchor_y = 'center',
-            batch = batch,
+            batch = main_menu_batch,
             color = TITLE_COLOR,
         )
 

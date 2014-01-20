@@ -5,6 +5,7 @@ Active view during gameplay.
 import cPickle
 import errno
 import os
+import pyglet
 
 from pyglet.window import key
 
@@ -42,24 +43,21 @@ class GameView(BaseView):
         
         if level_data:
             self.logger.debug("Starting new game at level %s" % level)
-            self.start_game(level_data)
+            self.start_level(level_data)
         elif level.endswith('.blackmango'):
             self.logger.debug("Loading game from file %s" % level)
-            self.load_game(level)
+            self.load_level(level)
         else:
             raise ValueError("Invalid argument passed to GameView.__init__: %s"\
                                 % level)
 
     def destroy(self):
-        self.game_teardown()
+        self.level_teardown()
 
     def level_teardown(self):
         if self.current_level:
             self.current_level.destroy()
             self.current_level = None
-        # Clean up the player if it wasn't cleaned up by the level teardown.
-        if self.player and hasattr(self.player, 'delete'):
-            self.player.delete()
 
     def save_level(self, filepath = 'autosave.blackmango'):
         stored_level = self.current_level.serialize(self.player)
@@ -69,7 +67,7 @@ class GameView(BaseView):
         try:
             os.makedirs(d)
         except OSError as exc:
-            if exc.errno == errno.EEXIST and os.path.isdir(dir):
+            if exc.errno == errno.EEXIST and os.path.isdir(d):
                 pass
             else:
                 raise
@@ -92,7 +90,6 @@ class GameView(BaseView):
                     raise IOError("Version mismatch trying to load saved game"
                        " data: %s:%s" % (version, current_save_vesion))
                 stored_level = cPickle.loads(leveldata)
-            self.loading = False
             self.start_level(stored_level)
 
         # Don't load the next level until the current update has completed
@@ -103,7 +100,7 @@ class GameView(BaseView):
     def start_level(self, level_data):
 
         self.loading = True
-        self.game_teardown()
+        self.level_teardown()
 
         # Initialize level and player
         self.current_level = blackmango.levels.BasicLevel(level_data)
@@ -119,11 +116,16 @@ class GameView(BaseView):
         self.logger.debug("Game started: %s" % repr(self.current_level))
 
     def next_level(self):
-        next_level_str = self.current_level.next_level
-        self.logger("Loading next level: %s" % next_level_str)
-        level_data = LEVELS.get(self.current_level.next_level)
-        if level_data:
+        self.loading = True
+        def loader(dt):
+            next_level_str = self.current_level.next_level
+            self.logger.debug("Loading next level: %s" % next_level_str)
+            level_data = LEVELS.get(self.current_level.next_level)
             self.start_level(level_data)
+        # Don't load the next level until the current update has completed
+        # (otherwise Pyglet will barf when you start to tear down Sprites that
+        # it is in the middle of updating).
+        pyglet.clock.schedule_once(loader, 1)
 
     @loading_halt
     def on_draw(self):
@@ -169,7 +171,7 @@ class GameView(BaseView):
             self.save_level()
         elif keyboard[key.L]:
             self.load_level()
-        elif keyboard[key.ESC]:
+        elif keyboard[key.ESCAPE]:
             from blackmango.ui.views.main_menu import MainMenuView
             blackmango.ui.game_window.set_view(MainMenuView())
 

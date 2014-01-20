@@ -7,6 +7,7 @@ All rights reserved.
 
 import argparse
 import os
+import pyglet
 import sys
 import traceback
 

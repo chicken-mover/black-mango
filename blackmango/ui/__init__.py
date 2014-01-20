@@ -25,8 +25,6 @@ def init(*args, **kwargs):
 
 class GameWindow(pyglet.window.Window):
 
-    logger = blackmango.configure.logger
-
     view = None
 
     def __init__(self):
@@ -44,14 +42,19 @@ class GameWindow(pyglet.window.Window):
                     style = pyglet.window.Window.WINDOW_STYLE_BORDERLESS,
                     caption = blackmango.configure.MAIN_WINDOW_TITLE)
 
+            # Center the window
+            scr_w, scr_h = game_screen.width, game_screen.height
+            self.set_location((scr_w - self.width) / 2,
+                (scr_h - self.height) / 2)
+
         # Might turn this on later, or depending on the DEBUG flag.
         #self.set_exclusive_mouse()
+        self.logger = blackmango.configure.logger
 
         self.keyboard = pyglet.window.key.KeyStateHandler()
         self.push_handlers(self.keyboard)
         
         self.resizeable = False
-        self.set_location(1, 1)
 
         self.fps_display = pyglet.clock.ClockDisplay()
 

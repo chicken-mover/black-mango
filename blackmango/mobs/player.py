@@ -11,14 +11,14 @@ from blackmango.masks.masklist import MASKS
 
 class Player(blackmango.mobs.BasicMobileSprite):
 
-    logger = blackmango.configure.logger
-    
     def __init__(self, x = 0, y = 0, z = 0):
 
         color = (0,255,0, 255)
 
         super(Player, self).__init__(None, x, y, z,
                 color)
+
+        self.logger = blackmango.configure.logger
 
         self.current_mask = None
 
