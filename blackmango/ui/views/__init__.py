@@ -13,6 +13,7 @@ class BaseView(object):
         """
         Called when the view is switched away from this view.
         """
+        pass
 
     def on_draw(self):
         """

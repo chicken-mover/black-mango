@@ -17,7 +17,7 @@ LEVEL_DATA = {
     'level_size': (10, 10, 4),
     'starting_location': (5, 5, 3),
 
-    'next_level': None,
+    'next_level': blackmango.levels.test_level2,
     'previous_level': None,
 
     'triggers': LevelTriggers(),

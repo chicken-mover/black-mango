@@ -27,7 +27,7 @@ ARGUMENTS = (
         'dest': 'debug',
         'help': 'Specify the debug level to use for logging output. This should'
                 ' match one of the log levels found in the built-in `logging` '
-                'module.',
+                'module (0, 10, 20, 30, 40, 50)',
         'type': int,
     }),
 )
@@ -49,26 +49,26 @@ if __name__ == "__main__":
     blackmango.configure.setup_logger(blackmango.configure.DEBUG)
     logger = blackmango.configure.logger
 
-    logger.info("Initializing ui and app")
+    logger.debug("Initializing ui and app")
     blackmango.ui.init()
     blackmango.app.init()
     
-    logger.info("Loading fonts")
+    logger.debug("Loading fonts")
     blackmango.assetloader.load_fonts()
 
-    logger.info("Initializing starting view")
+    logger.debug("Initializing starting view")
     from blackmango.ui.views.main_menu import MainMenuView
     blackmango.ui.game_window.set_view(MainMenuView())
 
-    logger.info("Scheduling tick handler")
+    logger.debug("Scheduling tick handler")
     pyglet.clock.schedule(blackmango.ui.game_window.tick)
 
     try:
-        logger.info("Starting event loop")
+        logger.debug("Starting event loop")
         blackmango.app.game_app.run()
-        logger.info("Exited event loop")
+        logger.debug("Exited event loop")
     except Exception as e:
-        logger.debug("Exited event loop due to error")
+        logger.fatal("Exited event loop due to error")
         # TODO implement crash logs/reporting
         print >>sys.stderr, traceback.format_exc()
         sys.exit(os.EX_SOFTWARE)

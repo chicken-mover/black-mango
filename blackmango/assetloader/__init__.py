@@ -22,7 +22,7 @@ def load_fonts():
             if not f.endswith('.ttf'):
                 continue
             fontfile = os.path.join(dirpath, f)
-            blackmango.configure.logger.info("- loading %s" % fontfile)
+            blackmango.configure.logger.debug("- loading %s" % fontfile)
             pyglet.font.add_file(fontfile)
 
 

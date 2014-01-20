@@ -11,9 +11,18 @@ Git commit messages should follow
 * `pyglet` for GUI/OpenGL support
 * `mock` and `nose` for testing
 * `setuptools` to install all other dependencies automatically.
-* In all commands, `python` refers to a Python 2.7 interpreter.
+* In all commands, `python` refers to a Python 2.7 interpreter. If you do not
+  have Python 2.7 installed, you can download a prepackaged installer from the
+  [Python website](http://www.python.org/getit/) (on Windows or OS X) or, under
+  Linux, install it on your favorite package manager (Arch:
+  `sudo pacman -S python2`; Debian: `sudo apt-get install python`)
 
 ### Build requirements
+
+**NB.:** You do not need to build binaries to test the functionality of the
+game. Binaries should only be build when you need to actually test whether the
+game builds correctly on a given system. Skip to "Setup instructions for
+development" for infomation on normal testing.
 
 * For building binary executables, you will need
   [PyInstaller](http://www.pyinstaller.org/):
@@ -29,28 +38,24 @@ $ sudo python setup.py install
 
 ## Setup instructions for development
 
+Start by cloning the repository and installing the Git hooks, which will do some
+basic checks when you commit/pull in the future.
+
 Simply clone the repository and run `setup.py develop`, like so:
 
 ```bash
 $ git clone git@github.com:chicken-mover/black-mango.git
 $ cd black-mango
-$ sudo python setup.py develop
+$ bash scripts/install-hooks.sh
 ```
 
-This should also install dependencies, assuming you have `setuptools` and `pip`
-installed correctly.
-
-If you want to activate the git hooks that come with the repository, you should
-also do the following, in the base directory of the project:
+You should then install Black Mango as a development module. The `run-setup.sh`
+script will take care of selecting the proper Python binary to use, assuming you
+have Python 2.7 installed. If you do not, you cannot run Black Mango.
 
 ```bash
-$ mv .git/hooks .git/hooks-backup
-$ ln -s ../hooks .git/hooks
-$ chmod u+x hooks/*
+$ bash run-setup.sh
 ```
-
-This will help with things like automatic validation of version numbers during
-commit.
 
 ## Build instructions
 
@@ -73,10 +78,6 @@ $ chmod u+x build.sh
 Any extra options beyond the first will be passed directly to PyInstaller. See
 [the manual](http://www.pyinstaller.org/export/develop/project/doc/Manual.html)
 for more information, or do `pyinstaller --help` at the command line.
-
-## Running tests
-
-Run `sudo python setup.py test` in the project root to run all unit tests.
 
 ## Progress and notes
 

@@ -20,7 +20,7 @@ def init(*args, **kwargs):
     """
     global game_window
     # Prevent circular imports
-    blackmango.configure.logger.info("Initializing GameWindow as game_window")
+    blackmango.configure.logger.debug("Initializing GameWindow as game_window")
     game_window = GameWindow(*args, **kwargs)
 
 class GameWindow(pyglet.window.Window):
@@ -57,9 +57,9 @@ class GameWindow(pyglet.window.Window):
 
     def set_view(self, view):
         if self.view:
-            self.logger.info("Tearing down view %s" %  repr(self.view))
+            self.logger.debug("Tearing down view %s" %  repr(self.view))
             self.view.destroy()
-        self.logger.info("Setting view: %s" % repr(view))
+        self.logger.debug("Setting view: %s" % repr(view))
         self.view = view
         
     def on_draw(self):

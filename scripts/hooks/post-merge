@@ -4,3 +4,6 @@ source scripts/vars.sh
 
 echo "Merge complete, running githook installer"
 bash scripts/install-hooks.sh
+
+echo "Setting executable flags on scripts"
+chmod u+x build.sh run-debug.sh scripts/install-hooks.sh

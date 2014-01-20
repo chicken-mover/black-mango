@@ -19,7 +19,6 @@ DIR_APPDATA = None
 DIR_SAVEDGAMES = None
 
 # Python should deal with pathsep issues correctly. (test this)
-# TODO: Backward-compatible paths for pre-Windows 7 setups (XP/Vista?)
 _DIR_WIN_APPDATA = '%USERPROFILE%/Application Data/Black Mango'
 _DIR_WIN_SAVEDGAMES = '%USERPROFILE%/Saved Games/Black Mango'
 
@@ -31,7 +30,7 @@ _DIR_MACOS_SAVEDGAMES = '~/Documents/Black Mango/Saved Games'
 _DIR_POSIX_APPDATA = os.path.join(blackmango.configure.POSIX_DATA_DIR, 
                         'appdata/')
 _DIR_POSIX_SAVEDGAMES = os.path.join(blackmango.configure.POSIX_DATA_DIR, 
-                            'savedgames/')
+                        'savedgames/')
 
 _posix_expandfunc = os.path.expanduser
 

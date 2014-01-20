@@ -16,16 +16,12 @@ def init(*args, **kwargs):
     Called by the central startup routine during initialization.
     """
     global game_app
-    blackmango.configure.logger.info("Initializing BlackMangoApp as game_app")
+    blackmango.configure.logger.debug("Initializing BlackMangoApp as game_app")
     game_app = BlackMangoApp(*args, **kwargs)
 
 class BlackMangoApp(pyglet.app.EventLoop):
 
     returncode = None
-
-    def __init__(self, *args):
-
-        super(BlackMangoApp, self).__init__()
 
     def user_quit(self):
         """

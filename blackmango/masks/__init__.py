@@ -30,5 +30,5 @@ class MaskOfAgammemnon(BaseMask):
 class NohMask(BaseMask):
     pass
 
-class PlagueDoctor(BaseMask):
+class PlagueDoctorMask(BaseMask):
     pass

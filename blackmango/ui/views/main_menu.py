@@ -19,10 +19,10 @@ class MainMenuView(BaseView):
     
     def __init__(self):
         
-        self.menu_options = [
+        MENU_OPTIONS = [
             ('New game', self.new_game_action),
             ('Load game', self.load_game_action),
-            ('Options & controls', None),
+            ('Options & controls', self.settings_action),
             ('Credits', self.credits_action),
             ('Quit', blackmango.app.game_app.user_quit),
         ]
@@ -31,7 +31,7 @@ class MainMenuView(BaseView):
         self.title = MainMenuTitle('Black Mango')
         self.versioninfo = VersionInfo(blackmango.configure.VERSION)
         offset = 0
-        for option, action in self.menu_options:
+        for option, action in MENU_OPTIONS:
             label = MainMenuLabel(option, offset)
             label.action = action
             self.menu_items.append(label)
@@ -44,13 +44,17 @@ class MainMenuView(BaseView):
         from blackmango.ui.views.credits import CreditsView
         blackmango.ui.game_window.set_view(CreditsView())
 
+    def load_game_action(self):
+        from blackmango.ui.views.load_game import LoadGameView
+        blackmango.ui.game_window.set_view(LoadGameView())
+
     def new_game_action(self):
         from blackmango.ui.views.game import GameView
         blackmango.ui.game_window.set_view(GameView('new'))
 
-    def load_game_action(self):
-        from blackmango.ui.views.load_game import LoadGameView
-        blackmango.ui.game_window.set_view(LoadGameView())
+    def settings_action(self):
+        from blackmango.ui.views.settings import SettingsView
+        blackmango.ui.game_window.set_view(SettingsView())
 
     def destroy(self):
         for i in self.menu_items:
@@ -125,7 +129,7 @@ class MainMenuView(BaseView):
 
 class MainMenuTitle(pyglet.text.Label):
 
-    def __init__(self, title, batch):
+    def __init__(self, title):
 
         x, y = blackmango.ui.game_window.get_size()
 

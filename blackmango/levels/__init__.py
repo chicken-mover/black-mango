@@ -9,12 +9,8 @@ The level's `tick` method is used to iterate and call the `behavior` method on
 each mob in the level.
 """
 
-import cPickle
-
-import blackmango.materials
-import blackmango.materials.materiallist
-import blackmango.mobs
-import blackmango.mobs.moblist
+from blackmango.materials.materiallist import MATERIALS
+from blackmango.mobs.moblist import MOBS
 
 class BasicLevel(object):
 
@@ -65,7 +61,7 @@ class BasicLevel(object):
                         if isinstance(v, tuple):
                             # This is for portals, but might be useful for
                             # other special cases in the future.
-                            material = blackmango.materials.materiallist.MATERIALS[v[0]]
+                            material = MATERIALS[v[0]]
                             kwargs = v[1]
                             kwargs.update({
                                 'x': x,
@@ -75,7 +71,7 @@ class BasicLevel(object):
                             block = material(**kwargs)
                         else:
                             # basic block init.
-                            material = blackmango.materials.materiallist.MATERIALS[v]
+                            material = MATERIALS[v]
                             block = material(x = x, y = y, z = floor)
                         self.set_block(block, x, y, floor)
                     # Check to see if there is a mob for this location
@@ -85,7 +81,7 @@ class BasicLevel(object):
                         v = None
                     if v:
                         if isinstance(v, tuple):
-                            mob = blackmango.mobs.moblist.MOBS[v[0]]
+                            mob = MOBS[v[0]]
                             kwargs = v[1]
                             kwargs.update({
                                 'x': x,
@@ -94,7 +90,7 @@ class BasicLevel(object):
                             })
                             m = mob(**kwargs)
                         else:
-                            m = blackmango.mobs.moblist.MOBS[v]
+                            m = MOBS[v]
                             mob = m(x = x, y = y, z = floor)
                         self.set_mob(mob, x, y, floor)
 
@@ -170,11 +166,8 @@ class BasicLevel(object):
 
     def serialize(self, player):
         """
-        Return a cPickle-encodable object that represents the current level
-        state.
-
-        Saved levels look a lot like standard levels, with a couple of extra
-        attributes.
+        Return a pickleable object that represents the current level state.
+        Saved level data should be identical in format to prepared level data.
         """
 
         saved_level = {
@@ -211,9 +204,9 @@ class BasicLevel(object):
             for coords, item in lookuplist.items():
                 v = 0
                 if lookuplist is self.blocks:
-                    lookup_dict = blackmango.materials.materiallist.MATERIALS
+                    lookup_dict = MATERIALS
                 elif lookuplist is self.mobs:
-                    lookup_dict = blackmango.mobs.moblist.MOBS
+                    lookup_dict = MOBS
                 for k, t in lookup_dict.items():
                     if t and isinstance(item, t):
                         v = k

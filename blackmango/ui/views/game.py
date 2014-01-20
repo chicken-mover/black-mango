@@ -36,7 +36,7 @@ class GameView(BaseView):
 
         if level == 'new':
             import blackmango.levels.test_level
-            self.logger.info("Starting new game...")
+            self.logger.debug("Starting new game...")
             self.start_game(
                     blackmango.levels.test_level.LEVEL_DATA)
         elif level.endswith('.blackmango'):
@@ -60,7 +60,7 @@ class GameView(BaseView):
         stored_level = self.current_level.serialize(self.player)
         f = os.path.join(blackmango.system.DIR_SAVEDGAMES, filepath)
         d = os.path.dirname(f)
-        self.logger.info("Saving game: %s" % f)
+        self.logger.debug("Saving game: %s" % f)
         try:
             os.makedirs(d)
         except OSError as exc:
@@ -75,12 +75,12 @@ class GameView(BaseView):
 
     def load_game(self, filepath = 'autosave.blackmango'):
         self.loading = True
-        self.logger.info("Scheduling load game...")
+        self.logger.debug("Scheduling load game...")
         current_save_vesion = blackmango.configure.SAVE_GAME_VERSION
 
         def loader(dt):
             file = os.path.join(blackmango.system.DIR_SAVEDGAMES, filepath)
-            self.logger.info("Loading game: %s" % file)
+            self.logger.debug("Loading game: %s" % file)
             with open(file) as f:
                 version, _, leveldata = f.read().partition('\n')
                 if version != current_save_vesion:
@@ -111,7 +111,7 @@ class GameView(BaseView):
         self.player.translate()
 
         self.loading = False
-        self.logger.info("Game started: %s" % repr(self.current_level))
+        self.logger.debug("Game started: %s" % repr(self.current_level))
 
     @loading_halt
     def on_draw(self):

@@ -2,9 +2,12 @@
 The main player class, a subclass of the BasicMobileSprite class.
 """
 
+from pyglet.window import key
+
 import blackmango.configure
-import blackmango.masks.masklist
 import blackmango.mobs
+
+from blackmango.masks.masklist import MASKS
 
 class Player(blackmango.mobs.BasicMobileSprite):
     
@@ -52,4 +55,11 @@ class Player(blackmango.mobs.BasicMobileSprite):
             self.move(level, -1, 0)
         elif keyboard[key.RIGHT]:
             self.move(level, 1, 0)
+
+        elif keyboard[key.NUM_1]:
+            self.activate_mask(MASKS[1])
+        elif keyboard[key.NUM_2]:
+            self.activate_mask(MASKS[2])
+        elif keyboard[key.NUM_3]:
+            self.activate_mask(MASKS[3])
 

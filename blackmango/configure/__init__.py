@@ -10,7 +10,7 @@ VERSION = '0.0.0'
 
 MAIN_WINDOW_TITLE = 'BLACK MANGO'
 
-DEBUG = logging.DEBUG
+DEBUG = logging.WARN
 FULLSCREEN = False
 # Main game window size.
 # TODO: Set this appropriately dynamically
