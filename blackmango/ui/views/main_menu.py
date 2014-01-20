@@ -6,7 +6,6 @@ import pyglet
 
 import blackmango.app
 import blackmango.configure
-import blackmango.engine
 import blackmango.ui.views
 import blackmango.ui.views.credits
 import blackmango.ui.views.game

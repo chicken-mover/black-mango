@@ -13,7 +13,6 @@ import traceback
 import blackmango.app
 import blackmango.assetloader
 import blackmango.configure
-import blackmango.engine
 import blackmango.ui
 import blackmango.ui.views.main_menu
 
@@ -50,8 +49,7 @@ if __name__ == "__main__":
 
     blackmango.configure.setup_logger(blackmango.configure.DEBUG)
 
-    blackmango.configure.logger.info("Initializing engine, ui, and app")
-    blackmango.engine.init()
+    blackmango.configure.logger.info("Initializing ui and app")
     blackmango.ui.init()
     blackmango.app.init()
     

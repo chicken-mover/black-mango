@@ -36,9 +36,25 @@ class BlackMangoApp(pyglet.app.EventLoop):
         """
         pyglet.clock.schedule(f)
 
+    def schedule_once(self, f, delay):
+        """
+        Schedule a callable <f> to be called once after <delay> seconds, using
+        `pyglet.clock.schedule_once`. Any callable scheduled this way must
+        accept a single argument (the number of ticks that have passed since the
+        previous call).
+        """
+        pyglet.clock.schedule_once(f, delay)
+
+    def unschedule(self, f):
+        """
+        Unschedule a previously scheduled callable.
+        """
+        pygleyt.clock.unschedule(f)
+
     def user_quit(self):
         """
-        Should be called whenever the user asks the app to quit.
+        Should be called whenever the user asks the app to quit. Stops the app
+        loop so that cleanup processes can run before the program exits.
         """
         self.exit()
         self.returncode = 0

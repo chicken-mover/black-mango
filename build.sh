@@ -48,8 +48,8 @@ SCRIPTPATH="blackmango/__init__.py"
 
 function make() {
     load-resources
-    $PYTHON -OO $PYINSTALLER ${ALL_OPTIONS[@]} ${NODEBUG_OPTIONS[@]} ${RESOURCES[@]} \
-        $SCRIPTPATH $@
+    $PYTHON -OO $PYINSTALLER ${ALL_OPTIONS[@]} ${NODEBUG_OPTIONS[@]} \
+         ${RESOURCES[@]} $SCRIPTPATH $@
 }
 
 function clean() {
@@ -64,7 +64,8 @@ function clean() {
 
 function make-debug() {
     load-resources
-    $PYINSTALLER ${ALL_OPTIONS[@]} ${DEBUG_OPTIONS[@]} $SCRIPTPATH ${RESOURCES[@]} $@
+    $PYINSTALLER ${ALL_OPTIONS[@]} ${DEBUG_OPTIONS[@]} $SCRIPTPATH \
+        ${RESOURCES[@]} $@
 }
 
 function help() {
