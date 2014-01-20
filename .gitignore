@@ -6,6 +6,7 @@
 *.swo
 *.swn
 __pycache__
+.LCK*
 
 # Python packaging junk
 *.egg*/
@@ -23,3 +24,6 @@ spec/
 *.spec
 *.o
 *.so
+
+# Don't let Mac OS junk leak onto my pristine Linux setups
+.DS_Store

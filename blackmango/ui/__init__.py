@@ -25,6 +25,8 @@ def init(*args, **kwargs):
 
 class GameWindow(pyglet.window.Window):
 
+    logger = blackmango.configure.logger
+
     view = None
 
     def __init__(self):
@@ -47,8 +49,6 @@ class GameWindow(pyglet.window.Window):
 
         self.keyboard = pyglet.window.key.KeyStateHandler()
         self.push_handlers(self.keyboard)
-
-        self.logger = blackmango.configure.logger
         
         self.resizeable = False
         self.set_location(1, 1)
@@ -57,7 +57,9 @@ class GameWindow(pyglet.window.Window):
 
     def set_view(self, view):
         if self.view:
+            self.logger.info("Tearing down view %s" %  repr(self.view))
             self.view.destroy()
+        self.logger.info("Setting view: %s" % repr(view))
         self.view = view
         
     def on_draw(self):

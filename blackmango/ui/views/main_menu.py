@@ -6,10 +6,8 @@ import pyglet
 
 import blackmango.app
 import blackmango.configure
-import blackmango.ui.views
-import blackmango.ui.views.credits
-import blackmango.ui.views.game
-import blackmango.ui.views.load_game
+
+from blackmango.ui.views import BaseView
 
 main_menu_batch = pyglet.graphics.Batch()
 
@@ -17,7 +15,7 @@ TITLE_COLOR = (110, 25, 71, 255)
 MENU_ITEM_COLOR = (80, 30, 102, 255)
 SELECTED_COLOR = (86, 117, 26, 255)
 
-class MainMenu(blackmango.ui.views.BaseView):
+class MainMenuView(BaseView):
     
     def __init__(self):
         
@@ -25,18 +23,16 @@ class MainMenu(blackmango.ui.views.BaseView):
             ('New game', self.new_game_action),
             ('Load game', self.load_game_action),
             ('Options & controls', None),
-            ('Credits', lambda : blackmango.ui.game_window.set_view(
-                    blackmango.ui.views.credits.CreditsView()
-                )),
+            ('Credits', self.credits_action),
             ('Quit', blackmango.app.game_app.user_quit),
         ]
         self.menu_items = []
 
-        self.title = MainMenuTitle('Black Mango', main_menu_batch)
+        self.title = MainMenuTitle('Black Mango')
         self.versioninfo = VersionInfo(blackmango.configure.VERSION)
         offset = 0
         for option, action in self.menu_options:
-            label = MainMenuLabel(option, offset, main_menu_batch)
+            label = MainMenuLabel(option, offset)
             label.action = action
             self.menu_items.append(label)
             offset += 1
@@ -44,15 +40,17 @@ class MainMenu(blackmango.ui.views.BaseView):
         self.selected = 0
         self.set_selected(0)
 
+    def credits_action(self):
+        from blackmango.ui.views.credits import CreditsView
+        blackmango.ui.game_window.set_view(CreditsView())
+
     def new_game_action(self):
-        blackmango.ui.game_window.set_view(
-            blackmango.ui.views.game.GameView('new')        
-        )
+        from blackmango.ui.views.game import GameView
+        blackmango.ui.game_window.set_view(GameView('new'))
 
     def load_game_action(self):
-        blackmango.ui.game_window.set_view(
-            blackmango.ui.views.load_game.LoadGameView()        
-        )
+        from blackmango.ui.views.load_game import LoadGameView
+        blackmango.ui.game_window.set_view(LoadGameView())
 
     def destroy(self):
         for i in self.menu_items:
@@ -145,7 +143,7 @@ class MainMenuTitle(pyglet.text.Label):
 
 class MainMenuLabel(pyglet.text.Label):
 
-    def __init__(self, title, offset = 0, batch = None):
+    def __init__(self, title, offset = 0):
 
         x, y = blackmango.ui.game_window.get_size()
 
@@ -161,7 +159,7 @@ class MainMenuLabel(pyglet.text.Label):
             y = y - 180 - 100*offset,
             anchor_x = 'right',
             anchor_y = 'top',
-            batch = batch,
+            batch = main_menu_batch,
             color = MENU_ITEM_COLOR,
         )
 

@@ -27,15 +27,15 @@ class LoadGameView(blackmango.ui.views.BaseView):
             self.menu_options.append((f[:-11], f))
         self.menu_items = []
 
-        self.title = MenuTitle('Load game', loading_menu_batch)
+        self.title = MenuTitle('Load game')
         offset = 0
         for option, s in self.menu_options:
-            label = MenuLabel(option, offset, loading_menu_batch)
+            label = MenuLabel(option, offset)
             label.action = lambda : self.load_game(s)
             self.menu_items.append(label)
             offset += 1
 
-        cancel = MenuLabel('Cancel', offset, loading_menu_batch)
+        cancel = MenuLabel('Cancel', offset)
         cancel.action = self.cancel_action
         self.menu_items.append(cancel)
 
@@ -48,12 +48,12 @@ class LoadGameView(blackmango.ui.views.BaseView):
         self.title.delete()
 
     def load_game(self, savefile):
-        blackmango.ui.game_window.set_view(
-            blackmango.ui.views.game.GameView(savefile))
+        from blackmango.ui.views.game import GameView
+        blackmango.ui.game_window.set_view(GameView(savefile))
 
     def cancel_action(self):
-        blackmango.ui.game_window.set_view(
-            blackmango.ui.views.main_menu.MainMenu())
+        from blackmango.ui.views.main_menu import MainMenuView
+        blackmango.ui.game_window.set_view(MainMenuView())
            
     def set_selected(self, i):
         self.menu_items[self.selected].color = MENU_ITEM_COLOR
@@ -122,7 +122,7 @@ class LoadGameView(blackmango.ui.views.BaseView):
 
 class MenuTitle(pyglet.text.Label):
 
-    def __init__(self, title, batch):
+    def __init__(self, title):
 
         x, y = blackmango.ui.game_window.get_size()
 
@@ -134,13 +134,13 @@ class MenuTitle(pyglet.text.Label):
             y = y - (y // 4),
             anchor_x = 'right',
             anchor_y = 'center',
-            batch = batch,
+            batch = loading_menu_batch,
             color = TITLE_COLOR,
         )
 
 class MenuLabel(pyglet.text.Label):
 
-    def __init__(self, title, offset = 0, batch = None):
+    def __init__(self, title, offset = 0):
 
         x, y = blackmango.ui.game_window.get_size()
 
@@ -155,6 +155,6 @@ class MenuLabel(pyglet.text.Label):
             y = y - 180 - 100*offset,
             anchor_x = 'right',
             anchor_y = 'top',
-            batch = batch,
+            batch = loading_menu_batch,
             color = MENU_ITEM_COLOR,
         )

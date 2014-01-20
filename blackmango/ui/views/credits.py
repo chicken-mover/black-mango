@@ -3,11 +3,12 @@ import pyglet
 
 import blackmango.assetloader
 import blackmango.ui
-import blackmango.ui.views
+
+from blackmango.ui.views import BaseView
 
 credits_batch = pyglet.graphics.Batch()
 
-class CreditsView(blackmango.ui.views.BaseView):
+class CreditsView(BaseView):
 
     def __init__(self):
         
@@ -49,5 +50,5 @@ class CreditsView(blackmango.ui.views.BaseView):
         self.back_to_main_menu()
 
     def back_to_main_menu(self):
-        blackmango.ui.game_window.set_view(
-                blackmango.ui.views.main_menu.MainMenu())
+        from blackmango.ui.views.main_menu import MainMenuView
+        blackmango.ui.game_window.set_view(MainMenuView())

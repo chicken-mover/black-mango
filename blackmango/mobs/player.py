@@ -39,3 +39,17 @@ class Player(blackmango.mobs.BasicMobileSprite):
             level.switch_floor(z)
         self.translate()
 
+    def user_input(self, keyboard, level):
+        """
+        Called on every tick by the GameView object.
+        """
+
+        if keyboard[key.UP]:
+            self.move(level, 0, -1)
+        elif keyboard[key.DOWN]:
+            self.move(level, 0, 1)
+        elif keyboard[key.LEFT]:
+            self.move(level, -1, 0)
+        elif keyboard[key.RIGHT]:
+            self.move(level, 1, 0)
+

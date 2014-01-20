@@ -14,7 +14,6 @@ import blackmango.app
 import blackmango.assetloader
 import blackmango.configure
 import blackmango.ui
-import blackmango.ui.views.main_menu
 
 ARGUMENTS = (
     ('--data-dir', {
@@ -48,27 +47,28 @@ if __name__ == "__main__":
         blackmango.configure.POSIX_DATA_DIR = args.data_dir
 
     blackmango.configure.setup_logger(blackmango.configure.DEBUG)
+    logger = blackmango.configure.logger
 
-    blackmango.configure.logger.info("Initializing ui and app")
+    logger.info("Initializing ui and app")
     blackmango.ui.init()
     blackmango.app.init()
     
-    blackmango.configure.logger.info("Loading fonts")
+    logger.info("Loading fonts")
     blackmango.assetloader.load_fonts()
 
-    blackmango.configure.logger.info("Initializing starting view")
-    starting_view = blackmango.ui.views.main_menu.MainMenu()
-    blackmango.ui.game_window.set_view(starting_view)
+    logger.info("Initializing starting view")
+    from blackmango.ui.views.main_menu import MainMenuView
+    blackmango.ui.game_window.set_view(MainMenuView())
 
-    blackmango.configure.logger.info("Scheduling tick handler")
-    blackmango.app.game_app.schedule(blackmango.ui.game_window.tick)
+    logger.info("Scheduling tick handler")
+    pyglet.clock.schedule(blackmango.ui.game_window.tick)
 
     try:
-        blackmango.configure.logger.info("Starting event loop")
+        logger.info("Starting event loop")
         blackmango.app.game_app.run()
-        blackmango.configure.logger.info("Exited event loop")
+        logger.info("Exited event loop")
     except Exception as e:
-        blackmango.configure.logger.debug("Exited event loop due to error")
+        logger.debug("Exited event loop due to error")
         # TODO implement crash logs/reporting
         print >>sys.stderr, traceback.format_exc()
         sys.exit(os.EX_SOFTWARE)

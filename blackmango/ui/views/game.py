@@ -5,14 +5,15 @@ import os
 
 from pyglet.window import key
 
-import blackmango.app
 import blackmango.configure
 import blackmango.levels
 import blackmango.materials
 import blackmango.mobs
 import blackmango.mobs.player
 import blackmango.system
-import blackmango.ui.views
+import blackmango.ui
+
+from blackmango.ui.views import BaseView
 
 def loading_halt(f):
     def wrapped(self, *args, **kwargs):
@@ -22,7 +23,9 @@ def loading_halt(f):
             return f(self, *args, **kwargs)
     return wrapped
 
-class GameView(blackmango.ui.views.BaseView):
+class GameView(BaseView):
+
+    logger = blackmango.configure.logger
 
     def __init__(self, level = None):
 
@@ -33,7 +36,7 @@ class GameView(blackmango.ui.views.BaseView):
 
         if level == 'new':
             import blackmango.levels.test_level
-            blackmango.configure.logger.info("Starting new game...")
+            self.logger.info("Starting new game...")
             self.start_game(
                     blackmango.levels.test_level.LEVEL_DATA)
         elif level.endswith('.blackmango'):
@@ -57,7 +60,7 @@ class GameView(blackmango.ui.views.BaseView):
         stored_level = self.current_level.serialize(self.player)
         f = os.path.join(blackmango.system.DIR_SAVEDGAMES, filepath)
         d = os.path.dirname(f)
-        blackmango.configure.logger.info("Saving game: %s" % f)
+        self.logger.info("Saving game: %s" % f)
         try:
             os.makedirs(d)
         except OSError as exc:
@@ -72,12 +75,12 @@ class GameView(blackmango.ui.views.BaseView):
 
     def load_game(self, filepath = 'autosave.blackmango'):
         self.loading = True
-        blackmango.configure.logger.info("Scheduling load game...")
+        self.logger.info("Scheduling load game...")
         current_save_vesion = blackmango.configure.SAVE_GAME_VERSION
 
         def loader(dt):
             file = os.path.join(blackmango.system.DIR_SAVEDGAMES, filepath)
-            blackmango.configure.logger.info("Loading game: %s" % file)
+            self.logger.info("Loading game: %s" % file)
             with open(file) as f:
                 version, _, leveldata = f.read().partition('\n')
                 if version != current_save_vesion:
@@ -90,7 +93,7 @@ class GameView(blackmango.ui.views.BaseView):
         # Don't load the next level until the current update has completed
         # (otherwise Pyglet will barf when you start to tear down Sprites that
         # it is in the middle of updating).
-        blackmango.app.game_app.schedule_once(loader, 1)
+        pyglet.clock.schedule_once(loader, 1)
 
     def start_game(self, level_data):
 
@@ -108,9 +111,7 @@ class GameView(blackmango.ui.views.BaseView):
         self.player.translate()
 
         self.loading = False
-
-        blackmango.configure.logger.info("Game started: %s" %
-                repr(self.current_level))
+        self.logger.info("Game started: %s" % repr(self.current_level))
 
     @loading_halt
     def on_draw(self):
@@ -148,22 +149,17 @@ class GameView(blackmango.ui.views.BaseView):
         Called on every window tick
         """
         # The order of these things may need adjustment at some point
+        self.player.user_input(keyboard, self.current_level)
 
-        # Deal with user input. May want to devolve this to the Player object at
-        # some point
-        if keyboard[key.UP]:
-            self.player.move(self.current_level, 0, -1)
-        elif keyboard[key.DOWN]:
-            self.player.move(self.current_level, 0, 1)
-        elif keyboard[key.LEFT]:
-            self.player.move(self.current_level, -1, 0)
-        elif keyboard[key.RIGHT]:
-            self.player.move(self.current_level, 1, 0)
-
-        elif keyboard[key.S]:
+        # View-level actions. These should go into some sort of overlay menu
+        # that pauses the game when active.
+        if keyboard[key.S]:
             self.save_game()
         elif keyboard[key.L]:
             self.load_game()
+        elif keyboard[key.ESC]:
+            from blackmango.ui.views.main_menu import MainMenuView
+            blackmango.ui.game_window.set_view(MainMenuView())
 
         if self.current_level:
             self.current_level.tick()

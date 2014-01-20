@@ -18,7 +18,8 @@ DIR_ASSETS = os.path.join(DIR_ENV, 'assets')
 DIR_APPDATA = None
 DIR_SAVEDGAMES = None
 
-# Python will deal with pathsep issues correctly.
+# Python should deal with pathsep issues correctly. (test this)
+# TODO: Backward-compatible paths for pre-Windows 7 setups (XP/Vista?)
 _DIR_WIN_APPDATA = '%USERPROFILE%/Application Data/Black Mango'
 _DIR_WIN_SAVEDGAMES = '%USERPROFILE%/Saved Games/Black Mango'
 
