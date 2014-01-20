@@ -7,12 +7,13 @@ import blackmango.ui.views
 import blackmango.ui.views.game
 import blackmango.ui.views.main_menu
 
+from blackmango.configure import COLORS
 
 loading_menu_batch = pyglet.graphics.Batch()
 
-TITLE_COLOR = (110, 25, 71, 255)
-MENU_ITEM_COLOR = (80, 30, 102, 255)
-SELECTED_COLOR = (86, 117, 26, 255)
+TITLE_COLOR = COLORS['secondary-a-5']
+MENU_ITEM_COLOR = COLORS['primary-4']
+SELECTED_COLOR = COLORS['secondary-b-5']
 
 class LoadGameView(blackmango.ui.views.BaseView):
     

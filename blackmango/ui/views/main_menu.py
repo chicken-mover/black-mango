@@ -7,13 +7,15 @@ import pyglet
 import blackmango.app
 import blackmango.configure
 
+from blackmango.configure import COLORS
 from blackmango.ui.views import BaseView
 
 main_menu_batch = pyglet.graphics.Batch()
 
-TITLE_COLOR = (110, 25, 71, 255)
-MENU_ITEM_COLOR = (80, 30, 102, 255)
-SELECTED_COLOR = (86, 117, 26, 255)
+TITLE_COLOR = COLORS['secondary-a-5']
+MENU_ITEM_COLOR = COLORS['primary-4']
+SELECTED_COLOR = COLORS['secondary-b-5']
+VERSIONINFO_COLOR = (255,255,255,50)
 
 NEW_GAME_LEVEL = 'test_level'
 
@@ -182,5 +184,5 @@ class VersionInfo(pyglet.text.Label):
             anchor_x = 'right',
             anchor_y = 'top',
             batch = main_menu_batch,
-            color = (255,255,255,50)
+            color = VERSIONINFO_COLOR
         )

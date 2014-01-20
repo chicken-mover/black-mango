@@ -38,6 +38,9 @@ ORDERED_GROUPS = {
 # sprite animations, too.
 BASE_ANIMATION_FRAMES = 10
 
+# Loaded by assetloader.load_colordata()
+COLORS = {}
+
 logger = None
 
 def setup_logger(lvl = DEBUG):

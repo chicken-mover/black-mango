@@ -19,15 +19,16 @@ if __name__ == "__main__":
         version = '0.0.0',
         py_modules = [
             'blackmango',
-            'blackmango_tests',
+#            'blackmango_tests',
         ],
         install_requires = [
             'pyglet>=1.1.4',
+            'xmltodict>=0.8.3',
         ],
-        tests_require = [
-            'mock>=1.0.1',
-            'nose>=1.3.0',
-        ],
+#        tests_require = [
+#            'mock>=1.0.1',
+#            'nose>=1.3.0',
+#        ],
         test_suite = 'nose.collector',
     )
 

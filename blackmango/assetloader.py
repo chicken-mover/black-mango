@@ -4,6 +4,7 @@ Module for loading assets
 
 import os
 import pyglet
+import xmltodict
 
 import blackmango.configure
 import blackmango.system
@@ -22,9 +23,26 @@ def load_fonts():
             if not f.endswith('.ttf'):
                 continue
             fontfile = os.path.join(dirpath, f)
-            blackmango.configure.logger.debug("- loading %s" % fontfile)
+            blackmango.configure.logger.debug(" - loading %s" % fontfile)
             pyglet.font.add_file(fontfile)
 
+def load_colordata():
+    f = os.path.join(blackmango.system.DIR_ASSETS, 'colorscheme.xml')
+    blackmango.configure.logger.debug(" - loading %s" % f)
+    outcolors = {}
+    with open(f) as fd:
+        d = fd.read()
+        colordata = xmltodict.parse(d)
+        palette = colordata.get('palette')
+        colorsets = palette.get('colorset')
+        for colorset in colorsets:
+            if hasattr(colorset, 'items'):
+                colors = colorset.get('color')
+                for c in colors:
+                    rgba = [int(i) for i in \
+                                (c.get('@r'), c.get('@g'), c.get('@b'), '255')]
+                    outcolors[c.get('@id')] = tuple(rgba)
+    return outcolors
 
 def load(asset_type, filename):
     path = os.path.join(blackmango.system.DIR_ASSETS, asset_type, filename)

@@ -53,8 +53,9 @@ if __name__ == "__main__":
     blackmango.ui.init()
     blackmango.app.init()
     
-    logger.debug("Loading fonts")
+    logger.debug("Loading fonts and colors")
     blackmango.assetloader.load_fonts()
+    blackmango.configure.COLORS = blackmango.assetloader.load_colordata()
 
     logger.debug("Initializing starting view")
     from blackmango.ui.views.main_menu import MainMenuView

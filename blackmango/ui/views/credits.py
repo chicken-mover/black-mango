@@ -16,7 +16,6 @@ class CreditsView(BaseView):
 
         text = blackmango.assetloader.load_text('credits.html')
         document = pyglet.text.decode_html(text)
-        document.color = (255,255,255,255)
         self.layout = pyglet.text.layout.ScrollableTextLayout(document,
                 width = x//3 * 2,
                 height = y,

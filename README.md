@@ -8,9 +8,10 @@ Git commit messages should follow
 
 ## Requirements
 
-* `pyglet` for GUI/OpenGL support
-* `mock` and `nose` for testing
-* `setuptools` to install all other dependencies automatically.
+* `pyglet` and `xmltodict` are `install_requires` entries (ie, you do not need
+  to install those dependencies manually).
+* ~~`mock` and `nose` for testing~~ (unit tests are on hold)
+* `setuptools` must be manually installed before you begin.
 * In all commands, `python` refers to a Python 2.7 interpreter. If you do not
   have Python 2.7 installed, you can download a prepackaged installer from the
   [Python website](http://www.python.org/getit/) (on Windows or OS X) or, under
@@ -38,23 +39,18 @@ $ sudo python setup.py install
 
 ## Setup instructions for development
 
-Start by cloning the repository and installing the Git hooks, which will do some
-basic checks when you commit/pull in the future.
-
-Simply clone the repository and run `setup.py develop`, like so:
-
+Start by cloning the repository and `cd`ing into the directory, like so:
 ```bash
 $ git clone git@github.com:chicken-mover/black-mango.git
 $ cd black-mango
-$ bash scripts/install-hooks.sh
 ```
 
 You should then install Black Mango as a development module. The `run-setup.sh`
 script will take care of selecting the proper Python binary to use, assuming you
-have Python 2.7 installed. If you do not, you cannot run Black Mango.
-
+have Python 2.7 installed, as well as installing Black Mango and the Git commit
+hooks that will perform automatic validation when pulling and commiting.
 ```bash
-$ bash run-setup.sh
+$ bash scripts/run-setup.sh
 ```
 
 ## Build instructions
@@ -62,7 +58,7 @@ $ bash run-setup.sh
 After running the `setup.py develop` command above, you can run the `build.sh`
 script from the project directory like so:
 ```bash
-$ ./build.sh make-debug
+$ ./scripts/build.sh make-debug
 ```
 
 The full set of options is as follows:
@@ -72,7 +68,7 @@ The full set of options is as follows:
 
 If `build.sh` isn't executable, fix the permissions with:
 ```bash
-$ chmod u+x build.sh
+$ chmod u+x scripts/build.sh
 ```
 
 Any extra options beyond the first will be passed directly to PyInstaller. See
