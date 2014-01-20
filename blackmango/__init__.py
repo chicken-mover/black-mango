@@ -15,7 +15,6 @@ import blackmango.assetloader
 import blackmango.configure
 import blackmango.engine
 import blackmango.ui
-import blackmango.ui.labels
 import blackmango.ui.views.main_menu
 
 ARGUMENTS = (
