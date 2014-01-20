@@ -16,7 +16,7 @@ FULLSCREEN = False
 # TODO: Set this appropriately dynamically
 SCREEN_SIZE = (900, 550)
 
-SAVE_GAME_VERSION='BLACKMANGO-0.0.0'
+SAVE_GAME_VERSION='BLACKMANGO-001'
 
 # Default POSIX data dir (except Mac OS)
 POSIX_DATA_DIR = '~/.blackmango'

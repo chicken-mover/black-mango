@@ -5,7 +5,10 @@ View for the 'Load game' screen.
 import os
 import pyglet
 
+from pyglet.window import key
+
 import blackmango.system
+import blackmango.ui.labels
 import blackmango.ui.views
 import blackmango.ui.views.game
 import blackmango.ui.views.main_menu
@@ -17,6 +20,7 @@ loading_menu_batch = pyglet.graphics.Batch()
 TITLE_COLOR = COLORS['secondary-a-5']
 MENU_ITEM_COLOR = COLORS['primary-4']
 SELECTED_COLOR = COLORS['secondary-b-5']
+ERROR_COLOR=(255,0,0,255)
 
 class LoadGameView(blackmango.ui.views.BaseView):
     
@@ -28,23 +32,41 @@ class LoadGameView(blackmango.ui.views.BaseView):
 
         self.menu_options = []
         for f in savefiles:
-            self.menu_options.append((f[:-11], f))
+            name = f[:-11]
+            if len(name) > 55:
+                name = '%s...' % name[:52]
+            f = os.path.join(savedir, f)
+            self.menu_options.append((name, f))
         self.menu_items = []
 
         self.title = MenuTitle('Load game')
         offset = 0
+
+        x, y = blackmango.ui.game_window.get_size()
+        self.labelset = blackmango.ui.labels.ScrollableLabelSet(
+            width = x,
+            height = y - 220,
+            anchor_x = 1,
+            anchor_y = y - 120,
+        )
+        
         for option, s in self.menu_options:
             label = MenuLabel(option, offset)
             label.action = lambda : self.load_game(s)
             self.menu_items.append(label)
+            self.labelset.add(label)
             offset += 1
 
-        cancel = MenuLabel('Cancel', offset)
-        cancel.action = self.cancel_action
-        self.menu_items.append(cancel)
+        #cancel = MenuLabel('Cancel', offset)
+        #cancel.action = self.cancel_action
+        #self.menu_items.append(cancel)
+        #self.labelset.add(cancel)
 
         self.selected = 0
         self.set_selected(0)
+
+        self.errors = []
+        self.logger = blackmango.configure.logger
 
     def destroy(self):
         for i in self.menu_items:
@@ -52,24 +74,43 @@ class LoadGameView(blackmango.ui.views.BaseView):
         self.title.delete()
 
     def load_game(self, savefile):
+        # Check the save version before we attempt to start up a game
+        with open(savefile) as f:
+            versioninfo = f.readline().strip()
+            if versioninfo != blackmango.configure.SAVE_GAME_VERSION:
+                self.logger.debug("Version mistmatch error opening file: %s" \
+                        % savefile)
+                self.open_error()
+                return
         from blackmango.ui.views.game import GameView
         blackmango.ui.game_window.set_view(GameView(savefile))
+
+    def open_error(self):
+        error = ErrorLabel("File can't be opened due to save version mismatch")
+        self.errors.append(error)
+
+    def clear_errors(self):
+        for error in self.errors:
+            error.delete()
 
     def cancel_action(self):
         from blackmango.ui.views.main_menu import MainMenuView
         blackmango.ui.game_window.set_view(MainMenuView())
            
     def set_selected(self, i):
-        self.menu_items[self.selected].color = MENU_ITEM_COLOR
+        self.labelset.set_selected(i, MENU_ITEM_COLOR)
+        # Handled by the labelset
+        #self.menu_items[self.selected].color = MENU_ITEM_COLOR
         self.selected = i
-        if i > -1:
-            self.menu_items[i].color = SELECTED_COLOR
+        self.menu_items[i].color = SELECTED_COLOR
 
     def select_next(self):
         s = self.selected
         s += 1
         if s > len(self.menu_items) - 1:
             s = 0
+        for i in self.menu_items:
+            i.y += i.content_height
         self.set_selected(s)
 
     def select_prev(self):
@@ -77,14 +118,19 @@ class LoadGameView(blackmango.ui.views.BaseView):
         s -= 1
         if s < 0:
             s = len(self.menu_items) - 1
+        for i in self.menu_items:
+            i.y -= i.content_height
         self.set_selected(s)
 
     def on_draw(self):
+        
         loading_menu_batch.draw()
 
     def get_intersecting_menu_item(self, x, y):
         # If the mouse intersects with any menu items, select them
         for idx, item in enumerate(self.menu_items):
+            if hasattr(item, 'visible') and not item.visible:
+                continue
             # Assuming menu items are top- and right-anchored, but if that 
             # changes then we need to change this line
             if x < item.x + 1 and x > item.x - item.content_width - 1 and \
@@ -100,6 +146,7 @@ class LoadGameView(blackmango.ui.views.BaseView):
         return
 
     def on_mouse_press(self, x, y, button, modifiers):
+        self.clear_errors()
         idx, item = self.get_intersecting_menu_item(x, y)
         if button == 1 and item:
             item.action()
@@ -107,22 +154,27 @@ class LoadGameView(blackmango.ui.views.BaseView):
     def tick(self, keyboard):
         pass
 
-    def on_key_press(self, key, modifiers, keyboard):
+    def on_key_press(self, k, modifiers, keyboard):
+
+        self.clear_errors()
         
-        if keyboard[pyglet.window.key.UP] or \
-           keyboard[pyglet.window.key.W] or \
-           keyboard[pyglet.window.key.LEFT] or \
-           keyboard[pyglet.window.key.A]:
+        if keyboard[key.UP] or \
+           keyboard[key.W] or \
+           keyboard[key.LEFT] or \
+           keyboard[key.A]:
             self.select_prev()
         
-        elif keyboard[pyglet.window.key.DOWN] or \
-           keyboard[pyglet.window.key.RIGHT] or \
-           keyboard[pyglet.window.key.S] or \
-           keyboard[pyglet.window.key.D]:
+        elif keyboard[key.DOWN] or \
+           keyboard[key.RIGHT] or \
+           keyboard[key.S] or \
+           keyboard[key.D]:
             self.select_next()
 
-        elif keyboard[pyglet.window.key.ENTER]:
+        elif keyboard[key.ENTER]:
             self.menu_items[self.selected].action()
+
+        elif keyboard[key.ESCAPE]:
+            self.cancel_action()
 
 class MenuTitle(pyglet.text.Label):
 
@@ -149,7 +201,7 @@ class MenuLabel(pyglet.text.Label):
         x, y = blackmango.ui.game_window.get_size()
 
         offset += 1
-        offset *= .5
+        offset *= .4
 
         super(MenuLabel, self).__init__(
             title,
@@ -161,4 +213,22 @@ class MenuLabel(pyglet.text.Label):
             anchor_y = 'top',
             batch = loading_menu_batch,
             color = MENU_ITEM_COLOR,
+        )
+
+class ErrorLabel(pyglet.text.Label):
+
+    def __init__(self, title):
+
+        x, y = blackmango.ui.game_window.get_size()
+
+        super(ErrorLabel, self).__init__(
+            title,
+            font_name = 'Prociono TT',
+            font_size = 18, 
+            x = x//2,
+            y = y - (y - 40),
+            anchor_x = 'center',
+            anchor_y = 'center',
+            batch = loading_menu_batch,
+            color = ERROR_COLOR, 
         )
