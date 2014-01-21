@@ -6,7 +6,9 @@ echo "Merge complete, running githook installer."
 bash scripts/install-hooks.sh
 
 echo "Setting executable flags on scripts."
-chmod u+x build.sh run-debug.sh scripts/install-hooks.sh
+chmod u+x scripts/build.sh 
+chmod u+x scripts/run-debug.sh
+chmod u+x scripts/install-hooks.sh
 
 echo 'This is what `git clean -fd blackmango/` would do right now:'
 git clean -fnd blackmango/
