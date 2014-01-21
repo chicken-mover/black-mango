@@ -6,7 +6,7 @@ Also contains a logger for use throughout the app.
 
 import logging
 
-VERSION = '0.0.0'
+VERSION = '0.0.0a'
 
 MAIN_WINDOW_TITLE = 'BLACK MANGO'
 

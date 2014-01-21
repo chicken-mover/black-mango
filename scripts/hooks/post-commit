@@ -3,4 +3,4 @@
 source scripts/vars.sh
 
 echo "Performing automatic push to origin/$BRANCH (CTL-C to abort)"
-sleep 2 && git push origin $BRANCH
+sleep 2 && git push origin $BRANCH --folow-tags

@@ -1,5 +1,9 @@
 #!/bin/bash
 
+exit 0
+
+# All of the below is disabled.
+
 source scripts/vars.sh
 
 # We don't care about version number validation if we aren't on the main master

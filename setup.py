@@ -16,7 +16,7 @@ if __name__ == "__main__":
 
     setuptools.setup(
         name = 'blackmango',
-        version = '0.0.0',
+        version = version,
         py_modules = [
             'blackmango',
 #            'blackmango_tests',
