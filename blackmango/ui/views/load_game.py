@@ -99,7 +99,7 @@ class LoadGameView(blackmango.ui.views.BaseView):
            
     def set_selected(self, i):
         self.labelset.set_selected(i, MENU_ITEM_COLOR)
-        # Handled by the labelset
+        # Handled by the labelse
         #self.menu_items[self.selected].color = MENU_ITEM_COLOR
         self.selected = i
         self.menu_items[i].color = SELECTED_COLOR

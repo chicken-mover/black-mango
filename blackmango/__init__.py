@@ -31,6 +31,11 @@ ARGUMENTS = (
                 'module (0, 10, 20, 30, 40, 50)',
         'type': int,
     }),
+    ('--fullscreen', {
+        'dest': 'fullscreen',
+        'action': 'store_true',
+        'help': 'Set full screen mode.',
+    }),
 )
 
 if __name__ == "__main__":
@@ -46,6 +51,8 @@ if __name__ == "__main__":
         blackmango.configure.DEBUG = args.debug
     if args.data_dir:
         blackmango.configure.POSIX_DATA_DIR = args.data_dir
+    if args.fullscreen:
+        blackmango.configure.FULLSCREEN = True
 
     blackmango.configure.setup_logger(blackmango.configure.DEBUG)
     logger = blackmango.configure.logger
