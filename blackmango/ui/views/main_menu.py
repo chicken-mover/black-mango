@@ -17,7 +17,7 @@ MENU_ITEM_COLOR = COLORS['primary-4']
 SELECTED_COLOR = COLORS['secondary-b-5']
 VERSIONINFO_COLOR = (255,255,255,50)
 
-NEW_GAME_LEVEL = 'test_level'
+NEW_GAME_LEVEL = 'puzzle_demo1'
 
 class MainMenuView(BaseView):
     
