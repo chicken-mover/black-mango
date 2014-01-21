@@ -6,4 +6,5 @@ cd $DIR/..
 
 source scripts/vars.sh
 
-$PYTHON blackmango/__init__.py --debug=$($PYTHON -c "import logging;print logging.DEBUG") $@
+$PYTHON blackmango/__init__.py \
+    --debug=$($PYTHON -c "import logging;print logging.DEBUG") $@
