@@ -53,6 +53,20 @@ hooks that will perform automatic validation when pulling and commiting.
 $ bash scripts/run-setup.sh
 ```
 
+### Running the development version
+
+Once you have set up Black Mango, you can run the program with all debug flags
+set by executing the script `run-debug.sh`:
+```bash
+$ ./scripts/run-debug.sh
+```
+
+To run the program manually, simply execute the `__init__.py` file and pass any
+command line flags directly. To see a complete list of flags, do
+```bash
+$ python blackmango/__init__.py --help
+```
+
 ## Build instructions
 
 **Note that the build process is still being worked out, so the instructions
