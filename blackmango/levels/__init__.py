@@ -31,7 +31,7 @@ class BasicLevel(object):
 
     scheduled_destroy = False
 
-    def __init__(self, level_data):
+    def __init__(self, level_data, player):
         """
         Read in the level data, and translate the lists of block ids in the
         floor data into instances of materials classes.
@@ -49,6 +49,8 @@ class BasicLevel(object):
 
         self.blocks = {}
         self.mobs = {}
+
+        self.player = player
 
         # Load all of the material and mob objects by iterating the data for
         # each floor
@@ -95,6 +97,9 @@ class BasicLevel(object):
                             m = MOBS[v]
                             mob = m(x = x, y = y, z = floor)
                         self.set_mob(mob, x, y, floor)
+
+        if not self.triggers.triggers_initialized:
+            self.triggers.init_triggers(self, self.player)
 
 
     def switch_floor(self, new_floor):
@@ -159,15 +164,15 @@ class BasicLevel(object):
         except (IndexError, KeyError):
             return None
 
-    def tick(self, player):
+    def tick(self):
         if self.scheduled_destroy:
             return
         for _, mob in self.mobs.items():
-            if mob is not player:
+            if mob is not self.player:
                 mob.behavior(self)
-        self.triggers.tick(self, player)
+        self.triggers.tick(self, self.player)
 
-    def serialize(self, player):
+    def serialize(self):
         """
         Return a pickleable object that represents the current level state.
         Saved level data should be identical in format to prepared level data.
@@ -176,7 +181,7 @@ class BasicLevel(object):
         saved_level = {
             'title_card': self.title_card,
             'level_size': self.level_size,
-            'starting_location': player.world_location,
+            'starting_location': self.player.world_location,
 
             'next_level': self.next_level,
 
@@ -233,7 +238,11 @@ class BasicLevel(object):
 
 class BasicLevelTriggers(object):
 
-    def __init__(self): pass
+    def __init__(self): 
+        self.triggers_initialized = False
+
+    def init_triggers(self, level, player):
+        self.triggers_initialized = True
 
     def tick(self, level, player):
         pass

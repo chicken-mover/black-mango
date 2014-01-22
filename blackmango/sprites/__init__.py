@@ -8,6 +8,8 @@ import blackmango.app
 import blackmango.configure
 import blackmango.ui
 
+debug_batch = pyglet.graphics.Batch()
+
 class BaseSprite(pyglet.sprite.Sprite):
     
     is_solid = 0
@@ -48,7 +50,23 @@ class BaseSprite(pyglet.sprite.Sprite):
                 batch = render_batch, group = group)
 
         self.world_location = (x, y, z)
+            
+        if blackmango.configure.DEBUG:
+            self.debug_label = pyglet.text.Label('',
+                    color = (255,0,255,255),
+                    font_size = 8,
+                    batch = debug_batch)
 
+    def set_position(self, x, y):
+        if blackmango.configure.DEBUG:
+            if hasattr(self, 'direction'):
+                d = self.direction
+            else:
+                d = ''
+            self.debug_label.x = x + blackmango.configure.GRID_SIZE + 3
+            self.debug_label.y = y - 3
+            self.debug_label.text = '%s %s' % (repr(self.world_location), d)
+        return super(BaseSprite, self).set_position(x, y)
 
     def translate(self):
         """
@@ -58,10 +76,9 @@ class BaseSprite(pyglet.sprite.Sprite):
         w, h = blackmango.ui.game_window.get_size()
 
         scale = blackmango.configure.GRID_SIZE
-        self.set_position(
-            self.world_location[0] * scale,
-            h - (self.world_location[1] + 1) * scale,
-        )
+        w_w = self.world_location[0] * scale
+        w_h = h - (self.world_location[1] + 1) * scale
+        self.set_position(w_w, w_h)
 
     def animate(self, dt, callback = None, t = .025):
         """

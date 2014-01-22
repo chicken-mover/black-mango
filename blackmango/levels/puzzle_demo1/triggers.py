@@ -9,5 +9,20 @@ import blackmango.ui
 
 class LevelTriggers(blackmango.levels.BasicLevelTriggers):
 
+    def init_triggers(self, level, player):
+        from blackmango.mobs.patrollers import ClockwisePatroller
+        
+        ks = sorted(level.mobs.keys())
+        d = [2, 1, 3, 4]
+        x = 0
+        for i, k in enumerate(ks):
+            mob = level.mobs[k]
+            if isinstance(mob, ClockwisePatroller):
+                print k
+                mob.turn(d[x])
+                x += 1
+
+        self.triggers_initialized = True
+
     def tick(self, level, player):
         pass

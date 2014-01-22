@@ -34,6 +34,8 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
         self.is_portal = 0
         self.opacity = 0
 
+        self.direction = 3
+
         self.animations = []
 
     def teleport(self, level, x, y, z):
@@ -87,9 +89,9 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
         )
 
         if delta_y:
-            self.turn(1 if delta_y > 0 else 2)
+            self.turn(3 if delta_y > 0 else 1)
         elif delta_x:
-            self.turn(3 if delta_x > 0 else 4)
+            self.turn(2 if delta_x > 0 else 4)
 
         block = level.get_block(*dest)
         if block and block.is_solid:

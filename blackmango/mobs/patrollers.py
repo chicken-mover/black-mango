@@ -33,11 +33,34 @@ class ClockwisePatroller(blackmango.mobs.SimpleMob):
 
     def __init__(self, *args, **kwargs):
 
+        self.walk_counter = 0
+
         #self.vertex_list = vertex_list
         super(ClockwisePatroller, self).__init__(*args, **kwargs)
 
     def behavior(self, level):
-        pass
+        
+        if self.animations:
+            return
+        
+        if self.walk_counter < 6:
+            if self.direction == 1:
+                d = (0, -1)
+            elif self.direction == 2:
+                d = (1, 0)
+            elif self.direction == 3:
+                d = (0, 1)
+            else:
+                d = (-1, 0)
+            self.move(level, *d)
+            self.walk_counter += 1
+        else:
+            self.walk_counter = 0
+            if self.direction < 4:
+                self.turn(self.direction + 1)
+            else:
+                self.turn(1)
+            return self.behavior(level)
 
 class Chaser(blackmango.mobs.SimpleMob):
 

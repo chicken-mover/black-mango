@@ -15,6 +15,7 @@ import blackmango.levels
 import blackmango.materials
 import blackmango.mobs
 import blackmango.mobs.player
+import blackmango.sprites
 import blackmango.system
 import blackmango.ui
 
@@ -65,7 +66,7 @@ class GameView(BaseView):
         if not filepath:
             filepath = 'autosave.%s.blackmango' % str(datetime.datetime.now())
         self.loading = True
-        stored_level = self.current_level.serialize(self.player)
+        stored_level = self.current_level.serialize()
         f = os.path.join(blackmango.system.DIR_SAVEDGAMES, filepath)
         d = os.path.dirname(f)
         self.logger.debug("Saving game: %s" % f)
@@ -107,8 +108,9 @@ class GameView(BaseView):
         self.level_teardown()
 
         # Initialize level and player
-        self.current_level = blackmango.levels.BasicLevel(level_data)
         self.player = blackmango.mobs.player.Player()
+        self.current_level = blackmango.levels.BasicLevel(level_data, \
+                                self.player)
 
         # Place the player into the level
         starting_location = self.current_level.starting_location
@@ -149,6 +151,7 @@ class GameView(BaseView):
         """
         blackmango.materials.materials_batch.draw()
         blackmango.mobs.mobs_batch.draw()
+        blackmango.sprites.debug_batch.draw()
 
     @loading_halt
     def on_mouse_press(self, x, y, button, modifiers):
@@ -189,4 +192,4 @@ class GameView(BaseView):
             self.quit_to_main_menu()
 
         if self.current_level:
-            self.current_level.tick(self.player)
+            self.current_level.tick()
