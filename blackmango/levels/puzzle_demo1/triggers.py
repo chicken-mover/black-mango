@@ -18,7 +18,6 @@ class LevelTriggers(blackmango.levels.BasicLevelTriggers):
         for i, k in enumerate(ks):
             mob = level.mobs[k]
             if isinstance(mob, ClockwisePatroller):
-                print k
                 mob.turn(d[x])
                 x += 1
 

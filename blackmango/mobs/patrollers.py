@@ -2,6 +2,8 @@
 A set of simple example patroller mobs for development and testing.
 """
 
+import pyglet
+
 import blackmango.mobs
 
 class PatrollerV(blackmango.mobs.SimpleMob):
@@ -33,17 +35,48 @@ class ClockwisePatroller(blackmango.mobs.SimpleMob):
 
     def __init__(self, *args, **kwargs):
 
-        self.walk_counter = 0
+        self.old_location = None
 
         #self.vertex_list = vertex_list
         super(ClockwisePatroller, self).__init__(*args, **kwargs)
 
+    def can_see_player(self, player):
+
+        x, y, z = self.world_location
+        px, py, pz = player.world_location
+
+        if x == px:
+            if y < py and self.direction == 3:
+                return True
+            elif py < y and self.direction == 1:
+                return True
+        if y == py:
+            if x < px and self.direction == 2:
+                return True
+            elif px < x and self.direction == 4:
+                return True
+        return False
+
     def behavior(self, level):
+
+        if not self.old_location:
+            self.old_location = self.world_location
+
+        if self.can_see_player(level.player):
+            chasers = filter(lambda x: isinstance(x, Chaser), \
+                    level.mobs.values())
+            for chaser in chasers:
+                chaser.chase_active = True
+                pyglet.clock.schedule_once(chaser.unchase, 1)
         
         if self.animations:
             return
+
+        delta = self.old_location[0] - self.world_location[0] or \
+                self.old_location[1] - self.world_location[1]
+        delta = abs(delta)
         
-        if self.walk_counter < 6:
+        if delta < 6:
             if self.direction == 1:
                 d = (0, -1)
             elif self.direction == 2:
@@ -53,9 +86,8 @@ class ClockwisePatroller(blackmango.mobs.SimpleMob):
             else:
                 d = (-1, 0)
             self.move(level, *d)
-            self.walk_counter += 1
         else:
-            self.walk_counter = 0
+            self.old_location = None
             if self.direction < 4:
                 self.turn(self.direction + 1)
             else:
@@ -66,8 +98,39 @@ class Chaser(blackmango.mobs.SimpleMob):
 
     def __init__(self, *args, **kwargs):
 
+        self.chase_active = False
+
         #self.vertex_list = vertex_list
         super(Chaser, self).__init__(*args, **kwargs)
 
     def behavior(self, level):
-        pass
+
+        if not self.chase_active:
+            return
+
+        next_move = self.path_to_player(level.player)
+        l = [
+            self.world_location,
+            next_move,
+        ]
+        next_location = [sum(i) for i in zip(*l)]
+        if tuple(next_location) == level.player.world_location[:2]:
+            level.player.kill()
+        self.move(level, *next_move)
+
+    def unchase(self, dt):
+        self.chase_active = False
+
+    def path_to_player(self, player):
+
+        x, y, z = self.world_location
+        px, py, pz = player.world_location
+
+        if z != pz:
+            return # Different room
+
+        mx, my = px - x, py - y
+        return int(mx > 0) or -1*int(mx < 0), \
+               int(my > 0) or -1*int(my < 0)
+
+

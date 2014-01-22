@@ -46,6 +46,9 @@ class Player(blackmango.mobs.BasicMobileSprite):
             level.switch_floor(z)
         self.translate()
 
+    def kill(self):
+        raise Exception("Game Over!")
+
     def user_input(self, keyboard, level):
         """
         Called on every tick by the GameView object.
