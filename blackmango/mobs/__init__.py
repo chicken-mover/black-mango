@@ -72,7 +72,7 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
         # TODO: Reflect turn in sprite image
         self.direction = direction
 
-    def move(self, level, delta_x = 0, delta_y = 0):
+    def move(self, level, delta_x = 0, delta_y = 0, strafe = False):
         """
         Move the sprite in the game world with an accompanying animation.
         """
@@ -88,13 +88,15 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
             self.world_location[2],
         )
 
-        if delta_y:
-            self.turn(3 if delta_y > 0 else 1)
-        elif delta_x:
-            self.turn(2 if delta_x > 0 else 4)
+        if not strafe:
+            if delta_y:
+                self.turn(3 if delta_y > 0 else 1)
+            elif delta_x:
+                self.turn(2 if delta_x > 0 else 4)
 
         block = level.get_block(*dest)
         if block and block.is_solid:
+            mob.push(self, self.world_location)
             return
         elif block and hasattr(block, 'interaction_callback'):
             callback = functools.partial(block.interaction_callback,
@@ -103,6 +105,7 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
 
         mob = level.get_mob(*dest)
         if mob and mob.is_solid:
+            mob.push(self, self.world_location)
             return
 
         level.unset_mob(*self.world_location)

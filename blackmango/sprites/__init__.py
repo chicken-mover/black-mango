@@ -17,6 +17,10 @@ class BaseSprite(pyglet.sprite.Sprite):
     is_portal = 0
     opacity = 0
 
+    is_pushable = 0
+    weight = 0
+    pushes = {}
+
     portal_location = None
 
     def __repr__(self):
@@ -56,6 +60,16 @@ class BaseSprite(pyglet.sprite.Sprite):
                     color = (255,0,255,255),
                     font_size = 8,
                     batch = debug_batch)
+
+    def push(self, pusher, force):
+        """
+        Receive a push from <pusher>. Called when something is trying to move to
+        this object's location, but can't.
+        """
+        # TODO: 'force' should escalate as long as the pusher hasn't moved and
+        # this object is pushable. When it surpasses the weight of the object,
+        # this method should run it's logic
+        pass
 
     def set_position(self, x, y):
         if blackmango.configure.DEBUG:
