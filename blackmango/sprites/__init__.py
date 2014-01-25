@@ -8,7 +8,8 @@ import blackmango.app
 import blackmango.configure
 import blackmango.ui
 
-debug_batch = pyglet.graphics.Batch()
+from blackmango.configure import ORDERED_GROUPS
+
 sprite_batch = pyglet.graphics.Batch()
 
 color_cache = {}
@@ -52,7 +53,7 @@ class BaseSprite(pyglet.sprite.Sprite):
                 color_cache[fill_color] = i
             image = color_cache[fill_color]
 
-        group = blackmango.configure.ORDERED_GROUPS.get(render_group)
+        group = ORDERED_GROUPS.get(render_group)
 
         super(BaseSprite, self).__init__(image,
                 batch = sprite_batch, group = group)
@@ -64,7 +65,8 @@ class BaseSprite(pyglet.sprite.Sprite):
             self.debug_label = pyglet.text.Label('',
                     color = (255,0,255,255),
                     font_size = 8,
-                    batch = debug_batch)
+                    batch = sprite_batch,
+                    group = ORDERED_GROUPS.get('foreground'))
 
     def push(self, pusher, force):
         """

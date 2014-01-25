@@ -160,7 +160,6 @@ class GameView(BaseView):
         """
         self.current_level.draw_background()
         blackmango.sprites.sprite_batch.draw()
-        blackmango.sprites.debug_batch.draw()
         if self.title_card:
             title_batch.draw()
 
