@@ -111,13 +111,6 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
         self.world_location = dest
         self.smooth_translate(callback = callback)
 
-    def scheduled_set_position(self, dt, *args):
-        """
-        A wrapper for self.set_position that has the write argspec for use
-        with the pyglet.clock.schedule* family of methods.
-        """
-        self.set_position(*args)
-
     def smooth_translate(self, callback = None):
         """
         Like self.translate, but provides gradual movement between two 
@@ -140,7 +133,7 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
 
         for i in xrange(1, frames + 1):
             self.animations.append((
-                self.scheduled_set_position,
+                lambda dt, *args: self.set_position(*args),
                 cur_x + delta_x * i,
                 cur_y + delta_y * i,
             ))

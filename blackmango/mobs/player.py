@@ -53,15 +53,17 @@ class Player(blackmango.mobs.BasicMobileSprite):
         """
         Called on every tick by the GameView object.
         """
-
+        move = [0,0]
         if keyboard[key.UP]:
-            self.move(level, 0, -1)
+            move[1] = -1
         elif keyboard[key.DOWN]:
-            self.move(level, 0, 1)
-        elif keyboard[key.LEFT]:
-            self.move(level, -1, 0)
+            move[1] = 1
+        if keyboard[key.LEFT]:
+            move[0] = -1
         elif keyboard[key.RIGHT]:
-            self.move(level, 1, 0)
+            move[0] = 1
+        if move != [0,0]:
+            self.move(level, *move)
 
         elif keyboard[key.NUM_1]:
             self.activate_mask(MASKS[1])

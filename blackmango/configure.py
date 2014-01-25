@@ -34,7 +34,7 @@ ORDERED_GROUPS = {
 
 # number of frames when animating movement slides. potentially will be used for
 # sprite animations, too.
-BASE_ANIMATION_FRAMES = 10
+BASE_ANIMATION_FRAMES = 10 # Keep this a common factor of GRID_SIZE
 
 # Loaded by assetloader.load_colordata()
 COLORS = {}

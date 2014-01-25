@@ -109,6 +109,8 @@ class Chaser(blackmango.mobs.SimpleMob):
 
         if not self.chase_active:
             return
+        if self.animations:
+            return
 
         next_move = self.path_to_player(level.player)
         if not next_move: return
@@ -118,8 +120,6 @@ class Chaser(blackmango.mobs.SimpleMob):
         ]
         next_location = [sum(i) for i in zip(*l)]
         if tuple(next_location) == level.player.world_location[:2]:
-            print self.world_location
-            print next_location
             level.player.kill()
         self.move(level, *next_move)
 
