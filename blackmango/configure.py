@@ -5,6 +5,7 @@ Also contains a logger for use throughout the app.
 """
 
 import logging
+import pyglet
 
 VERSION = '0.0.0a'
 
@@ -24,14 +25,11 @@ POSIX_DATA_DIR = '~/.blackmango'
 # Grid size. Used for translating world coordinates into screen coordinates.
 GRID_SIZE = 50
 
-# Batch rendering groups. This is actually only of limited value, because
-# if we want stuff to render on top of the player, everything has to be in one
-# batch group (as of this writing, materials and mobs get their own groups).
+# Batch rendering groups.
 ORDERED_GROUPS = {
-    'player': 10,
-    'mobs': 5,
-    'background': 0,
-    'foreground': 1,
+    'mobs': pyglet.graphics.OrderedGroup(5),
+    'background': pyglet.graphics.OrderedGroup(0),
+    'foreground': pyglet.graphics.OrderedGroup(1),
 }
 
 # number of frames when animating movement slides. potentially will be used for

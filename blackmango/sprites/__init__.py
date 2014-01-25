@@ -9,6 +9,9 @@ import blackmango.configure
 import blackmango.ui
 
 debug_batch = pyglet.graphics.Batch()
+sprite_batch = pyglet.graphics.Batch()
+
+color_cache = {}
 
 class BaseSprite(pyglet.sprite.Sprite):
     
@@ -36,7 +39,6 @@ class BaseSprite(pyglet.sprite.Sprite):
             x = 0,
             y = 0,
             z = 0,
-            render_batch = None,
             render_group = 'mobs',
             fill_color = (255,255,255, 255),
             width = blackmango.configure.GRID_SIZE,
@@ -44,14 +46,16 @@ class BaseSprite(pyglet.sprite.Sprite):
         ):
 
         if not image:
-            image = pyglet.image.SolidColorImagePattern(color=fill_color)
-            image = image.create_image(width, height)
+            if fill_color not in color_cache:
+                i = pyglet.image.SolidColorImagePattern(color=fill_color)
+                i = i.create_image(width, height)
+                color_cache[fill_color] = i
+            image = color_cache[fill_color]
 
         group = blackmango.configure.ORDERED_GROUPS.get(render_group)
-        group = pyglet.graphics.OrderedGroup(group)
 
         super(BaseSprite, self).__init__(image,
-                batch = render_batch, group = group)
+                batch = sprite_batch, group = group)
 
         self.world_location = (x, y, z)
             

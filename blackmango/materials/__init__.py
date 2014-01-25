@@ -14,8 +14,6 @@ import pyglet
 import blackmango.configure
 import blackmango.sprites
 
-materials_batch = pyglet.graphics.Batch()
-
 class BaseMaterial(blackmango.sprites.BaseSprite):
     
     def __init__(self, image = None,
@@ -26,10 +24,9 @@ class BaseMaterial(blackmango.sprites.BaseSprite):
         ):
 
         color = color or (255,255,255,255)
-        group = blackmango.configure.ORDERED_GROUPS.get('background')
 
         super(BaseMaterial, self).__init__(image, x, y, z,
-                materials_batch, group, color)
+                'background', color)
 
         self.is_solid = 1
         self.is_mover = 0

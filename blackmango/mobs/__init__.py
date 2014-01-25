@@ -12,8 +12,6 @@ import blackmango.configure
 import blackmango.sprites
 import blackmango.ui
 
-mobs_batch = pyglet.graphics.Batch()
-
 class BasicMobileSprite(blackmango.sprites.BaseSprite):
     
     def __init__(self, image = None,
@@ -24,10 +22,9 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
         ):
 
         color = color or (0,0,255,255)
-        group = blackmango.configure.ORDERED_GROUPS.get('mobs')
 
         super(BasicMobileSprite, self).__init__(image, x, y, z,
-                mobs_batch, group, color)
+                'mobs', color)
 
         self.is_solid = 1
         self.is_mover = 1
