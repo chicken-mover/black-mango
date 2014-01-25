@@ -14,7 +14,7 @@ DEBUG = 0 #logging.WARN
 FULLSCREEN = False
 # Main game window size.
 # TODO: Set this appropriately dynamically
-SCREEN_SIZE = (900, 550)
+SCREEN_SIZE = (950, 550)
 
 SAVE_GAME_VERSION='BLACKMANGO-001'
 
