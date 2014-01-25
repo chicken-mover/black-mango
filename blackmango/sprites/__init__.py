@@ -37,7 +37,7 @@ class BaseSprite(pyglet.sprite.Sprite):
             y = 0,
             z = 0,
             render_batch = None,
-            render_group = 0,
+            render_group = 'mobs',
             fill_color = (255,255,255, 255),
             width = blackmango.configure.GRID_SIZE,
             height = blackmango.configure.GRID_SIZE,
@@ -56,6 +56,7 @@ class BaseSprite(pyglet.sprite.Sprite):
         self.world_location = (x, y, z)
             
         if blackmango.configure.DEBUG:
+
             self.debug_label = pyglet.text.Label('',
                     color = (255,0,255,255),
                     font_size = 8,
@@ -72,11 +73,8 @@ class BaseSprite(pyglet.sprite.Sprite):
         pass
 
     def set_position(self, x, y):
-        if blackmango.configure.DEBUG:
-            if hasattr(self, 'direction'):
-                d = self.direction
-            else:
-                d = ''
+        if blackmango.configure.DEBUG and hasattr(self, 'direction'):
+            d = self.direction
             self.debug_label.x = x + blackmango.configure.GRID_SIZE + 3
             self.debug_label.y = y - 3
             self.debug_label.text = '%s %s' % (repr(self.world_location), d)

@@ -11,9 +11,10 @@ import blackmango.system
 
 def load_image(fname):
     """
-    Return the path to an image file.
+    Return a Pyglet image object loaded from the file specified by <fname>
     """
-    return load('images', fname)
+    return pyglet.image.load(load('images', fname))
+    
 
 def load_text(fname):
     """

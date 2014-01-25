@@ -20,6 +20,8 @@ LEVEL_DATA = {
     'next_level': 'test_level2',
 
     'triggers': LevelTriggers(),
+    
+    'backgrounds': {},
 
     'blocks': {
 

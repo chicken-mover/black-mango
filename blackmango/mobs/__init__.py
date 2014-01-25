@@ -96,7 +96,7 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
 
         block = level.get_block(*dest)
         if block and block.is_solid:
-            mob.push(self, self.world_location)
+            block.push(self, self.world_location)
             return
         elif block and hasattr(block, 'interaction_callback'):
             callback = functools.partial(block.interaction_callback,

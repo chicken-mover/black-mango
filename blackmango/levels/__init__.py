@@ -9,6 +9,8 @@ The level's `tick` method is used to iterate and call the `behavior` method on
 each mob in the level.
 """
 
+import blackmango.sprites.backgrounds
+
 from blackmango.materials.materiallist import MATERIALS
 from blackmango.mobs.moblist import MOBS
 
@@ -41,8 +43,11 @@ class BasicLevel(object):
         self.starting_location = level_data['starting_location']
         self.current_floor = self.starting_location[2]
         self.level_size = level_data['level_size']
-        self.triggers = level_data['triggers']
+        self.triggers = level_data['triggers']()
         self.next_level = level_data['next_level']
+        self.backgrounds = level_data['backgrounds']
+
+        self.set_background(self.current_floor)
 
         blockdata = level_data['blocks']
         mobdata = level_data['mobs']
@@ -101,6 +106,17 @@ class BasicLevel(object):
         if not self.triggers.triggers_initialized:
             self.triggers.init_triggers(self, self.player)
 
+    def set_background(self, floor):
+        image = self.backgrounds[floor]
+        if image:
+            background = blackmango.sprites.backgrounds.BackgroundImage(image)
+            self.background_image = background
+        else:
+            self.background_image = None
+
+    def draw_background(self):
+        if self.background_image:
+            self.background_image.draw()
 
     def switch_floor(self, new_floor):
         """
@@ -136,6 +152,10 @@ class BasicLevel(object):
         Get the material at <x>, <y>, <floor>. If the provided coordinates are
         invalid, returns an instance of VoidMaterial.
         """
+        if x < 0 or x > self.level_size[0] or \
+           y < 0 or y > self.level_size[1] or \
+           floor < 0 or floor > self.level_size[2]:
+            return MATERIALS[-1]()
         try:
             return self.blocks[(x, y, floor)]
         except (IndexError, KeyError):

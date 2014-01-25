@@ -9,6 +9,9 @@ import blackmango.ui
 
 class LevelTriggers(blackmango.levels.BasicLevelTriggers):
 
+    def __init__(self): 
+        self.triggers_initialized = False
+    
     def init_triggers(self, level, player):
         from blackmango.mobs.patrollers import ClockwisePatroller
         

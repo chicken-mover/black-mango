@@ -149,6 +149,7 @@ class GameView(BaseView):
         Called on every window draw (unless the window isn't drawing views for
         some reason, like during loading of new games).
         """
+        self.current_level.draw_background()
         blackmango.materials.materials_batch.draw()
         blackmango.mobs.mobs_batch.draw()
         blackmango.sprites.debug_batch.draw()
