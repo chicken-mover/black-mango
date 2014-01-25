@@ -45,6 +45,8 @@ class ClockwisePatroller(blackmango.mobs.SimpleMob):
         x, y, z = self.world_location
         px, py, pz = player.world_location
 
+        if z != pz: return
+
         if x == px:
             if y < py and self.direction == 3:
                 return True
@@ -109,6 +111,7 @@ class Chaser(blackmango.mobs.SimpleMob):
             return
 
         next_move = self.path_to_player(level.player)
+        if not next_move: return
         l = [
             self.world_location,
             next_move,

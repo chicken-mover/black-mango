@@ -152,9 +152,9 @@ class BasicLevel(object):
         Get the material at <x>, <y>, <floor>. If the provided coordinates are
         invalid, returns an instance of VoidMaterial.
         """
-        if x < 0 or x > self.level_size[0] or \
-           y < 0 or y > self.level_size[1] or \
-           floor < 0 or floor > self.level_size[2]:
+        if x < 0 or x > self.level_size[0] - 1 or \
+           y < 0 or y > self.level_size[1] - 1 or \
+           floor < 0 or floor > self.level_size[2] - 1:
             return MATERIALS[-1]()
         try:
             return self.blocks[(x, y, floor)]

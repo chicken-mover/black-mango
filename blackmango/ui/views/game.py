@@ -22,6 +22,10 @@ import blackmango.ui
 from blackmango.levels.levellist import LEVELS
 from blackmango.ui.views import BaseView
 
+title_batch = pyglet.graphics.Batch()
+
+TITLE_CARD_COLOR = blackmango.configure.COLORS['secondary-a-5']
+
 def loading_halt(f):
     def wrapped(self, *args, **kwargs):
         if self.loading:
@@ -121,6 +125,11 @@ class GameView(BaseView):
         self.loading = False
         self.logger.debug("Game started: %s" % repr(self.current_level))
 
+        # Show the title card
+        self.title_card = TitleCard(level_data.get('title_card'))
+        pyglet.clock.schedule_once(lambda dt: self.title_card.delete(), 2)
+
+
     def next_level(self):
         self.loading = True
         def loader(dt):
@@ -153,6 +162,8 @@ class GameView(BaseView):
         blackmango.materials.materials_batch.draw()
         blackmango.mobs.mobs_batch.draw()
         blackmango.sprites.debug_batch.draw()
+        if self.title_card:
+            title_batch.draw()
 
     @loading_halt
     def on_mouse_press(self, x, y, button, modifiers):
@@ -194,3 +205,40 @@ class GameView(BaseView):
 
         if self.current_level:
             self.current_level.tick()
+
+class TitleCard(pyglet.text.Label):
+
+    def __init__(self, title, offset = 0):
+
+        x, y = blackmango.ui.game_window.get_size()
+
+        offset += 1
+        offset *= .5
+
+        super(TitleCard, self).__init__(
+            title,
+            font_name = 'Prociono TT',
+            #font_name = 'Chapbook',
+            font_size = 20, 
+            x = x // 2,
+            y = y // 2,
+            anchor_x = 'center',
+            anchor_y = 'center',
+            batch = title_batch,
+            color = TITLE_CARD_COLOR,
+        )
+
+        w_2, h_2 = self.content_width / 2, self.content_height / 2
+        w_2 += 5
+        h_2 += 5
+        x1, y1 = self.x - w_2, self.y - h_2
+        x2, y2 = self.x + w_2, self.y + h_2
+
+        self.borderbox = title_batch.add(4, pyglet.gl.GL_QUADS, None,
+            ('v2i', [x1, y1, x2, y1, x2, y2, x1, y2]),
+            ('c4B', [200, 200, 220, 255] * 4)
+        )
+
+    def delete(self):
+        self.borderbox.delete()
+        super(TitleCard, self).delete()
