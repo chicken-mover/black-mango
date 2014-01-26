@@ -1,4 +1,8 @@
 
+import pyglet
+
+title_batch = pyglet.graphics.Batch()
+
 class ScrollableLabelSet(object):
     """
     A quick and dirty class for handling sets of scrolling labels.
@@ -67,3 +71,59 @@ class ScrollableLabelSet(object):
                 i.color = i.color[:-1] + (0,)
             elif hasattr(i, 'visible') and i.visible:
                 i.color = reset_color
+
+class TextBox(pyglet.text.Label):
+
+    def __init__(self, title, 
+            padding = 15,
+            box_color = (0,0,0,255),
+            text_color = (255,255,255,255),
+            position = 'center',
+            font_size = 15,
+        ):
+
+        import blackmango.ui
+
+        x, y = blackmango.ui.game_window.get_size()
+
+        if position == 'center':
+            x //= 2
+            y //= 2
+            anchor_x = anchor_y = 'center'
+        elif position == 'bottom':
+            x //= 2
+            y //= 6
+            anchor_x = 'center'
+            anchor_y = 'bottom'
+        else: raise ValueError('Bad position value')
+
+        super(TextBox, self).__init__(
+            title,
+            font_name = 'Prociono TT',
+            #font_name = 'Chapbook',
+            font_size = font_size, 
+            x = x,
+            y = y,
+            anchor_x = anchor_x,
+            anchor_y = anchor_y,
+            batch = title_batch,
+            color = text_color,
+        )
+
+        w_2, h_2 = self.content_width / 2, self.content_height / 2
+        w_2 += padding
+        h_2 += padding
+        x1, x2 = self.x - w_2, self.x + w_2
+        if anchor_y == 'center':
+            y1, y2 = self.y - h_2, self.y + h_2
+        elif anchor_y == 'bottom':
+            y1, y2 = self.y - padding, self.y + self.content_height + padding
+
+        self.borderbox = title_batch.add(4, pyglet.gl.GL_QUADS, None,
+            ('v2i', [x1, y1, x2, y1, x2, y2, x1, y2]),
+            ('c4B', list(box_color) * 4)
+        )
+
+    def delete(self):
+        self.borderbox.delete()
+        super(TextBox, self).delete()

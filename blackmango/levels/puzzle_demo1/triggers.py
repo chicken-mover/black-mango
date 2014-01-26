@@ -27,4 +27,8 @@ class LevelTriggers(blackmango.levels.BasicLevelTriggers):
         self.triggers_initialized = True
 
     def tick(self, level, player):
-        pass
+        if player.world_location[0]&1:
+            import blackmango.ui.labels
+            if hasattr(self, 'title') and self.title:
+                self.title.delete()
+            self.title = blackmango.ui.labels.TextBox('Testing', position = 'bottom')

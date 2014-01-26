@@ -79,7 +79,8 @@ class BaseSprite(pyglet.sprite.Sprite):
         pass
 
     def set_position(self, x, y):
-        if blackmango.configure.DEBUG and hasattr(self, 'direction'):
+        if blackmango.configure.DEBUG and hasattr(self, 'direction') and \
+           self.visible:
             d = self.direction
             self.debug_label.x = x + blackmango.configure.GRID_SIZE + 3
             self.debug_label.y = y - 3

@@ -33,6 +33,9 @@ class BaseMaterial(blackmango.sprites.BaseSprite):
         self.is_portal = 0
         self.opacity = 0
 
+    def interaction_callback(self, level, mob):
+        pass
+
 class BasePortalMaterial(BaseMaterial):
 
     def __init__(self, image = None,
