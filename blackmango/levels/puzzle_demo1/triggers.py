@@ -31,4 +31,4 @@ class LevelTriggers(blackmango.levels.BasicLevelTriggers):
             import blackmango.ui.labels
             if hasattr(self, 'title') and self.title:
                 self.title.delete()
-            self.title = blackmango.ui.labels.TextBox('Testing', position = 'bottom')
+#            self.title = blackmango.ui.labels.TextBox('Testing', position = 'bottom')

@@ -8,4 +8,5 @@ MOBS = {
     2: blackmango.mobs.patrollers.PatrollerV,
     3: blackmango.mobs.patrollers.ClockwisePatroller,
     4: blackmango.mobs.patrollers.Chaser,
+    5: blackmango.mobs.dancers.Mirror,
 }

@@ -145,6 +145,60 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
         
         pyglet.clock.schedule_once(self.animate, .001, callback)
 
+    def can_see(self, mob, level):
+        """
+        Check to see if this mob can see the target <mob>.
+        """
+        x, y, z = self.world_location
+        px, py, pz = mob.world_location
+
+        if z != pz: return
+
+        if x == px:
+            if y < py and self.direction == 3:
+                return True
+            elif py < y and self.direction == 1:
+                return True
+        if y == py:
+            if x < px and self.direction == 2:
+                return True
+            elif px < x and self.direction == 4:
+                return True
+        return False
+
+    def path_to(self, mob, level):
+        """
+        Give the next movement delta to apply to move towards <mob>.
+        """
+        x, y, z = self.world_location
+        px, py, pz = mob.world_location
+
+        if z != pz:
+            return # Different room
+
+        mx, my = px - x, py - y
+
+        delta_x, delta_y = int(mx > 0) or -1*int(mx < 0), \
+                           int(my > 0) or -1*int(my < 0)
+
+        # Don't try to move onto blocks that are occupied by solids
+        if delta_x:
+            next_pos = (x + delta_x, y, z)
+            block = level.get_block(next_pos)
+            if block.is_solid:
+                delta_x = 0
+        if delta_y:
+            next_pos = (x, y + delta_y, z)
+            block = level.get_block(next_pos)
+            if block.is_solid:
+                delta_y = 0
+
+        # Don't return diagonal paths
+        if delta_x:
+            return (delta_x, 0)
+        else:
+            return (0, delta_y)
+
 
 class SimpleMob(BasicMobileSprite):
 

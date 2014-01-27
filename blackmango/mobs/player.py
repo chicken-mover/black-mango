@@ -80,7 +80,7 @@ class Player(blackmango.mobs.BasicMobileSprite):
             move[1] = -1
         elif keyboard[key.DOWN]:
             move[1] = 1
-        if keyboard[key.LEFT]:
+        elif keyboard[key.LEFT]: # enable diagonals: change this 'elif' to 'if'
             move[0] = -1
         elif keyboard[key.RIGHT]:
             move[0] = 1

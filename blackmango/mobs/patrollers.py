@@ -40,31 +40,12 @@ class ClockwisePatroller(blackmango.mobs.SimpleMob):
         #self.vertex_list = vertex_list
         super(ClockwisePatroller, self).__init__(*args, **kwargs)
 
-    def can_see_player(self, player):
-
-        x, y, z = self.world_location
-        px, py, pz = player.world_location
-
-        if z != pz: return
-
-        if x == px:
-            if y < py and self.direction == 3:
-                return True
-            elif py < y and self.direction == 1:
-                return True
-        if y == py:
-            if x < px and self.direction == 2:
-                return True
-            elif px < x and self.direction == 4:
-                return True
-        return False
-
     def behavior(self, level):
 
         if not self.old_location:
             self.old_location = self.world_location
 
-        if self.can_see_player(level.player):
+        if self.can_see(level.player, level):
             chasers = filter(lambda x: isinstance(x, Chaser), \
                     level.mobs.values())
             for chaser in chasers:
@@ -125,17 +106,5 @@ class Chaser(blackmango.mobs.SimpleMob):
 
     def unchase(self, dt):
         self.chase_active = False
-
-    def path_to_player(self, player):
-
-        x, y, z = self.world_location
-        px, py, pz = player.world_location
-
-        if z != pz:
-            return # Different room
-
-        mx, my = px - x, py - y
-        return int(mx > 0) or -1*int(mx < 0), \
-               int(my > 0) or -1*int(my < 0)
 
 
