@@ -15,17 +15,18 @@ class Mirror(blackmango.mobs.SimpleMob):
 
     def behavior(self, level):
 
-        if self.can_see(level.player, level):
-            if not self.last_player_position:
-                self.last_player_position = level.player.world_location
-            if self.last_player_position != level.player.world_location:
-                # Get the delta between the last and the next player position,
-                # and move in a similar manner
-                ox, oy, oz = self.last_player_position
-                px, py, pz = level.player.world_location
-                delta = self._path_delta((ox, oy, oz), (px, py, pz))
-                self.move(level, *delta)
-        else:
-            # Don't try to mimic movement if there has been a gap in tracking
-            # the player
-            self.last_player_position = None
+        if not level.player.world_location[2] == self.world_location[2]:
+            return
+
+        if self.last_player_position and \
+           self.last_player_position != level.player.world_location:
+            # Get the delta between the last and the next player position,
+            # and move in a similar manner
+            ox, oy, oz = self.last_player_position
+            px, py, pz = level.player.world_location
+            delta = self._path_delta((ox, oy, oz), (px, py, pz), level)
+            self.move(level, *delta)
+        
+
+        self.last_player_position = level.player.world_location
+        

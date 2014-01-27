@@ -5,7 +5,7 @@ The main player class, a subclass of the BasicMobileSprite class.
 from pyglet.window import key
 
 import blackmango.configure
-import blackmango.mobs
+import blackmango.sprites
 
 from blackmango.masks.masklist import MASKS
 
@@ -17,7 +17,7 @@ def isalive(f):
             return f(self, *args, **kwargs)
     return wrapped
 
-class Player(blackmango.mobs.BasicMobileSprite):
+class Player(blackmango.sprites.BasicMobileSprite):
 
     def __init__(self, x = 0, y = 0, z = 0):
 

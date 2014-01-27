@@ -9,6 +9,8 @@ The level's `tick` method is used to iterate and call the `behavior` method on
 each mob in the level.
 """
 
+import blackmango.scenery
+
 from blackmango.materials.materiallist import MATERIALS
 from blackmango.mobs.moblist import MOBS
 
@@ -43,12 +45,10 @@ class BasicLevel(object):
         self.level_size = level_data['level_size']
         self.triggers = level_data['triggers']()
         self.next_level = level_data['next_level']
-        self.backgrounds = level_data['backgrounds']
-        for k, v in backgrounds.items():
+        self.backgrounds = level_data['backgrounds'].copy()
+        for k, v in self.backgrounds.items():
             if v:
                 self.backgrounds[k] = blackmango.scenery.Background(v)
-
-        self.set_background(self.current_floor)
 
         blockdata = level_data['blocks']
         mobdata = level_data['mobs']
@@ -107,8 +107,8 @@ class BasicLevel(object):
         if not self.triggers.triggers_initialized:
             self.triggers.init_triggers(self, self.player)
 
-    def get_background(self, floor):
-        return self.backgrounds[floor]
+    def get_background(self):
+        return self.backgrounds.get(self.current_floor)
 
     def switch_floor(self, new_floor):
         """

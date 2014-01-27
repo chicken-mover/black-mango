@@ -127,7 +127,7 @@ class GameView(BaseView):
         self.player.world_location = starting_location
         self.player.translate()
 
-        self.loading = MODE_NORMAL
+        self.mode = MODE_NORMAL
         self.logger.debug("Game started: %s" % repr(self.current_level))
 
         # Show the title card
@@ -140,7 +140,7 @@ class GameView(BaseView):
 
 
     def next_level(self):
-        self.loading = MODE_LOADING
+        self.mode = MODE_LOADING
         def loader(dt):
             next_level_str = self.current_level.next_level
             self.logger.debug("Loading next level: %s" % next_level_str)
@@ -152,7 +152,7 @@ class GameView(BaseView):
         pyglet.clock.schedule_once(loader, 1)
 
     def quit_to_main_menu(self):
-        self.loading = MODE_LOADING
+        self.mode = MODE_LOADING
         def loader(dt):
             from blackmango.ui.views.main_menu import MainMenuView
             blackmango.ui.game_window.set_view(MainMenuView())
@@ -170,7 +170,7 @@ class GameView(BaseView):
         background = self.current_level.get_background()
         if background:
             background.draw()
-
+        
         blackmango.sprites.sprite_batch.draw()
         if self.title_card:
             blackmango.ui.labels.title_batch.draw()
@@ -205,10 +205,10 @@ class GameView(BaseView):
             return self.quit_to_main_menu()
             
         # The order of these things may need adjustment at some point
-        if not self.pause():
+        if self.mode == MODE_NORMAL:
             self.player.tick(keyboard, self.current_level)
 
-        if self.current_level and not self.pause():
+        if self.current_level and self.mode == MODE_NORMAL:
             self.current_level.tick()
 
         # View-level actions. These should go into some sort of overlay menu

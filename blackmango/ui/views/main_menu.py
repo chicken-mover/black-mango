@@ -87,7 +87,7 @@ class MainMenuView(BaseView):
         self.set_selected(s)
 
     def on_draw(self):
-        main_menu_batch.draw()
+        self.batch.draw()
 
     def get_intersecting_menu_item(self, x, y):
         # If the mouse intersects with any menu items, select them
@@ -145,13 +145,16 @@ class MainMenuTitle(pyglet.text.Label):
             y = _win_y - (_win_y // 4),
             anchor_x = 'right',
             anchor_y = 'center',
-            batch = main_menu_batch,
+            batch = batch,
             color = TITLE_COLOR,
         )
 
 class MainMenuLabel(pyglet.text.Label):
 
-    def __init__(self, title, batch, offset = .5):
+    def __init__(self, title, batch, offset = 0):
+
+        offset *= .5
+
         super(MainMenuLabel, self).__init__(
             title,
             font_name = 'Chapbook',
@@ -160,7 +163,7 @@ class MainMenuLabel(pyglet.text.Label):
             y =  _win_y - 180 - 100*offset,
             anchor_x = 'right',
             anchor_y = 'top',
-            batch = main_menu_batch,
+            batch = batch,
             color = MENU_ITEM_COLOR,
         )
 
@@ -175,6 +178,6 @@ class VersionInfo(pyglet.text.Label):
             y = 25,
             anchor_x = 'right',
             anchor_y = 'top',
-            batch = main_menu_batch,
+            batch = batch,
             color = VERSIONINFO_COLOR
         )

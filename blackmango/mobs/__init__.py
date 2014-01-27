@@ -40,6 +40,8 @@ class SimpleMob(blackmango.sprites.BasicMobileSprite):
         actual 'behavior' method should be called. This method should not be
         subclassed unless you know what you are doing.
         """
-        return self.behaviour(level)
+        if self.animations:
+            return
+        return self.behavior(level)
 
     def behavior(self, level): pass

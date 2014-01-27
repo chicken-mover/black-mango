@@ -20,9 +20,6 @@ class PatrollerV(blackmango.mobs.SimpleMob):
 
     def behavior(self, level):
 
-        if self.animations:
-            return
-
         if self.world_location == self.previous_location:
             self.move_direction = [-1*i for i in self.move_direction]
 
@@ -59,9 +56,6 @@ class ClockwisePatroller(blackmango.mobs.SimpleMob):
                 chaser.chase_active = True
                 pyglet.clock.schedule_once(chaser.unchase, 1)
         
-        if self.animations:
-            return
-
         delta = self.old_location[0] - self.world_location[0] or \
                 self.old_location[1] - self.world_location[1]
         delta = abs(delta)
@@ -101,10 +95,8 @@ class Chaser(blackmango.mobs.SimpleMob):
 
         if not self.chase_active:
             return
-        if self.animations:
-            return
 
-        next_move = self.path_to_player(level.player)
+        next_move = self.path_to(level.player, level)
         if not next_move: return
         l = [
             self.world_location,

@@ -4,6 +4,7 @@ Defines the BaseSprite class, from which mobs and materials inherit.
 
 import functools
 import pyglet
+import random
 
 import blackmango.app
 import blackmango.configure
@@ -89,12 +90,15 @@ class BaseSprite(pyglet.sprite.Sprite):
         pass
 
     def set_position(self, x, y):
-        if blackmango.configure.DEBUG and hasattr(self, 'direction') and \
-           self.visible:
-            d = self.direction
-            self.debug_label.x = x + blackmango.configure.GRID_SIZE + 3
-            self.debug_label.y = y - 3
-            self.debug_label.text = '%s %s' % (repr(self.world_location), d)
+        if blackmango.configure.DEBUG:
+            if hasattr(self, 'direction') and \
+               self.visible:
+                d = self.direction
+                self.debug_label.x = x + blackmango.configure.GRID_SIZE + 3
+                self.debug_label.y = y - 3
+                self.debug_label.text = '%s %s' % (repr(self.world_location), d)
+            elif hasattr(self, 'direction') and not self.visible:
+                self.debug_label.delete()
         return super(BaseSprite, self).set_position(x, y)
 
     def translate(self):
@@ -150,7 +154,7 @@ class BasicMobileSprite(BaseSprite):
         self.is_solid = True
         self.is_mover = True
         self.is_portal = False
-        self.opacity = 0
+        self.opacity = .1
 
         self.direction = 3
 
@@ -270,7 +274,7 @@ class BasicMobileSprite(BaseSprite):
         """
         Check to see if this mob can see the target <mob>.
         """
-
+        
         if mob.opacity == 0: return # Invisible mobs
 
         x, y, z = self.world_location
@@ -301,24 +305,25 @@ class BasicMobileSprite(BaseSprite):
         # values. If the total opacity hits 1, sight is blocked.
         opacity = 0
         for coord in coords:
-            b = level.get_block(coord)
-            m = level.get_mob(coord)
+            b = level.get_block(*coord)
+            m = level.get_mob(*coord)
             if b:
                 opacity += b.opacity
             if m:
                 opacity += m.opacity
             if opacity >= 1:
+                print opacity
                 return False
 
         return True
 
-    def _path_delta(self, c1, c2):
+    def _path_delta(self, c1, c2, level):
         """
         Return the next delta between three-tuple coordinates <c1> and <c2>
         according to the pathing algo.
         """
-        x, y, z = self.world_location
-        px, py, pz = mob.world_location
+        x, y, z = c1
+        px, py, pz = c2
 
         if z != pz:
             return (0,0)# Different room
@@ -331,16 +336,23 @@ class BasicMobileSprite(BaseSprite):
         # Don't try to move onto blocks that are occupied by solids
         if delta_x:
             next_pos = (x + delta_x, y, z)
-            block = level.get_block(next_pos)
-            if block.is_solid:
+            block = level.get_block(*next_pos)
+            if block and block.is_solid:
                 delta_x = 0
         if delta_y:
             next_pos = (x, y + delta_y, z)
-            block = level.get_block(next_pos)
-            if block.is_solid:
+            block = level.get_block(*next_pos)
+            if block and block.is_solid:
                 delta_y = 0
 
         # Don't return diagonal paths
+        if delta_x and delta_y:
+            # To keep pathing from being boring, randomly choose between which
+            # axis gets moved along first
+            delta = [delta_x, delta_y]
+            delta[random.choice((0, 1))] = 0
+            delta_x, delta_y = delta
+
         if delta_x:
             return (delta_x, 0)
         else:
@@ -356,4 +368,4 @@ class BasicMobileSprite(BaseSprite):
         if z != pz:
             return # Different room
 
-        return self._path_delta((x, y, z), (px, py, pz))
+        return self._path_delta((x, y, z), (px, py, pz), level)
