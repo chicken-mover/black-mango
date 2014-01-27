@@ -131,18 +131,18 @@ class MainMenuView(BaseView):
         elif keyboard[pyglet.window.key.ENTER]:
             self.menu_items[self.selected].action()
 
+
+_win_x, _win_y = blackmango.ui.game_window.get_size()
+
 class MainMenuTitle(pyglet.text.Label):
 
     def __init__(self, title):
-
-        x, y = blackmango.ui.game_window.get_size()
-
         super(MainMenuTitle, self).__init__(
             title,
             font_name = 'Chapbook',
             font_size = 52,
-            x = x // 2,
-            y = y - (y // 4),
+            x = _win_x // 2,
+            y = _win_y - (_win_y // 4),
             anchor_x = 'right',
             anchor_y = 'center',
             batch = main_menu_batch,
@@ -151,20 +151,13 @@ class MainMenuTitle(pyglet.text.Label):
 
 class MainMenuLabel(pyglet.text.Label):
 
-    def __init__(self, title, offset = 0):
-
-        x, y = blackmango.ui.game_window.get_size()
-
-        offset += 1
-        offset *= .5
-
+    def __init__(self, title, offset = .5):
         super(MainMenuLabel, self).__init__(
             title,
-            #font_name = 'Prociono TT',
             font_name = 'Chapbook',
             font_size = 18, 
-            x = x - 140,
-            y = y - 180 - 100*offset,
+            x =  _win_x - 140,
+            y =  _win_y - 180 - 100*offset,
             anchor_x = 'right',
             anchor_y = 'top',
             batch = main_menu_batch,
@@ -174,12 +167,11 @@ class MainMenuLabel(pyglet.text.Label):
 class VersionInfo(pyglet.text.Label):
 
     def __init__(self, title):
-        x, y = blackmango.ui.game_window.get_size()
         super(VersionInfo, self).__init__(
             'v-%s' % title,
             font_name = 'Prociono TT',
             font_size = 8,
-            x = x - 20,
+            x = _win_x - 20,
             y = 25,
             anchor_x = 'right',
             anchor_y = 'top',

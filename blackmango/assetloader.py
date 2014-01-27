@@ -14,7 +14,6 @@ def load_image(fname):
     Return a Pyglet image object loaded from the file specified by <fname>
     """
     return pyglet.image.load(load('images', fname))
-    
 
 def load_text(fname):
     """
