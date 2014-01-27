@@ -7,6 +7,10 @@ import pyglet
 import blackmango.mobs
 
 class PatrollerV(blackmango.mobs.SimpleMob):
+    """
+    Walk up and down the screen, turning around every time an obstable is
+    encountered.
+    """
 
     move_direction = (0,1)
 
@@ -32,6 +36,9 @@ class PatrollerV(blackmango.mobs.SimpleMob):
         self.move(level, *self.move_direction)
 
 class ClockwisePatroller(blackmango.mobs.SimpleMob):
+    """
+    Move in a clockwise square of a set size (currently 6)
+    """
 
     def __init__(self, *args, **kwargs):
 
@@ -78,6 +85,10 @@ class ClockwisePatroller(blackmango.mobs.SimpleMob):
             return self.behavior(level)
 
 class Chaser(blackmango.mobs.SimpleMob):
+    """
+    If another mob sets this mob's chase_active attribute to True, run towards
+    the player until it is set to False.
+    """
 
     def __init__(self, *args, **kwargs):
 

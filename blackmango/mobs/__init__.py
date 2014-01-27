@@ -73,7 +73,7 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
         """
         Move the sprite in the game world with an accompanying animation.
         """
-        #TODO: Animate actual image frames
+        # TODO: Animate actual image frames
         if self.animations:
             return
 
@@ -188,15 +188,16 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
 
         return True
 
-    def path_to(self, mob, level):
+    def _path_delta(self, c1, c2):
         """
-        Give the next movement delta to apply to move towards <mob>.
+        Return the next delta between three-tuple coordinates <c1> and <c2>
+        according to the pathing algo.
         """
         x, y, z = self.world_location
         px, py, pz = mob.world_location
 
         if z != pz:
-            return # Different room
+            return (0,0)# Different room
 
         mx, my = px - x, py - y
 
@@ -220,6 +221,18 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
             return (delta_x, 0)
         else:
             return (0, delta_y)
+
+    def path_to(self, mob, level):
+        """
+        Give the next movement delta to apply to move towards <mob>.
+        """
+        x, y, z = self.world_location
+        px, py, pz = mob.world_location
+
+        if z != pz:
+            return # Different room
+
+        return self._path_delta((x, y, z), (px, py, pz))
 
 
 class SimpleMob(BasicMobileSprite):
