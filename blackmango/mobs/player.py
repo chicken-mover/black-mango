@@ -9,6 +9,14 @@ import blackmango.mobs
 
 from blackmango.masks.masklist import MASKS
 
+def isalive(f):
+    def wrapped(self, *args, **kwargs):
+        if self.dead:
+            return
+        else:
+            return f(self, *args, **kwargs)
+    return wrapped
+
 class Player(blackmango.mobs.BasicMobileSprite):
 
     def __init__(self, x = 0, y = 0, z = 0):
@@ -21,7 +29,9 @@ class Player(blackmango.mobs.BasicMobileSprite):
         self.logger = blackmango.configure.logger
 
         self.current_mask = None
+        self.dead = False
 
+    @isalive
     def activate_mask(self, id):
 
         if self.current_mask:
@@ -33,6 +43,7 @@ class Player(blackmango.mobs.BasicMobileSprite):
         self.current_mask(mask)
         mask.on_activate(self)
 
+    @isalive
     def teleport(self, level, x, y, z):
         """
         Overrides the parent class, because if the player changes floors, we
@@ -46,13 +57,24 @@ class Player(blackmango.mobs.BasicMobileSprite):
             level.switch_floor(z)
         self.translate()
 
+    @isalive
     def kill(self):
-        raise Exception("Game Over!")
+        self.dead = True
 
+    @isalive
+    def move(self, *args, **kwargs):
+        super(Player, self).move(*args, **kwargs)
+
+    @isalive
+    def turn(self, *args, **kwargs):
+        super(Player, self).turn(*args, **kwargs)
+
+    @isalive
     def user_input(self, keyboard, level):
         """
         Called on every tick by the GameView object.
         """
+        
         move = [0,0]
         if keyboard[key.UP]:
             move[1] = -1

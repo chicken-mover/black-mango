@@ -25,9 +25,13 @@ from blackmango.ui.views import BaseView
 
 TITLE_CARD_COLOR = blackmango.configure.COLORS['secondary-a-5']
 
+MODE_LOADING = 'MODE_LOADING'
+MODE_NORMAL = 'MODE_NORMAL'
+MODE_PAUSE = 'MODE_PAUSE'
+
 def loading_halt(f):
     def wrapped(self, *args, **kwargs):
-        if self.loading:
+        if self.mode == MODE_LOADING:
             return
         else:
             return f(self, *args, **kwargs)
@@ -42,7 +46,7 @@ class GameView(BaseView):
         self.current_level = None
         self.player = None
 
-        self.loading = False
+        self.mode = MODE_NORMAL
 
         level_data = LEVELS.get(level)
         
@@ -68,7 +72,7 @@ class GameView(BaseView):
     def save_level(self, filepath = None):
         if not filepath:
             filepath = 'autosave.%s.blackmango' % str(datetime.datetime.now())
-        self.loading = True
+        self.mode = MODE_LOADING
         stored_level = self.current_level.serialize()
         f = os.path.join(blackmango.system.DIR_SAVEDGAMES, filepath)
         d = os.path.dirname(f)
@@ -83,10 +87,10 @@ class GameView(BaseView):
         with open(f, 'w') as fp:
             fp.write(blackmango.configure.SAVE_GAME_VERSION + '\n')
             fp.write(cPickle.dumps(stored_level))
-        self.loading = False
+        self.loading = MODE_PAUSE
 
     def load_level(self, filepath):
-        self.loading = True
+        self.mode = MODE_LOADING
         self.logger.debug("Scheduling load game...")
         current_save_vesion = blackmango.configure.SAVE_GAME_VERSION
 
@@ -107,7 +111,7 @@ class GameView(BaseView):
 
     def start_level(self, level_data):
 
-        self.loading = True
+        self.mode = MODE_LOADING
         self.level_teardown()
 
         # Initialize level and player
@@ -121,7 +125,7 @@ class GameView(BaseView):
         self.player.world_location = starting_location
         self.player.translate()
 
-        self.loading = False
+        self.loading = MODE_NORMAL
         self.logger.debug("Game started: %s" % repr(self.current_level))
 
         # Show the title card
@@ -134,7 +138,7 @@ class GameView(BaseView):
 
 
     def next_level(self):
-        self.loading = True
+        self.loading = MODE_LOADING
         def loader(dt):
             next_level_str = self.current_level.next_level
             self.logger.debug("Loading next level: %s" % next_level_str)
@@ -146,7 +150,7 @@ class GameView(BaseView):
         pyglet.clock.schedule_once(loader, 1)
 
     def quit_to_main_menu(self):
-        self.loading = True
+        self.loading = MODE_LOADING
         def loader(dt):
             from blackmango.ui.views.main_menu import MainMenuView
             blackmango.ui.game_window.set_view(MainMenuView())
@@ -192,17 +196,23 @@ class GameView(BaseView):
         """
         Called on every window tick
         """
+        if self.player.dead:
+            return self.quit_to_main_menu()
+            
         # The order of these things may need adjustment at some point
-        self.player.user_input(keyboard, self.current_level)
+        if not self.pause():
+            self.player.user_input(keyboard, self.current_level)
+
+        if self.current_level and not self.pause():
+            self.current_level.tick()
 
         # View-level actions. These should go into some sort of overlay menu
         # that pauses the game when active.
         if keyboard[key.S]:
             self.save_level()
+            self.mode = MODE_NORMAL
         elif keyboard[key.L]:
             self.load_level()
         elif keyboard[key.ESCAPE]:
             self.quit_to_main_menu()
-
-        if self.current_level:
-            self.current_level.tick()
+        return
