@@ -12,6 +12,14 @@ import blackmango.configure
 import blackmango.sprites
 import blackmango.ui
 
+def notfrozen(f):
+    def wrapped(self, *args, **kwargs):
+        if self.is_frozen:
+            return False
+        else:
+            return f(self, *args, **kwargs)
+    return wrapped
+
 class BasicMobileSprite(blackmango.sprites.BaseSprite):
     
     def __init__(self, image = None,
@@ -26,15 +34,17 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
         super(BasicMobileSprite, self).__init__(image, x, y, z,
                 'mobs', color)
 
-        self.is_solid = 1
-        self.is_mover = 1
-        self.is_portal = 0
+        self.is_solid = True
+        self.is_mover = True
+        self.is_portal = False
+        self.is_frozen = False
         self.opacity = 0
 
         self.direction = 3
 
         self.animations = []
 
+    @notfrozen
     def teleport(self, level, x, y, z):
         """
         Change the position of the sprite in the game world instantly.
@@ -60,7 +70,8 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
             self.visible = True
             
         self.translate()
-
+    
+    @notfrozen
     def turn(self, direction):
         """
         Set the turn direction in degrees, where 'direction' is [1, 2, 3, 4],
@@ -69,6 +80,7 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
         # TODO: Reflect turn in sprite image
         self.direction = direction
 
+    @notfrozen
     def move(self, level, delta_x = 0, delta_y = 0, strafe = False):
         """
         Move the sprite in the game world with an accompanying animation.
@@ -149,6 +161,9 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
         """
         Check to see if this mob can see the target <mob>.
         """
+
+        if mob.opacity == 0: return # Invisible mobs
+
         x, y, z = self.world_location
         px, py, pz = mob.world_location
 

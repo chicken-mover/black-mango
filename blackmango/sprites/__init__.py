@@ -16,12 +16,12 @@ color_cache = {}
 
 class BaseSprite(pyglet.sprite.Sprite):
     
-    is_solid = 0
-    is_mover = 0
-    is_portal = 0
+    is_solid = False
+    is_mover = False
+    is_portal = False
     opacity = 0
 
-    is_pushable = 0
+    is_pushable = False
     weight = 0
     pushes = {}
 

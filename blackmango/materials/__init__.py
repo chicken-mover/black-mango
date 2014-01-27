@@ -28,9 +28,9 @@ class BaseMaterial(blackmango.sprites.BaseSprite):
         super(BaseMaterial, self).__init__(image, x, y, z,
                 'background', color)
 
-        self.is_solid = 1
-        self.is_mover = 0
-        self.is_portal = 0
+        self.is_solid = True
+        self.is_mover = False
+        self.is_portal = False
         self.opacity = 0
 
     def interaction_callback(self, level, mob):
@@ -47,11 +47,10 @@ class BasePortalMaterial(BaseMaterial):
         ):
 
         color = color or (255,0,0,255)
-        super(BasePortalMaterial, self).__init__(image, x, y, z,
-                color)
+        super(BasePortalMaterial, self).__init__(image, x, y, z, color)
 
-        self.is_solid = 0
-        self.is_portal = 1
+        self.is_solid = False
+        self.is_portal = True
         self.destination = destination
 
         self.kwargs = {
@@ -76,7 +75,7 @@ class VoidMaterial(BaseMaterial):
 
         super(VoidMaterial, self).__init__(color = color)
 
-        self.is_solid = 1
-        self.is_mover = 0
-        self.is_portal = 0
+        self.is_solid = True
+        self.is_mover = False
+        self.is_portal = False
         self.opacity = 0

@@ -201,7 +201,7 @@ class GameView(BaseView):
             
         # The order of these things may need adjustment at some point
         if not self.pause():
-            self.player.user_input(keyboard, self.current_level)
+            self.player.tick(keyboard, self.current_level)
 
         if self.current_level and not self.pause():
             self.current_level.tick()

@@ -70,10 +70,13 @@ class Player(blackmango.mobs.BasicMobileSprite):
         super(Player, self).turn(*args, **kwargs)
 
     @isalive
-    def user_input(self, keyboard, level):
+    def tick(self, keyboard, level):
         """
         Called on every tick by the GameView object.
         """
+
+        if self.current_mask:
+            self.current_mask.tick(self, level)
         
         move = [0,0]
         if keyboard[key.UP]:
