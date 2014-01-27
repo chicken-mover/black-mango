@@ -152,19 +152,41 @@ class BasicMobileSprite(blackmango.sprites.BaseSprite):
         x, y, z = self.world_location
         px, py, pz = mob.world_location
 
-        if z != pz: return
+        if z != pz: return False
 
-        if x == px:
+        # Check to see if the target mob is aligned with our field of view
+        if x != px and y != py:
+            return False
+
+        elif x == px:
             if y < py and self.direction == 3:
-                return True
+                coords = [(x, y, z) for y in xrange(y, py)]
             elif py < y and self.direction == 1:
-                return True
-        if y == py:
+                coords = [(x, y, z) for y in xrange(py, y)]
+            else:
+                return False
+        elif y == py:
             if x < px and self.direction == 2:
-                return True
+                coords = [(x, y, z) for x in xrange(x, px)]
             elif px < x and self.direction == 4:
-                return True
-        return False
+                coords = [(x, y, z) for x in xrange(px, x)]
+            else:
+                return False
+
+        # Get all of the blocks between this mob and <mob>, and check opacity
+        # values. If the total opacity hits 1, sight is blocked.
+        opacity = 0
+        for coord in coords:
+            b = level.get_block(coord)
+            m = level.get_mob(coord)
+            if b:
+                opacity += b.opacity
+            if m:
+                opacity += m.opacity
+            if opacity >= 1:
+                return False
+
+        return True
 
     def path_to(self, mob, level):
         """
