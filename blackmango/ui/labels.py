@@ -1,3 +1,7 @@
+"""
+Text and label classes shared by more than one view or submodule. Many define
+their own, but a few have more various utility.
+"""
 
 import pyglet
 
@@ -73,6 +77,9 @@ class ScrollableLabelSet(object):
                 i.color = reset_color
 
 class TextBox(pyglet.text.Label):
+    """
+    Text with an accompanying border box behind.
+    """
 
     def __init__(self, title, 
             padding = 15,

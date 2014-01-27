@@ -10,8 +10,6 @@ import blackmango.configure
 from blackmango.configure import COLORS
 from blackmango.ui.views import BaseView
 
-main_menu_batch = pyglet.graphics.Batch()
-
 TITLE_COLOR = COLORS['secondary-a-5']
 MENU_ITEM_COLOR = COLORS['primary-4']
 SELECTED_COLOR = COLORS['secondary-b-5']
@@ -32,11 +30,13 @@ class MainMenuView(BaseView):
         ]
         self.menu_items = []
 
-        self.title = MainMenuTitle('Black Mango')
-        self.versioninfo = VersionInfo(blackmango.configure.VERSION)
+        self.batch = pyglet.graphics.Batch()
+
+        self.title = MainMenuTitle('Black Mango', self.batch)
+        self.versioninfo = VersionInfo(blackmango.configure.VERSION, self.batch)
         offset = 0
         for option, action in MENU_OPTIONS:
-            label = MainMenuLabel(option, offset)
+            label = MainMenuLabel(option, self.batch, offset)
             label.action = action
             self.menu_items.append(label)
             offset += 1
@@ -136,7 +136,7 @@ _win_x, _win_y = blackmango.ui.game_window.get_size()
 
 class MainMenuTitle(pyglet.text.Label):
 
-    def __init__(self, title):
+    def __init__(self, title, batch):
         super(MainMenuTitle, self).__init__(
             title,
             font_name = 'Chapbook',
@@ -151,7 +151,7 @@ class MainMenuTitle(pyglet.text.Label):
 
 class MainMenuLabel(pyglet.text.Label):
 
-    def __init__(self, title, offset = .5):
+    def __init__(self, title, batch, offset = .5):
         super(MainMenuLabel, self).__init__(
             title,
             font_name = 'Chapbook',
@@ -166,7 +166,7 @@ class MainMenuLabel(pyglet.text.Label):
 
 class VersionInfo(pyglet.text.Label):
 
-    def __init__(self, title):
+    def __init__(self, title, batch):
         super(VersionInfo, self).__init__(
             'v-%s' % title,
             font_name = 'Prociono TT',

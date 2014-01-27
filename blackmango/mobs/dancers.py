@@ -1,6 +1,4 @@
 
-import pyglet
-
 import blackmango.mobs
 
 class Mirror(blackmango.mobs.SimpleMob):

@@ -27,9 +27,9 @@ GRID_SIZE = 50
 
 # Batch rendering groups.
 ORDERED_GROUPS = {
-    'mobs': pyglet.graphics.OrderedGroup(5),
     'background': pyglet.graphics.OrderedGroup(0),
-    'foreground': pyglet.graphics.OrderedGroup(1),
+    'mobs': pyglet.graphics.OrderedGroup(2),
+    'foreground': pyglet.graphics.OrderedGroup(3),
 }
 
 # number of frames when animating movement slides. potentially will be used for

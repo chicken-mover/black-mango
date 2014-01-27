@@ -47,6 +47,8 @@ class GameView(BaseView):
         self.player = None
 
         self.mode = MODE_NORMAL
+        self.background_image = None
+        self.background = None
 
         level_data = LEVELS.get(level)
         
@@ -165,7 +167,10 @@ class GameView(BaseView):
         Called on every window draw (unless the window isn't drawing views for
         some reason, like during loading of new games).
         """
-        self.current_level.draw_background()
+        background = self.current_level.get_background()
+        if background:
+            background.draw()
+
         blackmango.sprites.sprite_batch.draw()
         if self.title_card:
             blackmango.ui.labels.title_batch.draw()

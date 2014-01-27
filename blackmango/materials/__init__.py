@@ -9,8 +9,6 @@ This file should contain only the base material classes. Subclasses of the
 base materials should be divided out into logically appropriate submodules.
 """
 
-import pyglet
-
 import blackmango.configure
 import blackmango.sprites
 

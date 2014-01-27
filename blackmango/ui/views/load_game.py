@@ -15,8 +15,6 @@ import blackmango.ui.views.main_menu
 
 from blackmango.configure import COLORS
 
-loading_menu_batch = pyglet.graphics.Batch()
-
 TITLE_COLOR = COLORS['secondary-a-5']
 MENU_ITEM_COLOR = COLORS['primary-4']
 SELECTED_COLOR = COLORS['secondary-b-5']
@@ -30,6 +28,8 @@ class LoadGameView(blackmango.ui.views.BaseView):
         savefiles = os.listdir(savedir)
         savefiles = filter(lambda x: x.endswith('.blackmango'), savefiles)
 
+        self.batch = pyglet.graphics.Batch()
+
         self.menu_options = []
         for f in savefiles:
             name = f[:-11]
@@ -39,7 +39,7 @@ class LoadGameView(blackmango.ui.views.BaseView):
             self.menu_options.append((name, f))
         self.menu_items = []
 
-        self.title = MenuTitle('Load game')
+        self.title = MenuTitle('Load game', batch = self.batch)
         offset = 0
 
         x, y = blackmango.ui.game_window.get_size()
@@ -51,13 +51,13 @@ class LoadGameView(blackmango.ui.views.BaseView):
         )
         
         for option, s in self.menu_options:
-            label = MenuLabel(option, offset)
+            label = MenuLabel(option, offset, batch = self.batch)
             label.action = lambda : self.load_game(s)
             self.menu_items.append(label)
             self.labelset.add(label)
             offset += 1
 
-        #cancel = MenuLabel('Cancel', offset)
+        #cancel = MenuLabel('Cancel', offset, batch = self.batch)
         #cancel.action = self.cancel_action
         #self.menu_items.append(cancel)
         #self.labelset.add(cancel)
@@ -86,7 +86,8 @@ class LoadGameView(blackmango.ui.views.BaseView):
         blackmango.ui.game_window.set_view(GameView(savefile))
 
     def open_error(self):
-        error = ErrorLabel("File can't be opened due to save version mismatch")
+        error = ErrorLabel("File can't be opened due to save version mismatch",
+            batch = self.batch)
         self.errors.append(error)
 
     def clear_errors(self):
@@ -123,8 +124,7 @@ class LoadGameView(blackmango.ui.views.BaseView):
         self.set_selected(s)
 
     def on_draw(self):
-        
-        loading_menu_batch.draw()
+        self.batch.draw()
 
     def get_intersecting_menu_item(self, x, y):
         # If the mouse intersects with any menu items, select them
@@ -178,7 +178,7 @@ class LoadGameView(blackmango.ui.views.BaseView):
 
 class MenuTitle(pyglet.text.Label):
 
-    def __init__(self, title):
+    def __init__(self, title, batch):
 
         x, y = blackmango.ui.game_window.get_size()
 
@@ -190,7 +190,7 @@ class MenuTitle(pyglet.text.Label):
             y = y - (y // 4),
             anchor_x = 'right',
             anchor_y = 'center',
-            batch = loading_menu_batch,
+            batch = batch,
             color = TITLE_COLOR,
         )
 
@@ -211,7 +211,7 @@ class MenuLabel(pyglet.text.Label):
             y = y - 180 - 100*offset,
             anchor_x = 'right',
             anchor_y = 'top',
-            batch = loading_menu_batch,
+            batch = batch,
             color = MENU_ITEM_COLOR,
         )
 
@@ -229,6 +229,6 @@ class ErrorLabel(pyglet.text.Label):
             y = y - (y - 40),
             anchor_x = 'center',
             anchor_y = 'center',
-            batch = loading_menu_batch,
+            batch = batch,
             color = ERROR_COLOR, 
         )

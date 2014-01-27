@@ -9,8 +9,6 @@ The level's `tick` method is used to iterate and call the `behavior` method on
 each mob in the level.
 """
 
-import blackmango.sprites.backgrounds
-
 from blackmango.materials.materiallist import MATERIALS
 from blackmango.mobs.moblist import MOBS
 
@@ -46,6 +44,9 @@ class BasicLevel(object):
         self.triggers = level_data['triggers']()
         self.next_level = level_data['next_level']
         self.backgrounds = level_data['backgrounds']
+        for k, v in backgrounds.items():
+            if v:
+                self.backgrounds[k] = blackmango.scenery.Background(v)
 
         self.set_background(self.current_floor)
 
@@ -106,17 +107,8 @@ class BasicLevel(object):
         if not self.triggers.triggers_initialized:
             self.triggers.init_triggers(self, self.player)
 
-    def set_background(self, floor):
-        image = self.backgrounds[floor]
-        if image:
-            background = blackmango.sprites.backgrounds.BackgroundImage(image)
-            self.background_image = background
-        else:
-            self.background_image = None
-
-    def draw_background(self):
-        if self.background_image:
-            self.background_image.draw()
+    def get_background(self, floor):
+        return self.backgrounds[floor]
 
     def switch_floor(self, new_floor):
         """
@@ -189,7 +181,7 @@ class BasicLevel(object):
             return
         for _, mob in self.mobs.items():
             if mob is not self.player:
-                mob.behavior(self)
+                mob.do_behavior(self)
         self.triggers.tick(self, self.player)
 
     def serialize(self):
@@ -205,11 +197,16 @@ class BasicLevel(object):
 
             'next_level': self.next_level,
 
+            'backgrounds': {},
+
             'blocks': {},
             'mobs': {},
 
             'triggers': self.triggers,
         }
+
+        for k, v in backgrounds:
+            saved_level['backgrounds'][k] = v.image
 
         # Fill out the blocks and mobs dicts. This is in the LEVEL_DATA format,
         # not in the internally stored format.
