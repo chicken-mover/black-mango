@@ -42,7 +42,7 @@ class BasicLevel(object):
         self.title_card = level_data['title_card']
         self.starting_location = level_data['starting_location']
         self.current_floor = self.starting_location[2]
-        self.level_size = level_data['level_size']
+        self.size = level_data['level_size']
         self.triggers = level_data['triggers']()
         self.next_level = level_data['next_level']
         self.backgrounds = level_data['backgrounds'].copy()
@@ -60,9 +60,9 @@ class BasicLevel(object):
 
         # Load all of the material and mob objects by iterating the data for
         # each floor
-        for floor in xrange(self.level_size[2]):
-            for y in xrange(self.level_size[1]):
-                for x in xrange(self.level_size[0]):
+        for floor in xrange(self.size[2]):
+            for y in xrange(self.size[1]):
+                for x in xrange(self.size[0]):
                     try:
                         v = blockdata[floor][y][x]
                     except (IndexError, ValueError):
@@ -144,9 +144,9 @@ class BasicLevel(object):
         Get the material at <x>, <y>, <floor>. If the provided coordinates are
         invalid, returns an instance of VoidMaterial.
         """
-        if x < 0 or x > self.level_size[0] - 1 or \
-           y < 0 or y > self.level_size[1] - 1 or \
-           floor < 0 or floor > self.level_size[2] - 1:
+        if x < 0 or x > self.size[0] - 1 or \
+           y < 0 or y > self.size[1] - 1 or \
+           floor < 0 or floor > self.size[2] - 1:
             return MATERIALS[-1]()
         try:
             return self.blocks[(x, y, floor)]
@@ -192,7 +192,7 @@ class BasicLevel(object):
 
         saved_level = {
             'title_card': self.title_card,
-            'level_size': self.level_size,
+            'level_size': self.size,
             'starting_location': self.player.world_location,
 
             'next_level': self.next_level,
@@ -210,7 +210,7 @@ class BasicLevel(object):
 
         # Fill out the blocks and mobs dicts. This is in the LEVEL_DATA format,
         # not in the internally stored format.
-        lx, ly, lfloor = self.level_size
+        lx, ly, lfloor = self.size
         for map in (saved_level['blocks'], saved_level['mobs']):
             for floor in xrange(lfloor):
                 if not floor in map:

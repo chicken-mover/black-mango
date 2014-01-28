@@ -22,7 +22,7 @@ bindings = {
     'move_right': [key.RIGHT, key.NUM_RIGHT, key.D],    
 
     # Program control
-    'game_quit': [(key.Q, key.MOD_ACCEL), key.ESCAPE],
+    'game_quit': [key.ESCAPE],
     'game_save': [],
     'game_load': [],
     'prog_quit': [(key.Q, key.MOD_ACCEL|key.MOD_SHIFT),],
@@ -43,6 +43,7 @@ def check(binding):
             sym = keyset
             mods = 0
         allk = [sym,]
+        # TODO: the modifiers code isn't working properly
         mods = key.modifiers_string(mods)
         for m in filter(None, mods.split('|')):
             allk.append(getattr(key, m))

@@ -221,12 +221,17 @@ class BasicMobileSprite(BaseSprite):
 
         block = level.get_block(*dest)
         if block and block.is_solid:
-            block.push(self, self.world_location)
+            #block.push(self, self.world_location)
             # Interact with whatever you're pushing
             ##block.interaction_callback( self)
             # and whatever you're standing on
             block = level.get_block(*self.world_location)
-            if block:
+            if block and not block.is_portal:
+                block.interaction_callback(self)
+            # If the block is a portal, only activate it again if the mob is
+            # trying to move off the level (ie, it's a door or something)
+            if dest[0] < 0 or dest[1] < 0 or dest[0] > level.size[0] or \
+               dest[1] > level.size[1]:
                 block.interaction_callback(self)
             return
         elif block:

@@ -28,8 +28,6 @@ MODE_LOADING = 'MODE_LOADING'
 MODE_NORMAL = 'MODE_NORMAL'
 MODE_PAUSE = 'MODE_PAUSE'
 
-current_level = None # For easy access by external modules
-
 def loading_halt(f):
     def wrapped(self, *args, **kwargs):
         if self.mode == MODE_LOADING:
@@ -114,8 +112,6 @@ class GameView(BaseView):
 
     def start_level(self, level_data):
 
-        global current_level
-
         self.mode = MODE_LOADING
         self.level_teardown()
 
@@ -123,7 +119,6 @@ class GameView(BaseView):
         self.player = blackmango.mobs.player.Player()
         self.current_level = blackmango.levels.BasicLevel(level_data, \
                                 self.player)
-        current_level = self.current_level
 
         # Place the player into the level
         starting_location = self.current_level.starting_location
