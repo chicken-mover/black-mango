@@ -34,13 +34,13 @@ class BaseView(object):
         """
         pass
 
-    def on_key_press(self, key, modifiers, keyboard):
+    def on_key_press(self, key, modifiers):
         """
         Called by the window on every key press
         """
         pass
 
-    def tick(self, keyboard):
+    def tick(self):
         """
         Called on every window tick
         """

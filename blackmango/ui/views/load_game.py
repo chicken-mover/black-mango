@@ -5,8 +5,6 @@ View for the 'Load game' screen.
 import os
 import pyglet
 
-from pyglet.window import key
-
 import blackmango.system
 import blackmango.ui.labels
 import blackmango.ui.views
@@ -14,6 +12,7 @@ import blackmango.ui.views.game
 import blackmango.ui.views.main_menu
 
 from blackmango.configure import COLORS
+from blackmango.ui import keyboard
 
 TITLE_COLOR = COLORS['secondary-a-5']
 MENU_ITEM_COLOR = COLORS['primary-4']
@@ -51,7 +50,7 @@ class LoadGameView(blackmango.ui.views.BaseView):
         )
         
         for option, s in self.menu_options:
-            label = MenuLabel(option, offset, batch = self.batch)
+            label = MenuLabel(option, self.batch, offset)
             label.action = lambda : self.load_game(s)
             self.menu_items.append(label)
             self.labelset.add(label)
@@ -151,29 +150,23 @@ class LoadGameView(blackmango.ui.views.BaseView):
         if button == 1 and item:
             item.action()
 
-    def tick(self, keyboard):
+    def tick(self):
         pass
 
-    def on_key_press(self, k, modifiers, keyboard):
+    def on_key_press(self, k, modifiers):
 
         self.clear_errors()
         
-        if keyboard[key.UP] or \
-           keyboard[key.W] or \
-           keyboard[key.LEFT] or \
-           keyboard[key.A]:
+        if keyboard.check('menu_move_up'):
             self.select_prev()
         
-        elif keyboard[key.DOWN] or \
-           keyboard[key.RIGHT] or \
-           keyboard[key.S] or \
-           keyboard[key.D]:
+        elif keyboard.check('menu_move_down'):
             self.select_next()
 
-        elif keyboard[key.ENTER]:
+        elif keyboard.check('menu_select'):
             self.menu_items[self.selected].action()
 
-        elif keyboard[key.ESCAPE]:
+        elif keyboard.check('menu_cancel'):
             self.cancel_action()
 
 class MenuTitle(pyglet.text.Label):
@@ -196,7 +189,7 @@ class MenuTitle(pyglet.text.Label):
 
 class MenuLabel(pyglet.text.Label):
 
-    def __init__(self, title, offset = 0):
+    def __init__(self, title, batch, offset = 0):
 
         x, y = blackmango.ui.game_window.get_size()
 

@@ -8,6 +8,7 @@ import blackmango.app
 import blackmango.configure
 
 from blackmango.configure import COLORS
+from blackmango.ui import keyboard
 from blackmango.ui.views import BaseView
 
 TITLE_COLOR = COLORS['secondary-a-5']
@@ -111,24 +112,15 @@ class MainMenuView(BaseView):
         if button == 1 and item:
             item.action()
 
-    def tick(self, keyboard):
-        pass
-
-    def on_key_press(self, key, modifiers, keyboard):
+    def on_key_press(self, key, modifiers):
         
-        if keyboard[pyglet.window.key.UP] or \
-           keyboard[pyglet.window.key.W] or \
-           keyboard[pyglet.window.key.LEFT] or \
-           keyboard[pyglet.window.key.A]:
+        if keyboard.check('menu_move_up'):
             self.select_prev()
         
-        elif keyboard[pyglet.window.key.DOWN] or \
-           keyboard[pyglet.window.key.RIGHT] or \
-           keyboard[pyglet.window.key.S] or \
-           keyboard[pyglet.window.key.D]:
+        elif keyboard.check('menu_move_down'):
             self.select_next()
 
-        elif keyboard[pyglet.window.key.ENTER]:
+        elif keyboard.check('menu_select'):
             self.menu_items[self.selected].action()
 
 

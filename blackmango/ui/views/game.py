@@ -8,8 +8,6 @@ import errno
 import os
 import pyglet
 
-from pyglet.window import key
-
 import blackmango.configure
 import blackmango.levels
 import blackmango.materials
@@ -21,6 +19,7 @@ import blackmango.ui
 import blackmango.ui.labels
 
 from blackmango.levels.levellist import LEVELS
+from blackmango.ui import keyboard
 from blackmango.ui.views import BaseView
 
 TITLE_CARD_COLOR = blackmango.configure.COLORS['secondary-a-5']
@@ -190,14 +189,14 @@ class GameView(BaseView):
         pass
 
     @loading_halt
-    def on_key_press(self, key, modifiers, keyboard):
+    def on_key_press(self, key, modifiers):
         """
         Called by the window on every key press
         """
         pass
 
     @loading_halt
-    def tick(self, keyboard):
+    def tick(self):
         """
         Called on every window tick
         """
@@ -206,18 +205,19 @@ class GameView(BaseView):
             
         # The order of these things may need adjustment at some point
         if self.mode == MODE_NORMAL:
-            self.player.tick(keyboard, self.current_level)
+            self.player.tick(self.current_level)
 
         if self.current_level and self.mode == MODE_NORMAL:
             self.current_level.tick()
 
         # View-level actions. These should go into some sort of overlay menu
         # that pauses the game when active.
-        if keyboard[key.S]:
+        if keyboard.check('game_save'):
             self.save_level()
             self.mode = MODE_NORMAL
-        elif keyboard[key.L]:
+        elif keyboard.check('game_load'):
             self.load_level()
-        elif keyboard[key.ESCAPE]:
+        elif keyboard.check('game_quit'):
             self.quit_to_main_menu()
+
         return

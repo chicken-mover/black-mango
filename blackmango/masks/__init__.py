@@ -45,13 +45,14 @@ class MaskOfAgammemnon(BaseMask):
     """
 
     def on_deactivate(self, player, level):
-        for _, mob in level.mobs:
+        for mob in level.mobs.values():
             if hasattr(mob, 'frozen_by') and mob.frozen_by is self:
                 mob.is_frozen = False
 
     def tick(self, player, level):
-        for _, mob in level.mobs:
-            if mob is not player and player.can_see(mob) and not mob.is_frozen:
+        for mob in level.mobs.values():
+            if mob is not player and player.can_see(mob, level) \
+               and not mob.is_frozen:
                 mob.is_frozen = True
                 mob.frozen_by = self
         return True
