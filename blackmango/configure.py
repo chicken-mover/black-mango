@@ -5,16 +5,17 @@ Also contains a logger for use throughout the app.
 """
 
 import logging
+import pyglet
 
 VERSION = '0.0.0a'
 
 MAIN_WINDOW_TITLE = 'BLACK MANGO'
 
-DEBUG = logging.WARN
+DEBUG = 0 #logging.WARN
 FULLSCREEN = False
 # Main game window size.
 # TODO: Set this appropriately dynamically
-SCREEN_SIZE = (900, 550)
+SCREEN_SIZE = (950, 550)
 
 SAVE_GAME_VERSION='BLACKMANGO-001'
 
@@ -24,19 +25,16 @@ POSIX_DATA_DIR = '~/.blackmango'
 # Grid size. Used for translating world coordinates into screen coordinates.
 GRID_SIZE = 50
 
-# Batch rendering groups. This is actually only of limited value, because
-# if we want stuff to render on top of the player, everything has to be in one
-# batch group (as of this writing, materials and mobs get their own groups).
+# Batch rendering groups.
 ORDERED_GROUPS = {
-    'player': 10,
-    'mobs': 5,
-    'background': 0,
-    'foreground': 1,
+    'background': pyglet.graphics.OrderedGroup(0),
+    'mobs': pyglet.graphics.OrderedGroup(2),
+    'foreground': pyglet.graphics.OrderedGroup(3),
 }
 
 # number of frames when animating movement slides. potentially will be used for
 # sprite animations, too.
-BASE_ANIMATION_FRAMES = 10
+BASE_ANIMATION_FRAMES = 10 # Keep this a common factor of GRID_SIZE
 
 # Loaded by assetloader.load_colordata()
 COLORS = {}

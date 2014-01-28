@@ -5,16 +5,25 @@ Black Mango is a puzzle game.
 All rights reserved.
 """
 
+# Fix PIL import if Pillow is installed instead. This *must* happen before
+# Pyglet is imported
+import sys
+try:
+    import Image
+except ImportError:
+    from PIL import Image
+    sys.modules['Image'] = Image
+
 import argparse
 import os
 import pyglet
-import sys
 import traceback
 
 import blackmango.app
 import blackmango.assetloader
 import blackmango.configure
 import blackmango.ui
+
 
 ARGUMENTS = (
     ('--data-dir', {

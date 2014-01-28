@@ -8,16 +8,15 @@ import blackmango.app
 import blackmango.configure
 
 from blackmango.configure import COLORS
+from blackmango.ui import keyboard
 from blackmango.ui.views import BaseView
-
-main_menu_batch = pyglet.graphics.Batch()
 
 TITLE_COLOR = COLORS['secondary-a-5']
 MENU_ITEM_COLOR = COLORS['primary-4']
 SELECTED_COLOR = COLORS['secondary-b-5']
 VERSIONINFO_COLOR = (255,255,255,50)
 
-NEW_GAME_LEVEL = 'test_level'
+NEW_GAME_LEVEL = 'puzzle_demo1'
 
 class MainMenuView(BaseView):
     
@@ -32,11 +31,13 @@ class MainMenuView(BaseView):
         ]
         self.menu_items = []
 
-        self.title = MainMenuTitle('Black Mango')
-        self.versioninfo = VersionInfo(blackmango.configure.VERSION)
+        self.batch = pyglet.graphics.Batch()
+
+        self.title = MainMenuTitle('Black Mango', self.batch)
+        self.versioninfo = VersionInfo(blackmango.configure.VERSION, self.batch)
         offset = 0
         for option, action in MENU_OPTIONS:
-            label = MainMenuLabel(option, offset)
+            label = MainMenuLabel(option, self.batch, offset)
             label.action = action
             self.menu_items.append(label)
             offset += 1
@@ -87,7 +88,7 @@ class MainMenuView(BaseView):
         self.set_selected(s)
 
     def on_draw(self):
-        main_menu_batch.draw()
+        self.batch.draw()
 
     def get_intersecting_menu_item(self, x, y):
         # If the mouse intersects with any menu items, select them
@@ -111,78 +112,64 @@ class MainMenuView(BaseView):
         if button == 1 and item:
             item.action()
 
-    def tick(self, keyboard):
-        pass
-
-    def on_key_press(self, key, modifiers, keyboard):
+    def on_key_press(self, key, modifiers):
         
-        if keyboard[pyglet.window.key.UP] or \
-           keyboard[pyglet.window.key.W] or \
-           keyboard[pyglet.window.key.LEFT] or \
-           keyboard[pyglet.window.key.A]:
+        if keyboard.check('menu_move_up'):
             self.select_prev()
         
-        elif keyboard[pyglet.window.key.DOWN] or \
-           keyboard[pyglet.window.key.RIGHT] or \
-           keyboard[pyglet.window.key.S] or \
-           keyboard[pyglet.window.key.D]:
+        elif keyboard.check('menu_move_down'):
             self.select_next()
 
-        elif keyboard[pyglet.window.key.ENTER]:
+        elif keyboard.check('menu_select'):
             self.menu_items[self.selected].action()
+
+
+_win_x, _win_y = blackmango.ui.game_window.get_size()
 
 class MainMenuTitle(pyglet.text.Label):
 
-    def __init__(self, title):
-
-        x, y = blackmango.ui.game_window.get_size()
-
+    def __init__(self, title, batch):
         super(MainMenuTitle, self).__init__(
             title,
             font_name = 'Chapbook',
             font_size = 52,
-            x = x // 2,
-            y = y - (y // 4),
+            x = _win_x // 2,
+            y = _win_y - (_win_y // 4),
             anchor_x = 'right',
             anchor_y = 'center',
-            batch = main_menu_batch,
+            batch = batch,
             color = TITLE_COLOR,
         )
 
 class MainMenuLabel(pyglet.text.Label):
 
-    def __init__(self, title, offset = 0):
+    def __init__(self, title, batch, offset = 0):
 
-        x, y = blackmango.ui.game_window.get_size()
-
-        offset += 1
         offset *= .5
 
         super(MainMenuLabel, self).__init__(
             title,
-            #font_name = 'Prociono TT',
             font_name = 'Chapbook',
             font_size = 18, 
-            x = x - 140,
-            y = y - 180 - 100*offset,
+            x =  _win_x - 140,
+            y =  _win_y - 180 - 100*offset,
             anchor_x = 'right',
             anchor_y = 'top',
-            batch = main_menu_batch,
+            batch = batch,
             color = MENU_ITEM_COLOR,
         )
 
 class VersionInfo(pyglet.text.Label):
 
-    def __init__(self, title):
-        x, y = blackmango.ui.game_window.get_size()
+    def __init__(self, title, batch):
         super(VersionInfo, self).__init__(
             'v-%s' % title,
             font_name = 'Prociono TT',
             font_size = 8,
-            x = x - 20,
+            x = _win_x - 20,
             y = 25,
             anchor_x = 'right',
             anchor_y = 'top',
-            batch = main_menu_batch,
+            batch = batch,
             color = VERSIONINFO_COLOR
         )
