@@ -18,7 +18,7 @@ if __name__ == "__main__":
         name = 'blackmango',
         version = version,
         py_modules = [
-            'blackmango',
+            #'blackmango',
 #            'blackmango_tests',
         ],
         install_requires = [

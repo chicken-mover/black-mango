@@ -5,8 +5,9 @@
 *.swp
 *.swo
 *.swn
-__pycache__
 .LCK*
+# For those Python 3 fatfingers (this project should be all 2.7)
+__pycache__
 
 # Python packaging junk
 *.egg*/
@@ -23,6 +24,8 @@ spec/
 # Just in case the build directory is leaking
 *.spec
 *.o
+# Cython generates C and shared object files *everywhere*
+*.c
 *.so
 
 # Don't let Mac OS junk leak onto my pristine Linux setups
