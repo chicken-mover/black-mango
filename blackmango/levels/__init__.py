@@ -181,7 +181,7 @@ class BasicLevel(object):
             return
         for _, mob in self.mobs.items():
             if mob is not self.player:
-                mob.do_behavior(self)
+                mob.do_behavior()
         self.triggers.tick(self, self.player)
 
     def serialize(self):

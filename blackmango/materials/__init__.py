@@ -31,7 +31,7 @@ class BaseMaterial(blackmango.sprites.BaseSprite):
         self.is_portal = False
         self.opacity = 0
 
-    def interaction_callback(self, level, mob):
+    def interaction_callback(self, mob):
         pass
 
 class BasePortalMaterial(BaseMaterial):
@@ -55,14 +55,14 @@ class BasePortalMaterial(BaseMaterial):
             'destination': destination,        
         }
 
-    def interaction_callback(self, level, mob):
+    def interaction_callback(self, mob):
         """
         This is called by the mob object when it steps onto the material.
         Going forward, we might need to account for other kinds of interaction,
         like walking up to an object, or more complex ones that do things like
         interact with the level itself
         """
-        mob.teleport(level, *self.destination)
+        mob.teleport(*self.destination)
         
 
 class VoidMaterial(BaseMaterial):

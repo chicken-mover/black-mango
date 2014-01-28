@@ -160,11 +160,12 @@ class BasicMobileSprite(BaseSprite):
 
         self.animations = []
 
-    def teleport(self, level, x, y, z):
+    def teleport(self, x, y, z):
         """
         Change the position of the sprite in the game world instantly.
         """
         dest = (x, y, z)
+        level = blackmango.ui.game_window.view.current_level
 
         block = level.get_block(*dest)
         # Don't check interaction callbacks during teleport (otherwise you'll
@@ -194,13 +195,15 @@ class BasicMobileSprite(BaseSprite):
         # TODO: Reflect turn in sprite image
         self.direction = direction
 
-    def move(self, level, delta_x = 0, delta_y = 0, strafe = False):
+    def move(self, delta_x = 0, delta_y = 0, strafe = False):
         """
         Move the sprite in the game world with an accompanying animation.
         """
         # TODO: Animate actual image frames
         if self.animations:
             return
+
+        level = blackmango.ui.game_window.view.current_level
 
         callback = None
 
@@ -220,15 +223,14 @@ class BasicMobileSprite(BaseSprite):
         if block and block.is_solid:
             block.push(self, self.world_location)
             # Interact with whatever you're pushing
-            ##block.interaction_callback(level, self)
+            ##block.interaction_callback( self)
             # and whatever you're standing on
             block = level.get_block(*self.world_location)
             if block:
-                block.interaction_callback(level, self)
+                block.interaction_callback(self)
             return
         elif block:
-            callback = functools.partial(block.interaction_callback, level,
-                    self)
+            callback = functools.partial(block.interaction_callback, self)
 
         mob = level.get_mob(*dest)
         if mob and mob.is_solid:
@@ -270,10 +272,12 @@ class BasicMobileSprite(BaseSprite):
 
         pyglet.clock.schedule_once(self.animate, .001, callback)
 
-    def can_see(self, mob, level):
+    def can_see(self, mob):
         """
         Check to see if this mob can see the target <mob>.
         """
+        
+        level = blackmango.ui.game_window.view.current_level
         
         if mob.opacity == 0: return # Invisible mobs
 
@@ -317,11 +321,14 @@ class BasicMobileSprite(BaseSprite):
 
         return True
 
-    def _path_delta(self, c1, c2, level):
+    def _path_delta(self, c1, c2):
         """
         Return the next delta between three-tuple coordinates <c1> and <c2>
         according to the pathing algo.
         """
+
+        level = blackmango.ui.game_window.view.current_level
+
         x, y, z = c1
         px, py, pz = c2
 
@@ -358,7 +365,7 @@ class BasicMobileSprite(BaseSprite):
         else:
             return (0, delta_y)
 
-    def path_to(self, mob, level):
+    def path_to(self, mob):
         """
         Give the next movement delta to apply to move towards <mob>.
         """
@@ -368,4 +375,4 @@ class BasicMobileSprite(BaseSprite):
         if z != pz:
             return # Different room
 
-        return self._path_delta((x, y, z), (px, py, pz), level)
+        return self._path_delta((x, y, z), (px, py, pz))

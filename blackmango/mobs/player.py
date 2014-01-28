@@ -42,11 +42,13 @@ class Player(blackmango.sprites.BasicMobileSprite):
         mask.on_activate(self)
 
     @isalive
-    def teleport(self, level, x, y, z):
+    def teleport(self, x, y, z):
         """
         Overrides the parent class, because if the player changes floors, we
         want to move the currently viewed level floor, too.
         """
+        level = blackmango.ui.game_window.view.current_level
+
         dest = (x, y, z)
         level.unset_mob(*self.world_location)
         level.set_mob(self, *dest)
@@ -68,13 +70,13 @@ class Player(blackmango.sprites.BasicMobileSprite):
         super(Player, self).turn(*args, **kwargs)
 
     @isalive
-    def tick(self, level):
+    def tick(self):
         """
         Called on every tick by the GameView object.
         """
 
         if self.current_mask:
-            self.current_mask.tick(self, level)
+            self.current_mask.tick(self)
         
         move = [0,0]
         if keyboard.check('move_up'):
@@ -97,4 +99,4 @@ class Player(blackmango.sprites.BasicMobileSprite):
             self.activate_mask(4)
 
         if move != [0,0]:
-            self.move(level, *move)
+            self.move(*move)
