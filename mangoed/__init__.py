@@ -1,9 +1,21 @@
 """
 A really fuckin' basic level editor for Black Mango
 """
+# Fix PIL import if Pillow is installed instead. This *must* happen before
+# Pyglet is imported
+import sys
+try:
+    import Image
+except ImportError:
+    from PIL import Image
+    sys.modules['Image'] = Image
 
 import argparse
 import sys
+
+import blackmango.assetloader
+import mangoed.app
+import mangoed.configure
 
 ARGUMENTS = (
     ('filepath', {
@@ -11,10 +23,6 @@ ARGUMENTS = (
                 ' Without a file specified, the program will just dump the '
                 'final output to stdout when it exits.'
     }),)
-
-def main(data):
-    print data
-    return 1, ''
 
 if __name__ == "__main__":
 
@@ -25,9 +33,18 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    with open(args.filepath, 'w+') as f:
-        exitcode, data = main(f.read())
-        if not exitcode:
-            f.seek(0).write(data)
-        else:
-            sys.exit(exitcode)
+    mangoed.configure.setup_logger(mangoed.configure.DEBUG)
+    logger = mangoed.configure.logger
+
+    mangoed.ui.init()
+    mangoed.app.init()
+
+    blackmango.assetloader.load_fonts()
+    mangoed.configure.COLORS = blackmango.assetloader.load_colordata()
+
+    pyglet.clock.schedule(blackmango.ui.game_window.tick)
+
+    mangoed.app.app.run()
+
+    sys.exit(mangoed.app.app.returncode)
+

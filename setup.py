@@ -18,12 +18,13 @@ if __name__ == "__main__":
         name = 'blackmango',
         version = version,
         py_modules = [
-            #'blackmango',
-#            'blackmango_tests',
+            'blackmango',
+            'mangoed',
         ],
         install_requires = [
             'pyglet>=1.1.4',
             'xmltodict>=0.8.3',
+            'PIL>=1.1.7',
         ],
 #        tests_require = [
 #            'mock>=1.0.1',
