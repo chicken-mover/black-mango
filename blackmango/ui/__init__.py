@@ -104,7 +104,7 @@ class GameWindow(pyglet.window.Window):
         key presses.
         """
         if self.view and hasattr(self.view, 'on_key_press'):
-            self.view.on_key_press(key, modifiers, self.keyboard)
+            self.view.on_key_press(key, modifiers)
         
     def tick(self, dt):
         """
@@ -113,7 +113,5 @@ class GameWindow(pyglet.window.Window):
         passed the `keyboard` property of this object, which gives all current
         key presses.
         """
-        if blackmango.configure.DEBUG and self.keyboard[pyglet.window.key.Q]:
-            sys.exit(0)
         if self.view:
-            self.view.tick(self.keyboard)
+            self.view.tick()

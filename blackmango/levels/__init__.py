@@ -9,6 +9,8 @@ The level's `tick` method is used to iterate and call the `behavior` method on
 each mob in the level.
 """
 
+import blackmango.scenery
+
 from blackmango.materials.materiallist import MATERIALS
 from blackmango.mobs.moblist import MOBS
 
@@ -40,15 +42,13 @@ class BasicLevel(object):
         self.title_card = level_data['title_card']
         self.starting_location = level_data['starting_location']
         self.current_floor = self.starting_location[2]
-        self.level_size = level_data['level_size']
+        self.size = level_data['level_size']
         self.triggers = level_data['triggers']()
         self.next_level = level_data['next_level']
-        self.backgrounds = level_data['backgrounds']
-        for k, v in backgrounds.items():
+        self.backgrounds = level_data['backgrounds'].copy()
+        for k, v in self.backgrounds.items():
             if v:
                 self.backgrounds[k] = blackmango.scenery.Background(v)
-
-        self.set_background(self.current_floor)
 
         blockdata = level_data['blocks']
         mobdata = level_data['mobs']
@@ -60,9 +60,9 @@ class BasicLevel(object):
 
         # Load all of the material and mob objects by iterating the data for
         # each floor
-        for floor in xrange(self.level_size[2]):
-            for y in xrange(self.level_size[1]):
-                for x in xrange(self.level_size[0]):
+        for floor in xrange(self.size[2]):
+            for y in xrange(self.size[1]):
+                for x in xrange(self.size[0]):
                     try:
                         v = blockdata[floor][y][x]
                     except (IndexError, ValueError):
@@ -107,8 +107,8 @@ class BasicLevel(object):
         if not self.triggers.triggers_initialized:
             self.triggers.init_triggers(self, self.player)
 
-    def get_background(self, floor):
-        return self.backgrounds[floor]
+    def get_background(self):
+        return self.backgrounds.get(self.current_floor)
 
     def switch_floor(self, new_floor):
         """
@@ -144,9 +144,9 @@ class BasicLevel(object):
         Get the material at <x>, <y>, <floor>. If the provided coordinates are
         invalid, returns an instance of VoidMaterial.
         """
-        if x < 0 or x > self.level_size[0] - 1 or \
-           y < 0 or y > self.level_size[1] - 1 or \
-           floor < 0 or floor > self.level_size[2] - 1:
+        if x < 0 or x > self.size[0] - 1 or \
+           y < 0 or y > self.size[1] - 1 or \
+           floor < 0 or floor > self.size[2] - 1:
             return MATERIALS[-1]()
         try:
             return self.blocks[(x, y, floor)]
@@ -181,7 +181,7 @@ class BasicLevel(object):
             return
         for _, mob in self.mobs.items():
             if mob is not self.player:
-                mob.do_behavior(self)
+                mob.do_behavior()
         self.triggers.tick(self, self.player)
 
     def serialize(self):
@@ -192,7 +192,7 @@ class BasicLevel(object):
 
         saved_level = {
             'title_card': self.title_card,
-            'level_size': self.level_size,
+            'level_size': self.size,
             'starting_location': self.player.world_location,
 
             'next_level': self.next_level,
@@ -210,7 +210,7 @@ class BasicLevel(object):
 
         # Fill out the blocks and mobs dicts. This is in the LEVEL_DATA format,
         # not in the internally stored format.
-        lx, ly, lfloor = self.level_size
+        lx, ly, lfloor = self.size
         for map in (saved_level['blocks'], saved_level['mobs']):
             for floor in xrange(lfloor):
                 if not floor in map:

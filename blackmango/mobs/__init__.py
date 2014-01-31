@@ -34,12 +34,14 @@ class SimpleMob(blackmango.sprites.BasicMobileSprite):
         super(SimpleMob, self).move(*args, **kwargs)
 
     @notfrozen
-    def do_behavior(self, level):
+    def do_behavior(self):
         """
         This method is called by the level and will determine if the sub-class's
         actual 'behavior' method should be called. This method should not be
         subclassed unless you know what you are doing.
         """
-        return self.behaviour(level)
+        if self.animations:
+            return
+        return self.behavior()
 
-    def behavior(self, level): pass
+    def behavior(self): pass

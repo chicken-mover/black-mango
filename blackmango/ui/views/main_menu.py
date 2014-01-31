@@ -8,6 +8,7 @@ import blackmango.app
 import blackmango.configure
 
 from blackmango.configure import COLORS
+from blackmango.ui import keyboard
 from blackmango.ui.views import BaseView
 
 TITLE_COLOR = COLORS['secondary-a-5']
@@ -87,7 +88,7 @@ class MainMenuView(BaseView):
         self.set_selected(s)
 
     def on_draw(self):
-        main_menu_batch.draw()
+        self.batch.draw()
 
     def get_intersecting_menu_item(self, x, y):
         # If the mouse intersects with any menu items, select them
@@ -111,24 +112,15 @@ class MainMenuView(BaseView):
         if button == 1 and item:
             item.action()
 
-    def tick(self, keyboard):
-        pass
-
-    def on_key_press(self, key, modifiers, keyboard):
+    def on_key_press(self, key, modifiers):
         
-        if keyboard[pyglet.window.key.UP] or \
-           keyboard[pyglet.window.key.W] or \
-           keyboard[pyglet.window.key.LEFT] or \
-           keyboard[pyglet.window.key.A]:
+        if keyboard.check('menu_move_up'):
             self.select_prev()
         
-        elif keyboard[pyglet.window.key.DOWN] or \
-           keyboard[pyglet.window.key.RIGHT] or \
-           keyboard[pyglet.window.key.S] or \
-           keyboard[pyglet.window.key.D]:
+        elif keyboard.check('menu_move_down'):
             self.select_next()
 
-        elif keyboard[pyglet.window.key.ENTER]:
+        elif keyboard.check('menu_select'):
             self.menu_items[self.selected].action()
 
 
@@ -145,13 +137,16 @@ class MainMenuTitle(pyglet.text.Label):
             y = _win_y - (_win_y // 4),
             anchor_x = 'right',
             anchor_y = 'center',
-            batch = main_menu_batch,
+            batch = batch,
             color = TITLE_COLOR,
         )
 
 class MainMenuLabel(pyglet.text.Label):
 
-    def __init__(self, title, batch, offset = .5):
+    def __init__(self, title, batch, offset = 0):
+
+        offset *= .5
+
         super(MainMenuLabel, self).__init__(
             title,
             font_name = 'Chapbook',
@@ -160,7 +155,7 @@ class MainMenuLabel(pyglet.text.Label):
             y =  _win_y - 180 - 100*offset,
             anchor_x = 'right',
             anchor_y = 'top',
-            batch = main_menu_batch,
+            batch = batch,
             color = MENU_ITEM_COLOR,
         )
 
@@ -175,6 +170,6 @@ class VersionInfo(pyglet.text.Label):
             y = 25,
             anchor_x = 'right',
             anchor_y = 'top',
-            batch = main_menu_batch,
+            batch = batch,
             color = VERSIONINFO_COLOR
         )

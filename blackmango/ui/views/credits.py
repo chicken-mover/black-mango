@@ -7,6 +7,7 @@ import pyglet
 import blackmango.assetloader
 import blackmango.ui
 
+from blackmango.ui import keyboard
 from blackmango.ui.views import BaseView
 
 class CreditsView(BaseView):
@@ -47,7 +48,7 @@ class CreditsView(BaseView):
     def on_mouse_press(self, x, y, button, modifiers):
         self.back_to_main_menu()
 
-    def on_key_press(self, key, modifiers, keyboard):
+    def on_key_press(self, key, modifiers):
         self.back_to_main_menu()
 
     def back_to_main_menu(self):

@@ -32,3 +32,9 @@ Building with Cythin:
     - Secondary move keys [UP,DOWN,LEFT,RIGHT]
     - Secondary action key: [SPACE]
 
+# Crazy shit
+* *Could* compile assets into relevant python objects, pickle them, and then 
+  load them via import statements. (pyglet.image.load returns a pickleable 
+  object; fonts and other files could be read into StringIO buffers and 
+  pickled). This should possibly be re-examined again later when prepping for 
+  distribution

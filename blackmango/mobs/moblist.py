@@ -1,5 +1,6 @@
 
 import blackmango.mobs
+import blackmango.mobs.dancers
 import blackmango.mobs.patrollers
 
 MOBS = {

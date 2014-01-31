@@ -14,6 +14,7 @@ class LevelTriggers(blackmango.levels.BasicLevelTriggers):
     
     def init_triggers(self, level, player):
         from blackmango.mobs.patrollers import ClockwisePatroller
+        from blackmango.mobs.dancers import Mirror
         
         ks = sorted(level.mobs.keys())
         d = [2, 1, 3, 4]
@@ -23,6 +24,8 @@ class LevelTriggers(blackmango.levels.BasicLevelTriggers):
             if isinstance(mob, ClockwisePatroller) and mob.world_location[2] == 0:
                 mob.turn(d[x])
                 x += 1
+            elif isinstance(mob, Mirror):
+                mob.turn(2)
 
         self.triggers_initialized = True
 

@@ -8,8 +8,6 @@ import errno
 import os
 import pyglet
 
-from pyglet.window import key
-
 import blackmango.configure
 import blackmango.levels
 import blackmango.materials
@@ -21,6 +19,7 @@ import blackmango.ui
 import blackmango.ui.labels
 
 from blackmango.levels.levellist import LEVELS
+from blackmango.ui import keyboard
 from blackmango.ui.views import BaseView
 
 TITLE_CARD_COLOR = blackmango.configure.COLORS['secondary-a-5']
@@ -127,7 +126,7 @@ class GameView(BaseView):
         self.player.world_location = starting_location
         self.player.translate()
 
-        self.loading = MODE_NORMAL
+        self.mode = MODE_NORMAL
         self.logger.debug("Game started: %s" % repr(self.current_level))
 
         # Show the title card
@@ -140,7 +139,7 @@ class GameView(BaseView):
 
 
     def next_level(self):
-        self.loading = MODE_LOADING
+        self.mode = MODE_LOADING
         def loader(dt):
             next_level_str = self.current_level.next_level
             self.logger.debug("Loading next level: %s" % next_level_str)
@@ -152,7 +151,7 @@ class GameView(BaseView):
         pyglet.clock.schedule_once(loader, 1)
 
     def quit_to_main_menu(self):
-        self.loading = MODE_LOADING
+        self.mode = MODE_LOADING
         def loader(dt):
             from blackmango.ui.views.main_menu import MainMenuView
             blackmango.ui.game_window.set_view(MainMenuView())
@@ -170,7 +169,7 @@ class GameView(BaseView):
         background = self.current_level.get_background()
         if background:
             background.draw()
-
+        
         blackmango.sprites.sprite_batch.draw()
         if self.title_card:
             blackmango.ui.labels.title_batch.draw()
@@ -190,14 +189,14 @@ class GameView(BaseView):
         pass
 
     @loading_halt
-    def on_key_press(self, key, modifiers, keyboard):
+    def on_key_press(self, key, modifiers):
         """
         Called by the window on every key press
         """
         pass
 
     @loading_halt
-    def tick(self, keyboard):
+    def tick(self):
         """
         Called on every window tick
         """
@@ -205,19 +204,20 @@ class GameView(BaseView):
             return self.quit_to_main_menu()
             
         # The order of these things may need adjustment at some point
-        if not self.pause():
-            self.player.tick(keyboard, self.current_level)
+        if self.mode == MODE_NORMAL:
+            self.player.tick()
 
-        if self.current_level and not self.pause():
+        if self.current_level and self.mode == MODE_NORMAL:
             self.current_level.tick()
 
         # View-level actions. These should go into some sort of overlay menu
         # that pauses the game when active.
-        if keyboard[key.S]:
+        if keyboard.check('game_save'):
             self.save_level()
             self.mode = MODE_NORMAL
-        elif keyboard[key.L]:
+        elif keyboard.check('game_load'):
             self.load_level()
-        elif keyboard[key.ESCAPE]:
+        elif keyboard.check('game_quit'):
             self.quit_to_main_menu()
+
         return

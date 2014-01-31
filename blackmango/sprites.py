@@ -4,6 +4,7 @@ Defines the BaseSprite class, from which mobs and materials inherit.
 
 import functools
 import pyglet
+import random
 
 import blackmango.app
 import blackmango.configure
@@ -89,12 +90,15 @@ class BaseSprite(pyglet.sprite.Sprite):
         pass
 
     def set_position(self, x, y):
-        if blackmango.configure.DEBUG and hasattr(self, 'direction') and \
-           self.visible:
-            d = self.direction
-            self.debug_label.x = x + blackmango.configure.GRID_SIZE + 3
-            self.debug_label.y = y - 3
-            self.debug_label.text = '%s %s' % (repr(self.world_location), d)
+        if blackmango.configure.DEBUG:
+            if hasattr(self, 'direction') and \
+               self.visible:
+                d = self.direction
+                self.debug_label.x = x + blackmango.configure.GRID_SIZE + 3
+                self.debug_label.y = y - 3
+                self.debug_label.text = '%s %s' % (repr(self.world_location), d)
+            elif hasattr(self, 'direction') and not self.visible:
+                self.debug_label.delete()
         return super(BaseSprite, self).set_position(x, y)
 
     def translate(self):
@@ -150,17 +154,18 @@ class BasicMobileSprite(BaseSprite):
         self.is_solid = True
         self.is_mover = True
         self.is_portal = False
-        self.opacity = 0
+        self.opacity = .1
 
         self.direction = 3
 
         self.animations = []
 
-    def teleport(self, level, x, y, z):
+    def teleport(self, x, y, z):
         """
         Change the position of the sprite in the game world instantly.
         """
         dest = (x, y, z)
+        level = blackmango.ui.game_window.view.current_level
 
         block = level.get_block(*dest)
         # Don't check interaction callbacks during teleport (otherwise you'll
@@ -190,13 +195,15 @@ class BasicMobileSprite(BaseSprite):
         # TODO: Reflect turn in sprite image
         self.direction = direction
 
-    def move(self, level, delta_x = 0, delta_y = 0, strafe = False):
+    def move(self, delta_x = 0, delta_y = 0, strafe = False):
         """
         Move the sprite in the game world with an accompanying animation.
         """
         # TODO: Animate actual image frames
         if self.animations:
             return
+
+        level = blackmango.ui.game_window.view.current_level
 
         callback = None
 
@@ -214,17 +221,21 @@ class BasicMobileSprite(BaseSprite):
 
         block = level.get_block(*dest)
         if block and block.is_solid:
-            block.push(self, self.world_location)
+            #block.push(self, self.world_location)
             # Interact with whatever you're pushing
-            ##block.interaction_callback(level, self)
+            ##block.interaction_callback( self)
             # and whatever you're standing on
             block = level.get_block(*self.world_location)
-            if block:
-                block.interaction_callback(level, self)
+            if block and not block.is_portal:
+                block.interaction_callback(self)
+            # If the block is a portal, only activate it again if the mob is
+            # trying to move off the level (ie, it's a door or something)
+            if dest[0] < 0 or dest[1] < 0 or dest[0] > level.size[0] or \
+               dest[1] > level.size[1]:
+                block.interaction_callback(self)
             return
         elif block:
-            callback = functools.partial(block.interaction_callback, level,
-                    self)
+            callback = functools.partial(block.interaction_callback, self)
 
         mob = level.get_mob(*dest)
         if mob and mob.is_solid:
@@ -266,11 +277,13 @@ class BasicMobileSprite(BaseSprite):
 
         pyglet.clock.schedule_once(self.animate, .001, callback)
 
-    def can_see(self, mob, level):
+    def can_see(self, mob):
         """
         Check to see if this mob can see the target <mob>.
         """
-
+        
+        level = blackmango.ui.game_window.view.current_level
+        
         if mob.opacity == 0: return # Invisible mobs
 
         x, y, z = self.world_location
@@ -301,13 +314,14 @@ class BasicMobileSprite(BaseSprite):
         # values. If the total opacity hits 1, sight is blocked.
         opacity = 0
         for coord in coords:
-            b = level.get_block(coord)
-            m = level.get_mob(coord)
+            b = level.get_block(*coord)
+            m = level.get_mob(*coord)
             if b:
                 opacity += b.opacity
             if m:
                 opacity += m.opacity
             if opacity >= 1:
+                print opacity
                 return False
 
         return True
@@ -317,8 +331,11 @@ class BasicMobileSprite(BaseSprite):
         Return the next delta between three-tuple coordinates <c1> and <c2>
         according to the pathing algo.
         """
-        x, y, z = self.world_location
-        px, py, pz = mob.world_location
+
+        level = blackmango.ui.game_window.view.current_level
+
+        x, y, z = c1
+        px, py, pz = c2
 
         if z != pz:
             return (0,0)# Different room
@@ -331,22 +348,29 @@ class BasicMobileSprite(BaseSprite):
         # Don't try to move onto blocks that are occupied by solids
         if delta_x:
             next_pos = (x + delta_x, y, z)
-            block = level.get_block(next_pos)
-            if block.is_solid:
+            block = level.get_block(*next_pos)
+            if block and block.is_solid:
                 delta_x = 0
         if delta_y:
             next_pos = (x, y + delta_y, z)
-            block = level.get_block(next_pos)
-            if block.is_solid:
+            block = level.get_block(*next_pos)
+            if block and block.is_solid:
                 delta_y = 0
 
         # Don't return diagonal paths
+        if delta_x and delta_y:
+            # To keep pathing from being boring, randomly choose between which
+            # axis gets moved along first
+            delta = [delta_x, delta_y]
+            delta[random.choice((0, 1))] = 0
+            delta_x, delta_y = delta
+
         if delta_x:
             return (delta_x, 0)
         else:
             return (0, delta_y)
 
-    def path_to(self, mob, level):
+    def path_to(self, mob):
         """
         Give the next movement delta to apply to move towards <mob>.
         """
