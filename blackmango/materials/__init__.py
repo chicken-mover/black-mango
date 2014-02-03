@@ -67,11 +67,11 @@ class BasePortalMaterial(BaseMaterial):
 
 class VoidMaterial(BaseMaterial):
 
-    def __init__(self):
+    def __init__(self, x = 0, y = 0, z = 0):
 
         color = (0,0,0,0)
 
-        super(VoidMaterial, self).__init__(color = color)
+        super(VoidMaterial, self).__init__(None, x, y, z, color = color)
 
         self.is_solid = True
         self.is_mover = False

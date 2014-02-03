@@ -16,7 +16,7 @@ MENU_ITEM_COLOR = COLORS['primary-4']
 SELECTED_COLOR = COLORS['secondary-b-5']
 VERSIONINFO_COLOR = (255,255,255,50)
 
-NEW_GAME_LEVEL = 'puzzle_demo1'
+NEW_GAME_LEVEL = blackmango.configure.STARTING_LEVEL
 
 class MainMenuView(BaseView):
     

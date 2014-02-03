@@ -16,6 +16,8 @@ sprite_batch = pyglet.graphics.Batch()
 
 color_cache = {}
 
+TRANSLATION_OFFSET = 0
+
 def notfrozen(f):
     def wrapped(self, *args, **kwargs):
         if self.is_frozen:
@@ -23,7 +25,6 @@ def notfrozen(f):
         else:
             return f(self, *args, **kwargs)
     return wrapped
-
 
 class BaseSprite(pyglet.sprite.Sprite):
 
@@ -109,8 +110,8 @@ class BaseSprite(pyglet.sprite.Sprite):
         w, h = blackmango.ui.game_window.get_size()
 
         scale = blackmango.configure.GRID_SIZE
-        w_w = self.world_location[0] * scale
-        w_h = h - (self.world_location[1] + 1) * scale
+        w_w = (self.world_location[0] + TRANSLATION_OFFSET) * scale
+        w_h = h - (self.world_location[1] + 1 + TRANSLATION_OFFSET) * scale
         self.set_position(w_w, w_h)
 
     def animate(self, dt, callback = None, t = .025):

@@ -13,12 +13,15 @@ class Wall(blackmango.materials.BaseMaterial):
 
 class StairUp(blackmango.materials.BasePortalMaterial):
     opacity = 1
-    pass
+    def __init__(self, x, y, z, destination):
+        super(StairUp, self).__init__(None, x, y, z, destination = destination)
 
 class StairDown(blackmango.materials.BasePortalMaterial):
     opacity = 1
-    pass
+    def __init__(self, x, y, z, destination):
+        super(StairDown, self).__init__(None, x, y, z, destination = destination)
 
 class Door(blackmango.materials.BasePortalMaterial):
     opacity = 1
-    pass
+    def __init__(self, x, y, z, destination):
+        super(Door, self).__init__(None, x, y, z, destination = destination)

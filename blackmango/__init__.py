@@ -45,6 +45,10 @@ ARGUMENTS = (
         'action': 'store_true',
         'help': 'Set full screen mode.',
     }),
+    ('--start', {
+        'dest': 'start',
+        'help': 'Specify the level to start at.',
+    }),
 )
 
 if __name__ == "__main__":
@@ -62,6 +66,8 @@ if __name__ == "__main__":
         blackmango.configure.POSIX_DATA_DIR = args.data_dir
     if args.fullscreen:
         blackmango.configure.FULLSCREEN = True
+    if args.start:
+        blackmango.configure.STARTING_LEVEL = args.start
 
     blackmango.configure.setup_logger(blackmango.configure.DEBUG)
     logger = blackmango.configure.logger

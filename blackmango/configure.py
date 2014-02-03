@@ -13,17 +13,17 @@ MAIN_WINDOW_TITLE = 'BLACK MANGO'
 
 DEBUG = 0 #logging.WARN
 FULLSCREEN = False
+
+# Grid size. Used for translating world coordinates into screen coordinates.
+GRID_SIZE = 50
+
 # Main game window size.
-# TODO: Set this appropriately dynamically
-SCREEN_SIZE = (950, 550)
+SCREEN_SIZE = (GRID_SIZE * 19, GRID_SIZE * 11)
 
 SAVE_GAME_VERSION='BLACKMANGO-001'
 
 # Default POSIX data dir (except Mac OS)
 POSIX_DATA_DIR = '~/.blackmango'
-
-# Grid size. Used for translating world coordinates into screen coordinates.
-GRID_SIZE = 50
 
 # Batch rendering groups.
 ORDERED_GROUPS = {
@@ -34,7 +34,8 @@ ORDERED_GROUPS = {
 
 # number of frames when animating movement slides. potentially will be used for
 # sprite animations, too.
-BASE_ANIMATION_FRAMES = 10 # Keep this a common factor of GRID_SIZE
+BASE_ANIMATION_FRAMES = 10 # Keep this a common factor of GRID_SIZE or you will
+                           # get wierd jittery animations when sliding a sprite.
 
 # Loaded by assetloader.load_colordata()
 COLORS = {}
@@ -47,3 +48,33 @@ def setup_logger(lvl = DEBUG):
     logging.basicConfig()
     logger = logging.getLogger('blackmango')
     logger.setLevel(DEBUG)
+
+STARTING_LEVEL = 'puzzle_demo1'
+
+LEVEL_TEMPLATE = """
+
+from blackmango.levels.%s.triggers import LevelTriggers
+
+SIZE = %(SIZE)s
+NAME = %(NAME)s
+
+NEXT_LEVEL = %(NEXT_LEVEL)s
+PREV_LEVEL = %(PREV_LEVEL)s
+
+TRIGGERS = LevelTriggers
+
+# Everything below this line is automatically generated.
+# Generated %(generation_date_time)s
+
+BACKGROUNDS = %(BACKGROUNDS)s
+PLAYER_START = %(PLAYER_START)s
+BLOCKS = %(BLOCKS)s
+MOBS = %(MOBS)s
+"""
+
+TRIGGER_TEMPLATE = """
+import blackmango.levels
+
+class LevelTriggers(blackmango.levels.BasicLevelTriggers):
+    pass
+"""

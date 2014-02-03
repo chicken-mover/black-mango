@@ -1,6 +1,6 @@
 
-import blackmango.configure
 import blackmango.sprites
+import mangoed.configure
 import mangoed.ui
 
 
@@ -43,7 +43,7 @@ class GridCursor(blackmango.sprites.BaseSprite):
         """
         w, h = mangoed.ui.editor_window.get_size()
 
-        scale = blackmango.configure.GRID_SIZE
+        scale = mangoed.configure.GRID_SIZE
 
         world_x = x / scale
         world_y = -1 * (y / scale - h) - 1

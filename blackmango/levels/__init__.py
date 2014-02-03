@@ -9,6 +9,8 @@ The level's `tick` method is used to iterate and call the `behavior` method on
 each mob in the level.
 """
 
+import pprint
+
 import blackmango.scenery
 
 from blackmango.materials.materiallist import MATERIALS
@@ -18,7 +20,7 @@ class BasicLevel(object):
 
     level_size = None,
     starting_location = None
-    
+
     next_level = None
     previous_level = None
 
@@ -33,78 +35,46 @@ class BasicLevel(object):
 
     scheduled_destroy = False
 
-    def __init__(self, level_data, player):
+    def __init__(self, level_data, player = None):
         """
         Read in the level data, and translate the lists of block ids in the
         floor data into instances of materials classes.
         """
 
-        self.title_card = level_data['title_card']
-        self.starting_location = level_data['starting_location']
+        self.title_card = level_data.NAME
+        self.starting_location = level_data.PLAYER_START
         self.current_floor = self.starting_location[2]
-        self.size = level_data['level_size']
-        self.triggers = level_data['triggers']()
-        self.next_level = level_data['next_level']
-        self.backgrounds = level_data['backgrounds'].copy()
+        self.size = level_data.SIZE
+        self.triggers = level_data.TRIGGERS()
+        self.next_level = level_data.next_level
+        self.backgrounds = level_data.BACKGROUNDS.copy()
         for k, v in self.backgrounds.items():
             if v:
                 self.backgrounds[k] = blackmango.scenery.Background(v)
 
-        blockdata = level_data['blocks']
-        mobdata = level_data['mobs']
+        blockdata = level_data.BLOCKS
+        mobdata = level_data.MOBS
 
         self.blocks = {}
         self.mobs = {}
 
         self.player = player
 
-        # Load all of the material and mob objects by iterating the data for
-        # each floor
-        for floor in xrange(self.size[2]):
-            for y in xrange(self.size[1]):
-                for x in xrange(self.size[0]):
-                    try:
-                        v = blockdata[floor][y][x]
-                    except (IndexError, ValueError):
-                        v = None
-                    if v:
-                        if isinstance(v, tuple):
-                            # This is for portals, but might be useful for
-                            # other special cases in the future.
-                            material = MATERIALS[v[0]]
-                            kwargs = v[1]
-                            kwargs.update({
-                                'x': x,
-                                'y': y,
-                                'z': floor,
-                            })
-                            block = material(**kwargs)
-                        else:
-                            # basic block init.
-                            material = MATERIALS[v]
-                            block = material(x = x, y = y, z = floor)
-                        self.set_block(block, x, y, floor)
-                    # Check to see if there is a mob for this location
-                    try:
-                        v = mobdata[floor][y][x]
-                    except (IndexError, KeyError):
-                        v = None
-                    if v:
-                        if isinstance(v, tuple):
-                            mob = MOBS[v[0]]
-                            kwargs = v[1]
-                            kwargs.update({
-                                'x': x,
-                                'y': y,
-                                'z': floor,
-                            })
-                            m = mob(**kwargs)
-                        else:
-                            m = MOBS[v]
-                            mob = m(x = x, y = y, z = floor)
-                        self.set_mob(mob, x, y, floor)
+        for coords, blockinfo in blockdata.items():
+            x, y, z = coords
+            id, args, kwargs = blockinfo
+            material = MATERIALS[id]
+            block = material(x, y, z, *args, **kwargs)
+            self.set_block(block, x, y, z)
 
-        if not self.triggers.triggers_initialized:
+        for coords, mobinfo in mobdata.items():
+            x, y, z = coords
+            id, args, kwargs = mobinfo
+            mob = MOBS[id]
+            mob = mob(x, y, z, *args, **kwargs)
+            self.set_mob(mob, x, y, z)
+
+        if player and not self.triggers.triggers_initialized:
             self.triggers.init_triggers(self, self.player)
 
     def get_background(self):
@@ -112,7 +82,7 @@ class BasicLevel(object):
 
     def switch_floor(self, new_floor):
         """
-        Set which floor we're on. This currently iterates every block and mob 
+        Set which floor we're on. This currently iterates every block and mob
         for the current and new floor, and re-sets their visibility flag as
         appropriate.
         """
@@ -144,13 +114,13 @@ class BasicLevel(object):
         Get the material at <x>, <y>, <floor>. If the provided coordinates are
         invalid, returns an instance of VoidMaterial.
         """
-        if x < 0 or x > self.size[0] - 1 or \
-           y < 0 or y > self.size[1] - 1 or \
-           floor < 0 or floor > self.size[2] - 1:
-            return MATERIALS[-1]()
         try:
             return self.blocks[(x, y, floor)]
         except (IndexError, KeyError):
+            if x < 0 or x > self.size[0] - 1 or \
+               y < 0 or y > self.size[1] - 1 or \
+               floor < 0 or floor > self.size[2] - 1:
+                return MATERIALS[-1]()
             return None
 
     def set_mob(self, mob, x, y, floor):
@@ -186,76 +156,54 @@ class BasicLevel(object):
 
     def serialize(self):
         """
-        Return a pickleable object that represents the current level state.
+        Return a string that represents the current level state.
         Saved level data should be identical in format to prepared level data.
         """
-
-        saved_level = {
-            'title_card': self.title_card,
-            'level_size': self.size,
-            'starting_location': self.player.world_location,
-
-            'next_level': self.next_level,
-
-            'backgrounds': {},
-
-            'blocks': {},
-            'mobs': {},
-
-            'triggers': self.triggers,
-        }
-
-        for k, v in backgrounds:
-            saved_level['backgrounds'][k] = v.image
-
-        # Fill out the blocks and mobs dicts. This is in the LEVEL_DATA format,
-        # not in the internally stored format.
-        lx, ly, lfloor = self.size
-        for map in (saved_level['blocks'], saved_level['mobs']):
-            for floor in xrange(lfloor):
-                if not floor in map:
-                    map[floor] = []
-                for y in xrange(ly):
-                    while len(map[floor]) < y + 1:
-                        map[floor].append([])
-                    for x in xrange(lx):
-                        while len(map[floor][y]) < x + 1:
-                            map[floor][y].append(None)
-
-        # Now read the current block and mob states and record them
-        for lookup in ('blocks', 'mobs'):
-            lookuplist = getattr(self, lookup)
-            for coords, item in lookuplist.items():
-                v = 0
-                if lookuplist is self.blocks:
-                    lookup_dict = MATERIALS
-                elif lookuplist is self.mobs:
-                    lookup_dict = MOBS
-                for k, t in lookup_dict.items():
-                    if t and isinstance(item, t):
-                        v = k
-
-                # For re-initializing blocks later. Retrieve the stored kwargs
-                # that they were intialized with.
-                if hasattr(item, 'kwargs'):
-                    v = (v, getattr(item, 'kwargs'))
-
-                # Save the item in the map
-                x, y, floor = coords
-                saved_level[lookup][floor][y][x] = v
-
-        return saved_level
+        saved_level = SavedLevel({
+            "BLOCKS": repr(self.blocks),
+            "MOBS": repr(self.mobs),
+        })
+        return repr(saved_level)
 
     def destroy(self):
         self.scheduled_destroy = True
         for lookuplist in [self.mobs, self.blocks]:
             for coords, sprite in lookuplist.items():
                 sprite.delete()
-            
+
+class SavedLevel(object):
+    """
+    A simple object interface over the top of a dictionary for storing level
+    values.
+    """
+    _d = {
+        "SIZE": None,
+        "NAME": '',
+        "NEXT_LEVEL": '',
+        "PREV_LEVEL": '',
+        "BACKGROUNDS": {},
+        "PLAYER_START": '',
+        "BLOCKS": {},
+        "MOBS": {},
+    }
+    def __repr__(self):
+        formatd = self._d.copy()
+        for k, v in formatd.items():
+            formatd[k] = pprint.pformat(v)
+        blackmango.configure.LEVEL_TEMPALTE % formatd
+    def __init__(self, dictionary = {}, level_ref = None):
+        self.level_ref = level_ref
+        self._d.update(dictionary)
+    def __getattr__(self, k):
+        return self._d[k]
+    def __setattr__(self, k, v):
+        self._d[k] = v
+    def _update(self, dictionary):
+        self._d.update(dictionary)
 
 class BasicLevelTriggers(object):
 
-    def __init__(self): 
+    def __init__(self):
         self.triggers_initialized = False
 
     def init_triggers(self, level, player):
