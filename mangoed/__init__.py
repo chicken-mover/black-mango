@@ -1,14 +1,9 @@
 """
 A really fuckin' basic level editor for Black Mango
 """
-# Fix PIL import if Pillow is installed instead. This *must* happen before
-# Pyglet is imported
-import sys
-try:
-    import Image
-except ImportError:
-    from PIL import Image
-    sys.modules['Image'] = Image
+
+# Perform preload tasks (things which must be executed first)
+import blackmango.preload
 
 import argparse
 import sys
@@ -18,10 +13,9 @@ import mangoed.app
 import mangoed.configure
 
 ARGUMENTS = (
-    ('filepath', {
-        'help': 'Filepath to load on startup and write to on completion.'
-                ' Without a file specified, the program will just dump the '
-                'final output to stdout when it exits.'
+    ('level', {
+        'help': 'The name of the level to edit. If the level does not exist on'
+                ' startup it will be created on save.'
     }),)
 
 if __name__ == "__main__":
@@ -42,7 +36,10 @@ if __name__ == "__main__":
     blackmango.assetloader.load_fonts()
     mangoed.configure.COLORS = blackmango.assetloader.load_colordata()
 
-    pyglet.clock.schedule(blackmango.ui.game_window.tick)
+    from mangoed.ui.views.editor import EditorView
+    mangoed.ui.editor_window.set_view(EditorView())
+
+    pyglet.clock.schedule(mangoed.ui.editor_window.tick)
 
     mangoed.app.app.run()
 

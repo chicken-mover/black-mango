@@ -1,7 +1,4 @@
 
-import cPickle
-import datetime
-import errno
 import os
 import pyglet
 
