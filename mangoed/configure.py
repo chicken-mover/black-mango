@@ -33,6 +33,7 @@ PREV_LEVEL = %(prev_level_string)s
 
 # Everything below this line is automatically generated.
 # Generated %(generation_date_time)s
+
 BACKGROUNDS = %(backgrounds_dict)s
 PLAYER_START = %(player_start_tuple)s
 BLOCKS = %(blocks_dict)s

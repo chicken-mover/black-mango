@@ -8,22 +8,31 @@ import errno
 import os
 import pyglet
 
+from pyglet.window import key
+
 import blackmango.levels
 import blackmango.materials
 import blackmango.mobs
 import blackmango.mobs.player
 import blackmango.sprites
 import blackmango.system
-import mangoed.ui
+import mangoed.app
 import mangoed.configure
+import mangoed.sprites
+import mangoed.ui
 
+from blackmango.blocks.blocklist import BLOCKS
 from blackmango.levels.levellist import LEVELS
+from blackmango.mobs.moblist import MOBS
 from mangoed.ui import keyboard
 from mangoed.ui.views import BaseView
 
-MODE_LOADING = 'MODE_LOADING'
-MODE_NORMAL = 'MODE_NORMAL'
-MODE_PAUSE = 'MODE_PAUSE'
+MODE_LOADING = 'LOADING'
+MODE_SELECT = 'SELECT_ED'
+MODE_BLOCK = 'BLOCK_ED'
+MODE_MOB = 'MOB_ED'
+
+SECONDARY_MODE_START = 'SECONDARY_MODE_START'
 
 def loading_halt(f):
     def wrapped(self, *args, **kwargs):
@@ -33,7 +42,7 @@ def loading_halt(f):
             return f(self, *args, **kwargs)
     return wrapped
 
-class GameView(BaseView):
+class EditorView(BaseView):
 
     logger = mangoed.configure.logger
 
@@ -42,11 +51,16 @@ class GameView(BaseView):
         self.current_level = None
         self.player = None
 
-        self.mode = MODE_NORMAL
+        self.mode = MODE_SELECT
+        self.secondary_mode = None
+        self.secondary_mode_buffer = ''
+        
         self.background_image = None
         self.background = None
 
         level_data = LEVELS.get(level)
+
+        self.cursor = mangoed.sprites.GridCursor()
 
         if level_data:
             self.logger.debug("Editing level: %s" % level)
@@ -135,8 +149,37 @@ class GameView(BaseView):
 #        self.player.world_location = starting_location
 #        self.player.translate()
 #
-#        self.mode = MODE_NORMAL
+#        self.mode = MODE_SELECT
 #        self.logger.debug("Game started: %s" % repr(self.current_level))
+
+    def quit(self):
+        mangoed.app.app.user_quit()
+
+    def write(self):
+        raise NotImplemented()
+
+    def set_mode(self, mode):
+        self.secondary_mode = None
+        self.secondary_mode_buffer = ''
+        self.mode = mode
+        self.selected_key = None
+        print "Mode set:", mode, "(Selections reset)"
+
+    def select_action(self):
+        try:
+            k = int(self.secondary_mode_buffer)
+        except ValueError:
+            print 'Bad block or mob number:', self.secondary_mode_buffer
+            return
+        self.secondary_mode_buffer = ''
+        self.selected_key = k
+        if self.mode == MODE_BLOCK:
+            print "Selected block:", repr(BLOCKS[k])
+        elif self.mode == MODE_MOB:
+            print "Selected mob:", repr(MOBS[k])
+
+    def select_existing(self):
+        pass
 
     @loading_halt
     def on_draw(self):
@@ -161,38 +204,33 @@ class GameView(BaseView):
         """
         Called by the window during mouse movement.
         """
-        pass
+        self.cursor.untranslate(x, y)
 
     @loading_halt
     def on_key_press(self, key, modifiers):
         """
         Called by the window on every key press
         """
-        pass
 
-    @loading_halt
-    def tick(self):
-        """
-        Called on every window tick
-        """
-#        if self.player.dead:
-#            return self.quit_to_main_menu()
-#
-#        # The order of these things may need adjustment at some point
-#        if self.mode == MODE_NORMAL:
-#            self.player.tick()
-#
-#        if self.current_level and self.mode == MODE_NORMAL:
-#            self.current_level.tick()
-#
-#        # View-level actions. These should go into some sort of overlay menu
-#        # that pauses the game when active.
-#        if keyboard.check('game_save'):
-#            self.save_level()
-#            self.mode = MODE_NORMAL
-#        elif keyboard.check('game_load'):
-#            self.load_level()
-#        elif keyboard.check('game_quit'):
-#            self.quit_to_main_menu()
-#
-#        return
+        if key == key.ESCAPE:
+            self.set_mode(MODE_SELECT)
+        elif key == key.M:
+            self.set_mode(MODE_MOB)
+        elif key == key.B:
+            self.set_mode(MODE_BLOCK)
+
+        elif key == key.Q:
+            self.quit()
+        elif key == key.W:
+            self.write()
+
+        if mode != MODE_SELECT:
+
+            if key == key.COLON and self.seconary_mode is None:
+                self.secondary_mode = SECONDARY_MODE_START
+            elif key in [key.ENTER, key.NUM_ENTER] and \
+                self.secondary_mode == SECONDARY_MODE_START:
+                self.secondary_mode = None
+                self.select_action()
+            elif self.secondary_mode == SECONDARY_MODE_START:
+                self.secondary_mode_buffer += pyglet.window.key.symbol_string(key)
