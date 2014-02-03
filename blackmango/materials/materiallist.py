@@ -14,6 +14,8 @@ MATERIALS = {
     10: blackmango.materials.architecture.Platform,
 }
 
+# Wrap the __init__ functions of each class so that we can easily retrieve the
+# settings they were initialized with.
 for v in MATERIALS.values():
     v.__init__ = blackmango.sprites.storecall(v.__init__)
 
