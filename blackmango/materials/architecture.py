@@ -4,8 +4,8 @@ Materials for rooms and buildings.
 
 import blackmango.materials
 
-
 img_brick = blackmango.assetloader.load_image('placeholders/brick.gif')
+img_platform = blackmango.assetloader.load_image('placeholders/platform.gif')
 
 class Wall(blackmango.materials.BaseMaterial):
     opacity = 1
@@ -32,4 +32,4 @@ class Platform(blackmango.materials.BaseMaterial):
     is_solid = False
     height = 1
     def __init__(self, x, y, z):
-        super(Platform, self).__init__(None, x, y, z)
+        super(Platform, self).__init__(img_platform, x, y, z)

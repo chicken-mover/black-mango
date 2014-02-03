@@ -17,6 +17,7 @@ sprite_batch = pyglet.graphics.Batch()
 color_cache = {}
 
 TRANSLATION_OFFSET = 0
+STEP_THRESHOLD = 1
 
 def notfrozen(f):
     """
@@ -49,7 +50,7 @@ def translate_coordinates(x, y, height_offset = 0):
     scale = blackmango.configure.GRID_SIZE
     dx = (self.world_location[0] + TRANSLATION_OFFSET) * scale
     dy = h - (self.world_location[1] + 1 + TRANSLATION_OFFSET) * scale,
-    return dx + (height_offset * 3), dy
+    return dx + (height_offset * 7), dy
     
 class BaseSprite(pyglet.sprite.Sprite):
 
@@ -256,6 +257,16 @@ class BasicMobileSprite(BaseSprite):
                dest[1] > level.size[1]:
                 block.interaction_callback(self)
             return
+        # Deal with floor blocks of varying heights
+        elif block.height and not block.is_solid:
+            current_block = level.get_block(*self.world_location)
+            if block.height - current_block.height <= STEP_THRESHOLD:
+                pass
+            else:
+                # TODO:
+                # Do whatever happens when the step is too high. Try to push the
+                # block of wahtever.
+                return
         elif block:
             callback = functools.partial(block.interaction_callback, self)
 

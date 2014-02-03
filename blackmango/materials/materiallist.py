@@ -11,6 +11,7 @@ MATERIALS = {
     7: blackmango.materials.architecture.Door,
     8: blackmango.materials.architecture.StairUp,
     9: blackmango.materials.architecture.StairDown,
+    10: blackmango.materials.architecture.Platform,
 }
 
 for v in MATERIALS.values():
