@@ -159,9 +159,27 @@ class BasicLevel(object):
         Return a string that represents the current level state.
         Saved level data should be identical in format to prepared level data.
         """
+        blocks = {}
+        mobs = {}
+        
+        for k, v in self.blocks:
+            for idx, cls in BLOCKS.items():
+                if isinstance(v, cls):
+                    break
+            else:
+                continue
+            blocks[k] = (idx, v._args, v._kwargs)
+        for k, v in self.mobs:
+            for idx, cls in MOBS.items():
+                if isinstance(v, cls):
+                    break
+            else:
+                continue
+            mobs[k] = (idx, v._args, v._kwargs)
+
         saved_level = SavedLevel({
-            "BLOCKS": repr(self.blocks),
-            "MOBS": repr(self.mobs),
+            "BLOCKS": repr(blocks),
+            "MOBS": repr(mobs),
         })
         return repr(saved_level)
 

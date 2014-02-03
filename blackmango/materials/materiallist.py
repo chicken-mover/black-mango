@@ -1,6 +1,7 @@
 
 import blackmango.materials
 import blackmango.materials.architecture
+import blackmango.sprites
 
 # Global dict for lookups by the levels module
 MATERIALS = {
@@ -11,3 +12,8 @@ MATERIALS = {
     8: blackmango.materials.architecture.StairUp,
     9: blackmango.materials.architecture.StairDown,
 }
+
+for v in MATERIALS.values():
+    v.__init__ = blackmango.sprites.storecall(v.__init__)
+
+

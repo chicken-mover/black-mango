@@ -2,6 +2,7 @@
 import blackmango.mobs
 import blackmango.mobs.dancers
 import blackmango.mobs.patrollers
+import blackmango.sprites
 
 MOBS = {
     0: None,
@@ -11,3 +12,8 @@ MOBS = {
     4: blackmango.mobs.patrollers.Chaser,
     5: blackmango.mobs.dancers.Mirror,
 }
+
+for v in MOBS.values():
+    v.__init__ = blackmango.sprites.storecall(v.__init__)
+
+

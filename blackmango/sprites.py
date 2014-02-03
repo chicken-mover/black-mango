@@ -19,11 +19,25 @@ color_cache = {}
 TRANSLATION_OFFSET = 0
 
 def notfrozen(f):
+    """
+    A decorator for skipping certain methods when a mob's is_frozen flag is set.
+    """
     def wrapped(self, *args, **kwargs):
         if self.is_frozen:
             return False
         else:
             return f(self, *args, **kwargs)
+    return wrapped
+
+def storecall(f):
+    """
+    A decorator used to dynamically wrap __init__ functions so that instances
+    of sprites store the arguments used to initialize them.
+    """
+    def wrapped(self, *args, **kwargs):
+        f(self, *args, **kwargs)
+        setattr(self, '_args', args)
+        setattr(self, '_kwargs', kwargs)
     return wrapped
 
 class BaseSprite(pyglet.sprite.Sprite):
@@ -112,6 +126,9 @@ class BaseSprite(pyglet.sprite.Sprite):
         scale = blackmango.configure.GRID_SIZE
         w_w = (self.world_location[0] + TRANSLATION_OFFSET) * scale
         w_h = h - (self.world_location[1] + 1 + TRANSLATION_OFFSET) * scale
+        # TODO: Combine boilerplate here with smooth_translate, apply
+        #       displacements for block.height values if we're standing on one.
+
         self.set_position(w_w, w_h)
 
     def animate(self, dt, callback = None, t = .025):
@@ -259,6 +276,8 @@ class BasicMobileSprite(BaseSprite):
         w, h = blackmango.ui.game_window.get_size()
         scale = blackmango.configure.GRID_SIZE
 
+        # TODO: Combine boilerplate here with translate, apply displacements
+        #       for block.height values if we're standing on one.
         cur_x, cur_y = self.x, self.y
         dest_x, dest_y = (
             self.world_location[0] * scale,

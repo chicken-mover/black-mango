@@ -13,7 +13,7 @@ import blackmango.configure
 import blackmango.sprites
 
 class BaseMaterial(blackmango.sprites.BaseSprite):
-    
+
     def __init__(self, image = None,
             x = 0,
             y = 0,
@@ -29,6 +29,7 @@ class BaseMaterial(blackmango.sprites.BaseSprite):
         self.is_solid = True
         self.is_mover = False
         self.is_portal = False
+        self.height = 0 # Displaces mobs standing on top of it
         self.opacity = 0
 
     def interaction_callback(self, mob):
@@ -67,6 +68,7 @@ class BasePortalMaterial(BaseMaterial):
 
 class VoidMaterial(BaseMaterial):
 
+    @storecall
     def __init__(self, x = 0, y = 0, z = 0):
 
         color = (0,0,0,0)
