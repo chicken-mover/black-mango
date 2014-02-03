@@ -68,7 +68,6 @@ class BasePortalMaterial(BaseMaterial):
 
 class VoidMaterial(BaseMaterial):
 
-    @storecall
     def __init__(self, x = 0, y = 0, z = 0):
 
         color = (0,0,0,0)

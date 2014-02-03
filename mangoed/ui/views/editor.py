@@ -1,4 +1,5 @@
 
+import errno
 import os
 import pyglet
 
@@ -20,7 +21,7 @@ import mangoed.ui
 from blackmango.blocks.blocklist import BLOCKS
 from blackmango.levels.levellist import LEVELS
 from blackmango.mobs.moblist import MOBS
-from mangoed.ui.views import BaseView
+from blackmango.ui.views import BaseView
 
 MODE_SELECT = 'SELECT_ED'
 MODE_BLOCK = 'BLOCK_ED'
@@ -76,6 +77,11 @@ class EditorView(BaseView):
         serialized_data = self.current_level.serialize()
         dir = os.dirpath(blackmango.levels.__file__)
         dir = os.path.join(dir, self.level_ref)
+        try:
+            os.makedirs(dir)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
         with open(os.path.join(dir, '__init__.py'), 'w') as f:
             f.write(serialized_data)
         triggers = os.path.join(dir, 'triggers.py')
