@@ -156,6 +156,7 @@ class BasicMobileSprite(BaseSprite):
             y = 0,
             z = 0,
             color = None,
+            direction = 3,
         ):
 
         color = color or (0,0,255,255)
@@ -168,7 +169,7 @@ class BasicMobileSprite(BaseSprite):
         self.is_portal = False
         self.opacity = .1
 
-        self.direction = 3
+        self.direction = direction
 
         self.animations = []
 
