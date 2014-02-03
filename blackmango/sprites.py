@@ -19,17 +19,6 @@ color_cache = {}
 TRANSLATION_OFFSET = 0
 STEP_THRESHOLD = 1
 
-def notfrozen(f):
-    """
-    A decorator for skipping certain methods when a mob's is_frozen flag is set.
-    """
-    def wrapped(self, *args, **kwargs):
-        if self.is_frozen:
-            return False
-        else:
-            return f(self, *args, **kwargs)
-    return wrapped
-
 def storecall(f):
     """
     A decorator used to dynamically wrap __init__ functions so that instances

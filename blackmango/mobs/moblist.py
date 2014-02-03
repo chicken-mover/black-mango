@@ -13,6 +13,8 @@ MOBS = {
     5: blackmango.mobs.dancers.Mirror,
 }
 
+# Wrap the __init__ functions of each class so that we can easily retrieve the
+# settings they were initialized with.
 for v in MOBS.values():
     v.__init__ = blackmango.sprites.storecall(v.__init__)
 

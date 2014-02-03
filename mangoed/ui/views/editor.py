@@ -1,3 +1,7 @@
+"""
+The main editor view. At present, the editor only has the one view class, since
+it's pretty bare bones.
+"""
 
 import errno
 import os
@@ -67,13 +71,22 @@ class EditorView(BaseView):
             self.new_level()
 
     def new_level(self):
+        """
+        Create a new empty level
+        """
         level = blackmango.levels.SavedLevel()
         self.load_level(level)
 
     def load_level(self, leveldata):
+        """
+        Load an existing level from the main Black Mango source tree.
+        """
         self.current_level = blackmango.levels.BasicLevel(leveldata)
 
     def save_level(self):
+        """
+        Write a level directly to the Black Mango source tree.
+        """
         serialized_data = self.current_level.serialize()
         dir = os.dirpath(blackmango.levels.__file__)
         dir = os.path.join(dir, self.level_ref)
@@ -90,23 +103,39 @@ class EditorView(BaseView):
                 f.write(mangoed.configure.TRIGGER_TEMPLATE)
 
     def switch_floor(self, floor):
+        """
+        Switch the view to another floor/room
+        """
         self.current_level.switch_floor(floor)
 
     def quit(self):
+        """
+        Quit the app (calls mangoed.app.app.user_quit())
+        """
         mangoed.app.app.user_quit()
 
     def clear_selections(self):
+        """
+        Clear all selections and buffers
+        """
         self.secondary_mode = None
         self.secondary_mode_buffer = ''
         self.selected_key = None
         print "Selections cleared."
 
     def set_mode(self, mode):
+        """
+        Set the mod and clear the selections of the current mode
+        """
         self.clear_selections()
         self.mode = mode
         print "Mode set:", mode
 
     def select_action(self):
+        """
+        Depending on the mode, select a block/mob for placement, or switch floor
+        view.
+        """
         try:
             k = int(self.secondary_mode_buffer)
         except ValueError:
@@ -132,6 +161,10 @@ class EditorView(BaseView):
             self.switch_floor(k)
 
     def select_existing(self, x, y, z):
+        """
+        Select an existing block or mob out of the specified coordinates,
+        depending on which mode we are in.
+        """
         if self.mode == MODE_SELECT:
             sel = self.current_level.get_mob(x, y, z)
             if sel:
@@ -151,6 +184,10 @@ class EditorView(BaseView):
             
 
     def delete_existing(self, x, y, z):
+        """
+        Depending on the mode, delete an existing block or mob from the
+        specified grid square.
+        """
         if self.mode == MODE_BLOCK:
             b = self.current_level.get_block(*coords)
             self.current_level.unset_block(*coords)
@@ -161,6 +198,10 @@ class EditorView(BaseView):
             m.delete()
 
     def edit_obj(self, obj):
+        """
+        'Edit' a selected object by replacing it with another version of the
+        same.
+        """
         args = ()
         kwargs = {}
 
@@ -203,8 +244,8 @@ class EditorView(BaseView):
 
     def on_draw(self):
         """
-        Called on every window draw (unless the window isn't drawing views for
-        some reason, like during loading of new games).
+        Performs the requisite draw operations delegated from the EditorWindow
+        class
         """
         background = self.current_level.get_background()
         if background:

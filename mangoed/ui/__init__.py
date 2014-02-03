@@ -1,5 +1,5 @@
 """
-The user interface for the game.
+The user interface window for the editor.
 """
 
 import pyglet

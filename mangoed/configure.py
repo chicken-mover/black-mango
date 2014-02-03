@@ -1,5 +1,6 @@
 """
-Configuration variables, collected here for easy tweaking.
+Configuration variables, collected here for easy tweaking and overriding of
+certain configuration options inherited from the main Black Mango app.
 
 Also contains a logger for use throughout the app.
 """
