@@ -29,7 +29,7 @@ class BaseMaterial(blackmango.sprites.BaseSprite):
         self.is_solid = True
         self.is_mover = False
         self.is_portal = False
-        self.height = 0 # Displaces mobs standing on top of it
+        self.world_height = 0 # Displaces mobs standing on top of it
         self.opacity = 0
 
     def interaction_callback(self, mob):

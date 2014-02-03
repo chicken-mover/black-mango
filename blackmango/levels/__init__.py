@@ -45,36 +45,42 @@ class BasicLevel(object):
         self.starting_location = level_data.PLAYER_START
         self.current_floor = self.starting_location[2]
         self.size = level_data.SIZE
-        self.triggers = level_data.TRIGGERS()
-        self.next_level = level_data.next_level
+        # Probably being loaded by the level editor. Ignore triggers
+        if level_data.TRIGGERS:
+            self.triggers = level_data.TRIGGERS()
+        self.next_level = level_data.NEXT_LEVEL
         self.backgrounds = level_data.BACKGROUNDS.copy()
         for k, v in self.backgrounds.items():
             if v:
                 self.backgrounds[k] = blackmango.scenery.Background(v)
 
-        blockdata = level_data.BLOCKS
-        mobdata = level_data.MOBS
+        self.blockdata = level_data.BLOCKS
+        self.mobdata = level_data.MOBS
 
         self.blocks = {}
         self.mobs = {}
 
         self.player = player
 
-        for coords, blockinfo in blockdata.items():
+    def load(self):
+
+        for coords, blockinfo in self.blockdata.items():
             x, y, z = coords
             id, args, kwargs = blockinfo
             material = MATERIALS[id]
-            block = material(x, y, z, *args, **kwargs)
+            block = material(*args, **kwargs)
             self.set_block(block, x, y, z)
 
-        for coords, mobinfo in mobdata.items():
+        for coords, mobinfo in self.mobdata.items():
             x, y, z = coords
             id, args, kwargs = mobinfo
             mob = MOBS[id]
-            mob = mob(x, y, z, *args, **kwargs)
+            mob = mob(*args, **kwargs)
             self.set_mob(mob, x, y, z)
 
-        if player and not self.triggers.triggers_initialized:
+        # If the player object isn't present, ignore triggers, since this is
+        # probably being loaded by the level editor.
+        if self.player and not self.triggers.triggers_initialized:
             self.triggers.init_triggers(self, self.player)
 
     def get_background(self):
@@ -117,6 +123,10 @@ class BasicLevel(object):
         try:
             return self.blocks[(x, y, floor)]
         except (IndexError, KeyError):
+            if not self.player:
+                # Return None if the player object is not present, since that
+                # probably means this is being run in the level editor.
+                return None
             if x < 0 or x > self.size[0] - 1 or \
                y < 0 or y > self.size[1] - 1 or \
                floor < 0 or floor > self.size[2] - 1:
@@ -162,16 +172,16 @@ class BasicLevel(object):
         blocks = {}
         mobs = {}
         
-        for k, v in self.blocks:
+        for k, v in self.blocks.items():
             for idx, cls in MATERIALS.items():
-                if isinstance(v, cls):
+                if cls and isinstance(v, cls):
                     break
             else:
                 continue
             blocks[k] = (idx, v._args, v._kwargs)
-        for k, v in self.mobs:
+        for k, v in self.mobs.items():
             for idx, cls in MOBS.items():
-                if isinstance(v, cls):
+                if cls and isinstance(v, cls):
                     break
             else:
                 continue
@@ -195,20 +205,22 @@ class SavedLevel(object):
     values.
     """
     _d = {
-        "SIZE": None,
+        "SIZE": (0,0,0),
         "NAME": '',
+        "LEVEL_NAME": '',
         "NEXT_LEVEL": '',
         "PREV_LEVEL": '',
         "BACKGROUNDS": {},
-        "PLAYER_START": '',
+        "PLAYER_START": (0,0,0),
         "BLOCKS": {},
         "MOBS": {},
+        "TRIGGERS": None,
     }
     def __repr__(self):
         formatd = self._d.copy()
         for k, v in formatd.items():
-            formatd[k] = pprint.pformat(v)
-        blackmango.configure.LEVEL_TEMPALTE % formatd
+            formatd[k] = pprint.pformat(v).strip('"\'') or repr(type(v)())
+        return blackmango.configure.LEVEL_TEMPLATE % formatd
     def __init__(self, dictionary = {}, level_ref = None):
         self.level_ref = level_ref
         self._d.update(dictionary)

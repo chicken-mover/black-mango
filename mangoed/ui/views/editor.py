@@ -22,13 +22,13 @@ import mangoed.lib
 import mangoed.sprites
 import mangoed.ui
 
-from blackmango.blocks.blocklist import BLOCKS
+from blackmango.materials.materiallist import MATERIALS
 from blackmango.levels.levellist import LEVELS
 from blackmango.mobs.moblist import MOBS
 from blackmango.ui.views import BaseView
 
 MODE_SELECT = 'SELECT_ED'
-MODE_BLOCK = 'BLOCK_ED'
+MODE_MATERIAL = 'MATERIAL_ED'
 MODE_MOB = 'MOB_ED'
 
 SECONDARY_MODE_START = 'SECONDARY_MODE_START'
@@ -51,7 +51,9 @@ class EditorView(BaseView):
 
         level = mangoed.lib.name_cleanup(level)
         self.level_ref = level
-        level_data = LEVELS.get(level)
+
+    def load(self):
+        level_data = LEVELS.get(self.level_ref)
         
         self.batch = pyglet.graphics.Batch()
         self.cursor = mangoed.sprites.GridCursor()
@@ -59,15 +61,10 @@ class EditorView(BaseView):
             self.batch)
 
         if level_data:
-            self.logger.debug("Editing level: %s" % level)
-            try:
-                self.load_level(level_data)
-            except Exception, e:
-                print "ERROR: Failed to load level '%s'" % level
-                print "(Loading new level instead.)"
-                self.new_level()
+            self.logger.debug("Editing level: %s" % self.level_ref)
+            self.load_level(level_data)
         else:
-            self.logger.debug("New level: %s" % level)
+            self.logger.debug("New level: %s" % self.level_ref)
             self.new_level()
 
     def new_level(self):
@@ -81,14 +78,16 @@ class EditorView(BaseView):
         """
         Load an existing level from the main Black Mango source tree.
         """
+        leveldata.LEVEL_NAME = self.level_ref
         self.current_level = blackmango.levels.BasicLevel(leveldata)
+        self.current_level.load()
 
     def save_level(self):
         """
         Write a level directly to the Black Mango source tree.
         """
         serialized_data = self.current_level.serialize()
-        dir = os.dirpath(blackmango.levels.__file__)
+        dir = os.path.dirname(blackmango.levels.__file__)
         dir = os.path.join(dir, self.level_ref)
         try:
             os.makedirs(dir)
@@ -101,6 +100,7 @@ class EditorView(BaseView):
         if not os.path.exists(triggers):
             with open(triggers, 'w') as f:
                 f.write(mangoed.configure.TRIGGER_TEMPLATE)
+        print "Wrote level:", self.level_ref
 
     def switch_floor(self, floor):
         """
@@ -133,7 +133,7 @@ class EditorView(BaseView):
 
     def select_action(self):
         """
-        Depending on the mode, select a block/mob for placement, or switch floor
+        Depending on the mode, select a material/mob for placement, or switch floor
         view.
         """
         try:
@@ -145,11 +145,11 @@ class EditorView(BaseView):
             self.secondary_mode_buffer = ''
             
         self.selected_key = k
-        if self.mode == MODE_BLOCK:
-            if k in BLOCKS:
-                print "Selected block:", repr(BLOCKS[k])
+        if self.mode == MODE_MATERIAL:
+            if k in MATERIALS:
+                print "Selected material:", repr(MATERIALS[k])
             else:
-                print "No such block:", k
+                print "No such material:", k
                 self.selected_key = None
         elif self.mode == MODE_MOB:
             if k in MOBS:
@@ -162,9 +162,10 @@ class EditorView(BaseView):
 
     def select_existing(self, x, y, z):
         """
-        Select an existing block or mob out of the specified coordinates,
+        Select an existing material or mob out of the specified coordinates,
         depending on which mode we are in.
         """
+        sel = None
         if self.mode == MODE_SELECT:
             sel = self.current_level.get_mob(x, y, z)
             if sel:
@@ -172,23 +173,24 @@ class EditorView(BaseView):
             else:
                 sel = self.current_level.get_block(x, y, z)
                 if self:
-                    self.set_mode(MODE_BLOCK)
-        elif self.mode == MODE_BLOCK:
+                    self.set_mode(MODE_MATERIAL)
+        elif self.mode == MODE_MATERIAL:
             sel = self.current_level.get_block(x, y, z)
         elif self.mode == MODE_MOB:
             sel = self.current_level.get_mob(x, y, z)
-        for d in (BLOCKS, MOBS):
+        for d in (MATERIALS, MOBS):
             for k, v in d.items():
-                if isinstance(sel, v):
+                if v and isinstance(sel, v):
                     self.selected_key = k
+        return sel
             
 
     def delete_existing(self, x, y, z):
         """
-        Depending on the mode, delete an existing block or mob from the
+        Depending on the mode, delete an existing material or mob from the
         specified grid square.
         """
-        if self.mode == MODE_BLOCK:
+        if self.mode == MODE_MATERIAL:
             b = self.current_level.get_block(x, y, z)
             self.current_level.unset_block(x, y, z)
             b.delete()
@@ -202,15 +204,14 @@ class EditorView(BaseView):
         'Edit' a selected object by replacing it with another version of the
         same.
         """
-        args = ()
-        kwargs = {}
+        args, kwargs = obj._args, obj._kwargs 
 
-        # Blocks!
+        # materials!
         if isinstance(obj, blackmango.materials.BasePortalMaterial):
             try:
                 inp = input('Enter the portal destinaton (x, y, z):')
                 inp = tuple([int(i) for i in inp])
-            except (SyntaxError, ValueError, TypeError) as e:
+            except Exception as e:
                 print e
                 print 'Invalid input, detination not set.'
                 return
@@ -223,7 +224,7 @@ class EditorView(BaseView):
             try:
                 inp = input('Enter the direction the mob faces (1,2,3,4) [3]:')
                 inp = int(inp)
-            except (SyntaxError, ValueError) as e:
+            except Exception as e:
                 print e
                 print '(Direction set to default, 3)'
                 inp = 3
@@ -237,8 +238,8 @@ class EditorView(BaseView):
         obj.delete()
         # Replace it
         obj = cls(*args, **kwargs)
-        if self.mode == MODE_BLOCK:
-            self.current_level.set_block(obj, *coords)
+        if self.mode == MODE_MATERIAL:
+            self.current_level.set_material(obj, *coords)
         elif self.mode == MODE_MOB:
             self.current_level.set_mob(obj, *coords)
 
@@ -257,8 +258,23 @@ class EditorView(BaseView):
         """
         Called by the window on mouse clicks.
         """
+        cx, cy = self.cursor.world_location[:2]
         if button == mouse.LEFT:
-            self.select_existing(*self.cursor.world_location)
+            sel = self.select_existing(*self.cursor.world_location)
+            if self.selected_key and not sel:
+                if self.mode == MODE_MATERIAL:
+                    d = MATERIALS
+                    f = self.current_level.set_block
+                elif self.mode == MODE_MOB:
+                    d = MOBS
+                    f = self.current_level.set_mob
+                m = d[self.selected_key](x = cx, y = cy, 
+                        z = self.current_level.current_floor)
+                f(m, cx, cy, self.current_level.current_floor)
+                print 'Placed %s' % m
+            else:
+                print 'Nothing selected to place'
+
 
     def on_mouse_motion(self, x, y, dx, dy):
         """
@@ -282,7 +298,7 @@ class EditorView(BaseView):
         elif keypress == key.M:
             self.set_mode(MODE_MOB)
         elif keypress == key.B:
-            self.set_mode(MODE_BLOCK)
+            self.set_mode(MODE_MATERIAL)
 
         # Save and quit
         elif keypress == key.Q:
@@ -292,28 +308,29 @@ class EditorView(BaseView):
 
         # Delete and select
         elif keypress == key.E:
-            self.select_existing(*self.cursor.world_location)
+            sel = self.select_existing(*self.cursor.world_location)
+            if sel:
+                self.edit_obj(sel)
         elif keypress in [key.DELETE, key.BACKSPACE]:
             self.delete_existing(*self.cursor.world_location)
 
-        # Handle block selection sequences or floor switching sequences
-        elif keypress == key.COLON and self.seconary_mode is None:
+        # Handle material selection sequences or floor switching sequences
+        elif keypress == key.COLON and self.secondary_mode is None:
             self.secondary_mode = SECONDARY_MODE_START
         elif keypress in [key.ENTER, key.NUM_ENTER] and \
             self.secondary_mode == SECONDARY_MODE_START:
             self.secondary_mode = None
             self.select_action()
         elif self.secondary_mode == SECONDARY_MODE_START:
-            self.secondary_mode_buffer += key.symbol_string(keypress)
+            self.secondary_mode_buffer += key.symbol_string(keypress).strip('_')
 
 class CursorInfo(pyglet.text.Label):
 
     def __init__(self, text, batch):
-        _win_x, _win_y = mangoed.ui.editor_window.get_size()
         super(CursorInfo, self).__init__(
             text,
             font_size = 15,
-            x = _win_x - 50,
+            x = 50,
             y = 50,
             anchor_x = 'left',
             anchor_y = 'bottom',

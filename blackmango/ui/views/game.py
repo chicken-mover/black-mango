@@ -49,17 +49,21 @@ class GameView(BaseView):
         self.background_image = None
         self.background = None
 
-        level_data = LEVELS.get(level)
+        self.level = level
+
+    def load(self):
+
+        level_data = LEVELS.get(self.level)
         
         if level_data:
-            self.logger.debug("Starting new game at level %s" % level)
+            self.logger.debug("Starting new game at level %s" % self.level)
             self.start_level(level_data)
         elif level.endswith('.blackmango'):
-            self.logger.debug("Loading game from file %s" % level)
+            self.logger.debug("Loading game from file %s" % self.level)
             self.load_level(level)
         else:
             raise ValueError("Invalid argument passed to GameView.__init__: %s"\
-                                % level)
+                                % self.level)
 
     def destroy(self):
         self.level_teardown()
@@ -119,6 +123,7 @@ class GameView(BaseView):
         self.player = blackmango.mobs.player.Player()
         self.current_level = blackmango.levels.BasicLevel(level_data, \
                                 self.player)
+        self.current_level.load()
 
         # Place the player into the level
         starting_location = self.current_level.starting_location
@@ -131,7 +136,7 @@ class GameView(BaseView):
 
         # Show the title card
         self.title_card = blackmango.ui.labels.TextBox(
-            level_data.get('title_card'),
+            level_data.NAME,
             box_color = (0,0,0,255),
             text_color = TITLE_CARD_COLOR,
         )

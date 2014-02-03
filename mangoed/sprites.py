@@ -47,12 +47,12 @@ class GridCursor(blackmango.sprites.BaseSprite):
 
         scale = mangoed.configure.GRID_SIZE
 
-        world_x = x / scale
-        world_y = -1 * (y / scale - h) - 1
+        world_x = (x) / scale 
+        world_y = -1 * (y - h) / scale
 
         self.world_location = (
-            math.floor(world_x),
-            math.floor(world_y),
+            math.floor(world_x - 1),
+            math.floor(world_y - 1),
             self.world_location[2]
         )
         self.translate()

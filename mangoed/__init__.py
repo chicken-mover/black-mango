@@ -12,6 +12,7 @@ import sys
 import blackmango.assetloader
 import mangoed.app
 import mangoed.configure
+import mangoed.ui
 
 ARGUMENTS = (
     ('level', {
@@ -38,7 +39,8 @@ if __name__ == "__main__":
     mangoed.configure.COLORS = blackmango.assetloader.load_colordata()
 
     from mangoed.ui.views.editor import EditorView
-    mangoed.ui.editor_window.set_view(EditorView(args.level))
+    mangoed.ui.editor_window.set_view(EditorView(level = args.level))
+    mangoed.ui.editor_window.view.load()
 
     pyglet.clock.schedule(mangoed.ui.editor_window.tick)
 

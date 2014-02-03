@@ -38,7 +38,7 @@ def translate_coordinates(x, y, height_offset = 0):
     w, h = blackmango.ui.game_window.get_size()
     scale = blackmango.configure.GRID_SIZE
     dx = (x + TRANSLATION_OFFSET) * scale
-    dy = h - (y + 1 + TRANSLATION_OFFSET) * scale,
+    dy = h - (y + 1 + TRANSLATION_OFFSET) * scale
     return dx + (height_offset * 7), dy
     
 class BaseSprite(pyglet.sprite.Sprite):
@@ -248,7 +248,7 @@ class BasicMobileSprite(BaseSprite):
                 block.interaction_callback(self)
             return
         # Deal with floor blocks of varying heights
-        elif block.height and not block.is_solid:
+        elif block and block.height and not block.is_solid:
             current_block = level.get_block(*self.world_location)
             if block.height - current_block.height <= STEP_THRESHOLD:
                 pass
@@ -279,7 +279,7 @@ class BasicMobileSprite(BaseSprite):
         level = blackmango.ui.game_window.view.current_level
         block = level.get_block(*self.world_location)
         w_w, w_h = translate_coordinates(*self.world_location[:2],
-            height_offset = block.height)
+            height_offset = block.world_height if block else 0)
         self.set_position(w_w, w_h)
 
     def smooth_translate(self, callback = None):
@@ -289,11 +289,11 @@ class BasicMobileSprite(BaseSprite):
 
         The <callback> callable is called after the final animation frame.
         """
-        cur_x, cur_y = self.world_location[:2]
+        cur_x, cur_y = self.x, self.y
         level = blackmango.ui.game_window.view.current_level
         block = level.get_block(*self.world_location)
-        dest_x, dest_y = translate_coordinates(cur_x, cur_y,
-            height_offset = block.height)
+        dest_x, dest_y = translate_coordinates(*self.world_location[:2],
+            height_offset = block.world_height if block else 0)
 
         frames = blackmango.configure.BASE_ANIMATION_FRAMES
         delta_x = (dest_x - cur_x)/frames
@@ -317,8 +317,8 @@ class BasicMobileSprite(BaseSprite):
         
         if mob.opacity == 0: return # Invisible mobs
 
-        x, y, z = self.world_location
-        px, py, pz = mob.world_location
+        x, y, z = map(int, self.world_location)
+        px, py, pz = map(int, mob.world_location)
 
         if z != pz: return False
 

@@ -10,3 +10,4 @@ def name_cleanup(name):
     name = re.sub(r'[^a-z0-9]', '_', name)
     if name[0].isdigit():
         raise ValueError('Name can\'t start with a number.')
+    return name

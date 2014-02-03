@@ -49,11 +49,11 @@ def setup_logger(lvl = DEBUG):
     logger = logging.getLogger('blackmango')
     logger.setLevel(DEBUG)
 
-STARTING_LEVEL = 'puzzle_demo1'
+STARTING_LEVEL = 'test' #'puzzle_demo1'
 
 LEVEL_TEMPLATE = """
 
-from blackmango.levels.%s.triggers import LevelTriggers
+from blackmango.levels.%(LEVEL_NAME)s.triggers import LevelTriggers
 
 SIZE = %(SIZE)s
 NAME = %(NAME)s
@@ -64,7 +64,6 @@ PREV_LEVEL = %(PREV_LEVEL)s
 TRIGGERS = LevelTriggers
 
 # Everything below this line is automatically generated.
-# Generated %(generation_date_time)s
 
 BACKGROUNDS = %(BACKGROUNDS)s
 PLAYER_START = %(PLAYER_START)s

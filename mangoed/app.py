@@ -15,7 +15,7 @@ def init(*args, **kwargs):
     """
     Called by the central startup routine during initialization.
     """
-    global game_app
+    global app
     mangoed.configure.logger.debug("Initializing MangoEd as app")
     app = MangoEd(*args, **kwargs)
 

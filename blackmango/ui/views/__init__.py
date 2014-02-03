@@ -9,6 +9,13 @@ class BaseView(object):
     def __init__(self):
         pass
 
+    def load(self):
+        """
+        Defer some initialization until the view object exists and is set
+        properly on the parent window object.
+        """
+        pass
+
     def destroy(self):
         """
         Called when the view is switched away from this view.

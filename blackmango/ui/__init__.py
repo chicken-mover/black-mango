@@ -68,6 +68,7 @@ class GameWindow(pyglet.window.Window):
             self.view.destroy()
         self.logger.debug("Setting view: %s" % repr(view))
         self.view = view
+        self.view.load()
         
     def on_draw(self):
         """

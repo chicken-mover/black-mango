@@ -18,10 +18,12 @@ def init(*args, **kwargs):
     """
     Called by the central startup routine during initialization.
     """
-    global game_window
+    global editor_window
     # Prevent circular imports
     mangoed.configure.logger.debug("Initializing EditorWindow as editor_window")
     editor_window = EditorWindow(*args, **kwargs)
+    import blackmango.ui
+    blackmango.ui.game_window = editor_window
 
 class EditorWindow(pyglet.window.Window):
 
