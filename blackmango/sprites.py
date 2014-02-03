@@ -40,6 +40,17 @@ def storecall(f):
         setattr(self, '_kwargs', kwargs)
     return wrapped
 
+def translate_coordinates(x, y, height_offset = 0):
+    """
+    Translate world coordinates and an optional height offset into screen
+    coordinates for sprite rendering.
+    """
+    w, h = blackmango.ui.game_window.get_size()
+    scale = blackmango.configure.GRID_SIZE
+    dx = (self.world_location[0] + TRANSLATION_OFFSET) * scale
+    dy = h - (self.world_location[1] + 1 + TRANSLATION_OFFSET) * scale,
+    return dx + (height_offset * 3), dy
+    
 class BaseSprite(pyglet.sprite.Sprite):
 
     is_solid = False
@@ -121,14 +132,7 @@ class BaseSprite(pyglet.sprite.Sprite):
         Translate the current game world coordinates into the screen position
         for the current sprite object.
         """
-        w, h = blackmango.ui.game_window.get_size()
-
-        scale = blackmango.configure.GRID_SIZE
-        w_w = (self.world_location[0] + TRANSLATION_OFFSET) * scale
-        w_h = h - (self.world_location[1] + 1 + TRANSLATION_OFFSET) * scale
-        # TODO: Combine boilerplate here with smooth_translate, apply
-        #       displacements for block.height values if we're standing on one.
-
+        w_w, w_h = translate_coordinates(cur_x, cur_y)
         self.set_position(w_w, w_h)
 
     def animate(self, dt, callback = None, t = .025):
@@ -266,6 +270,17 @@ class BasicMobileSprite(BaseSprite):
         self.world_location = dest
         self.smooth_translate(callback = callback)
 
+    def translate(self):
+        """
+        Translate the current game world coordinates into the screen position
+        for the current sprite object.
+        """
+        level = blackmango.ui.game_window.view.current_level
+        block = level.get_block(*self.world_location)
+        w_w, w_h = translate_coordinates(*self.world_location[:2],
+            height_offset = block.height)
+        self.set_position(w_w, w_h)
+
     def smooth_translate(self, callback = None):
         """
         Like self.translate, but provides gradual movement between two
@@ -273,16 +288,10 @@ class BasicMobileSprite(BaseSprite):
 
         The <callback> callable is called after the final animation frame.
         """
-        w, h = blackmango.ui.game_window.get_size()
-        scale = blackmango.configure.GRID_SIZE
-
-        # TODO: Combine boilerplate here with translate, apply displacements
-        #       for block.height values if we're standing on one.
-        cur_x, cur_y = self.x, self.y
-        dest_x, dest_y = (
-            self.world_location[0] * scale,
-            h - (self.world_location[1] + 1) * scale,
-        )
+        level = blackmango.ui.game_window.view.current_level
+        block = level.get_block(*self.world_location)
+        dest_x, dest_y = translate_coordinates(*self.world_location[:2],
+            height_offset = block.height)
 
         frames = blackmango.configure.BASE_ANIMATION_FRAMES
         delta_x = (dest_x - cur_x)/frames
