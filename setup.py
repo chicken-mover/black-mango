@@ -17,10 +17,11 @@ if __name__ == "__main__":
     setuptools.setup(
         name = 'blackmango',
         version = version,
-        py_modules = [
-            'blackmango',
-            'mangoed',
-        ],
+#        py_modules = [
+#            'blackmango',
+#            'mangoed',
+#        ],
+        packages = setuptools.find_packages(exclude = ['blackmango_tests']),
         install_requires = [
             'pyglet>=1.1.4',
             'xmltodict>=0.8.3',

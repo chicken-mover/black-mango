@@ -15,7 +15,7 @@ import mangoed.configure
 ARGUMENTS = (
     ('level', {
         'help': 'The name of the level to edit. If the level does not exist on'
-                ' startup it will be created on save.'
+                ' startup it will be created on save.',
     }),)
 
 if __name__ == "__main__":
@@ -37,7 +37,7 @@ if __name__ == "__main__":
     mangoed.configure.COLORS = blackmango.assetloader.load_colordata()
 
     from mangoed.ui.views.editor import EditorView
-    mangoed.ui.editor_window.set_view(EditorView())
+    mangoed.ui.editor_window.set_view(EditorView(args.level))
 
     pyglet.clock.schedule(mangoed.ui.editor_window.tick)
 

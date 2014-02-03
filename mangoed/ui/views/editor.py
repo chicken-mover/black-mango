@@ -55,7 +55,12 @@ class EditorView(BaseView):
 
         if level_data:
             self.logger.debug("Editing level: %s" % level)
-            self.load_level(level_data)
+            try:
+                self.load_level(level_data)
+            except Exception, e:
+                print "ERROR: Failed to load level '%s'" % level
+                print "(Loading new level instead.)"
+                self.new_level()
         else:
             self.logger.debug("New level: %s" % level)
             self.new_level()
