@@ -6,6 +6,7 @@ A really fuckin' basic level editor for Black Mango
 import blackmango.preload
 
 import argparse
+import pyglet
 import sys
 
 import blackmango.assetloader

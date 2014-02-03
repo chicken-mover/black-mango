@@ -163,7 +163,7 @@ class BasicLevel(object):
         mobs = {}
         
         for k, v in self.blocks:
-            for idx, cls in BLOCKS.items():
+            for idx, cls in MATERIALS.items():
                 if isinstance(v, cls):
                     break
             else:

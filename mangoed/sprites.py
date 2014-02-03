@@ -1,4 +1,6 @@
 
+import math
+
 import blackmango.sprites
 import mangoed.configure
 import mangoed.ui

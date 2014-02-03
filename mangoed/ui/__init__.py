@@ -10,18 +10,18 @@ import mangoed.configure
 editor_window = None
 
 editor_platform = pyglet.window.get_platform()
-editor_display = game_platform.get_default_display()
-editor_screen = game_display.get_default_screen()
+editor_display = editor_platform.get_default_display()
+editor_screen = editor_display.get_default_screen()
 
-# There is only one GameWindow object active at any one time.
+# There is only one EditorWindow object active at any one time.
 def init(*args, **kwargs):
     """
     Called by the central startup routine during initialization.
     """
     global game_window
     # Prevent circular imports
-    mangoed.configure.logger.debug("Initializing GameWindow as game_window")
-    editor_window = GameWindow(*args, **kwargs)
+    mangoed.configure.logger.debug("Initializing EditorWindow as editor_window")
+    editor_window = EditorWindow(*args, **kwargs)
 
 class EditorWindow(pyglet.window.Window):
 
@@ -30,13 +30,13 @@ class EditorWindow(pyglet.window.Window):
     def __init__(self):
 
         if mangoed.configure.FULLSCREEN:
-            super(GameWindow, self).__init__(
+            super(EditorWindow, self).__init__(
                     fullscreen = mangoed.configure.FULLSCREEN,
                     style = pyglet.window.Window.WINDOW_STYLE_BORDERLESS,
                     caption = mangoed.configure.MAIN_WINDOW_TITLE)
         else:
             width, height = mangoed.configure.SCREEN_SIZE
-            super(GameWindow, self).__init__(
+            super(EditorWindow, self).__init__(
                     width = width,
                     height = height,
                     style = pyglet.window.Window.WINDOW_STYLE_BORDERLESS,

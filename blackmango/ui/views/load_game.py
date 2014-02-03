@@ -210,7 +210,7 @@ class MenuLabel(pyglet.text.Label):
 
 class ErrorLabel(pyglet.text.Label):
 
-    def __init__(self, title):
+    def __init__(self, title, batch):
 
         x, y = blackmango.ui.game_window.get_size()
 

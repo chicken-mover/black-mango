@@ -189,12 +189,12 @@ class EditorView(BaseView):
         specified grid square.
         """
         if self.mode == MODE_BLOCK:
-            b = self.current_level.get_block(*coords)
-            self.current_level.unset_block(*coords)
+            b = self.current_level.get_block(x, y, z)
+            self.current_level.unset_block(x, y, z)
             b.delete()
         elif self.mode == MODE_MOB:
-            m = self.current_level.get_mob(*coords)
-            self.current_level.unset_mob(*coords)
+            m = self.current_level.get_mob(x, y, z)
+            self.current_level.unset_mob(x, y, z)
             m.delete()
 
     def edit_obj(self, obj):
@@ -210,7 +210,7 @@ class EditorView(BaseView):
             try:
                 inp = input('Enter the portal destinaton (x, y, z):')
                 inp = tuple([int(i) for i in inp])
-            except SyntaxError, ValueError, TypeError as e:
+            except (SyntaxError, ValueError, TypeError) as e:
                 print e
                 print 'Invalid input, detination not set.'
                 return
@@ -223,7 +223,7 @@ class EditorView(BaseView):
             try:
                 inp = input('Enter the direction the mob faces (1,2,3,4) [3]:')
                 inp = int(inp)
-            except SyntaxError, ValueError as e:
+            except (SyntaxError, ValueError) as e:
                 print e
                 print '(Direction set to default, 3)'
                 inp = 3
@@ -237,10 +237,10 @@ class EditorView(BaseView):
         obj.delete()
         # Replace it
         obj = cls(*args, **kwargs)
-        if self.mode = MODE_BLOCK:
+        if self.mode == MODE_BLOCK:
             self.current_level.set_block(obj, *coords)
-        elif self.mode = MODE_MOB:
-            self.current_level.set_mob(obj, *mob)
+        elif self.mode == MODE_MOB:
+            self.current_level.set_mob(obj, *coords)
 
     def on_draw(self):
         """

@@ -38,3 +38,15 @@ Building with Cythin:
   object; fonts and other files could be read into StringIO buffers and 
   pickled). This should possibly be re-examined again later when prepping for 
   distribution
+
+
+# Compile everything using Cython
+(also good for doing correctness checks on the code)
+```bash
+$ find . -type f -name '*.py' -exec $PY27/cython -a -f {} \;
+```
+
+## Cleanup from that compile:
+```bash
+$ sudo find . -type f -name '*.c' -exec rm -v {} \;
+$ sudo find . -type f -name '*.pyc' -exec rm -v {} \;

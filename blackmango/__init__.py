@@ -11,6 +11,7 @@ import blackmango.preload
 import argparse
 import os
 import pyglet
+import sys
 import traceback
 
 import blackmango.app

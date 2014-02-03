@@ -37,8 +37,8 @@ def translate_coordinates(x, y, height_offset = 0):
     """
     w, h = blackmango.ui.game_window.get_size()
     scale = blackmango.configure.GRID_SIZE
-    dx = (self.world_location[0] + TRANSLATION_OFFSET) * scale
-    dy = h - (self.world_location[1] + 1 + TRANSLATION_OFFSET) * scale,
+    dx = (x + TRANSLATION_OFFSET) * scale
+    dy = h - (y + 1 + TRANSLATION_OFFSET) * scale,
     return dx + (height_offset * 7), dy
     
 class BaseSprite(pyglet.sprite.Sprite):
@@ -122,7 +122,7 @@ class BaseSprite(pyglet.sprite.Sprite):
         Translate the current game world coordinates into the screen position
         for the current sprite object.
         """
-        w_w, w_h = translate_coordinates(cur_x, cur_y)
+        w_w, w_h = translate_coordinates(*self.world_location[:2])
         self.set_position(w_w, w_h)
 
     def animate(self, dt, callback = None, t = .025):
@@ -289,9 +289,10 @@ class BasicMobileSprite(BaseSprite):
 
         The <callback> callable is called after the final animation frame.
         """
+        cur_x, cur_y = self.world_location[:2]
         level = blackmango.ui.game_window.view.current_level
         block = level.get_block(*self.world_location)
-        dest_x, dest_y = translate_coordinates(*self.world_location[:2],
+        dest_x, dest_y = translate_coordinates(cur_x, cur_y,
             height_offset = block.height)
 
         frames = blackmango.configure.BASE_ANIMATION_FRAMES
