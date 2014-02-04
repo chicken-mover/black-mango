@@ -10,6 +10,7 @@ base materials should be divided out into logically appropriate submodules.
 """
 
 import blackmango.configure
+import blackmango.ui
 import blackmango.sprites
 
 class BaseMaterial(blackmango.sprites.BaseSprite):
@@ -63,7 +64,12 @@ class BasePortalMaterial(BaseMaterial):
         like walking up to an object, or more complex ones that do things like
         interact with the level itself
         """
-        mob.teleport(*self.destination)
+        level = blackmango.ui.game_window.view.current_level
+        # Teleport the mob
+        b, m = level.get_sprites(self.destination)
+        if b and b.is_solid: return
+        if m and m.is_solid: return
+        level.set_sprite(mob, self.destination)
         
 
 class VoidMaterial(BaseMaterial):

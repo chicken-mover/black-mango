@@ -31,10 +31,6 @@ class SimpleMob(blackmango.sprites.BasicMobileSprite):
         self.is_frozen = False
 
     @notfrozen
-    def teleport(self, *args, **kwargs):
-        super(SimpleMob, self).teleport(*args, **kwargs)
-
-    @notfrozen
     def turn(self, *args, **kwargs):
         super(SimpleMob, self).turn(*args, **kwargs)
 

@@ -7,7 +7,7 @@
 Temporary sprites:
 * http://www.spriters-resource.com/playstation/fft/
 
-Building with Cythin:
+Building with Cython:
 * https://github.com/cython/cython/wiki/PackageHierarchy
 
 ## Menu sections
@@ -43,7 +43,7 @@ Building with Cythin:
 # Compile everything using Cython
 (also good for doing correctness checks on the code)
 ```bash
-$ find . -type f -name '*.py' -exec $PY27/cython -a -f {} \;
+$ find . -type f -name '*.py' -exec $PY27/cython -f {} \;
 ```
 
 ## Cleanup from that compile:

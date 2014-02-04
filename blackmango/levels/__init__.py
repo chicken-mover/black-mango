@@ -11,47 +11,48 @@ each mob in the level.
 
 import pprint
 
+import blackmango.materials
 import blackmango.scenery
+import blackmango.sprites
 
 from blackmango.materials.materiallist import MATERIALS
 from blackmango.mobs.moblist import MOBS
 
 class BasicLevel(object):
 
-    level_size = None,
-    starting_location = None
-
-    blocks = None
-
     # Blocks and mobs are tracked seperately. I don't know if this is a good
     # idea or a terrible one. It seems like it might not be super extensible in
     # the future, because it means not having more than one mob at each world
     # location, but we can always change it in the future.
-    blocks = None
-    mobs = None
-
-    scheduled_destroy = False
 
     def __init__(self, level_data, player = None):
         """
         Read in the level data, and translate the lists of block ids in the
-        floor data into instances of materials classes.
+        room data into instances of materials classes.
         """
 
-        self.title_card = level_data.NAME
-        self.starting_location = level_data.PLAYER_START
-        self.current_floor = self.starting_location[2]
+        self.init_data = level_data
+
+        self.current_room = level_data.PLAYER_START[2]
         self.size = level_data.SIZE
+
+        self.scheduled_destroy = False
+        
         # Probably being loaded by the level editor. Ignore triggers
         if level_data.TRIGGERS:
             self.triggers = level_data.TRIGGERS()
-        self.backgrounds = level_data.BACKGROUNDS.copy()
-        for k, v in self.backgrounds.items():
-            if v:
-                self.background_images[k] = blackmango.scenery.Background(v)
 
-        self.blockdata = level_data.BLOCKS
-        self.mobdata = level_data.MOBS
+        self.background_images = {}
+        for k, v in level_data.BACKGROUNDS.items():
+            if v:
+                # Make only one Background object per image, to keep things
+                # reasonably efficient.
+                img_values = self.background_images.values()
+                existing = filter(lambda x: x.image == v, img_values)
+                if len(existing):
+                    self.background_images[k] = existing[0]
+                else:
+                    self.background_images[k] = blackmango.scenery.Background(v)
 
         self.blocks = {}
         self.mobs = {}
@@ -60,19 +61,15 @@ class BasicLevel(object):
 
     def load(self):
 
-        for coords, blockinfo in self.blockdata.items():
-            x, y, z = coords
-            id, args, kwargs = blockinfo
-            material = MATERIALS[id]
-            block = material(*args, **kwargs)
-            self.set_block(block, x, y, z)
-
-        for coords, mobinfo in self.mobdata.items():
-            x, y, z = coords
-            id, args, kwargs = mobinfo
-            mob = MOBS[id]
-            mob = mob(*args, **kwargs)
-            self.set_mob(mob, x, y, z)
+        for data, lookuplist in [
+            (self.init_data.BLOCKS, MATERIALS)
+            (self.init_data.MOBS, MOBS)
+        ]:
+            for coords, blockinfo in data.items():
+                id, args, kwargs = blockinfo
+                sprite = lookuplist[id]
+                sprite = sprite(*args, **kwargs)
+                self.set_sprite(sprite, coords)
 
         # If the player object isn't present, ignore triggers, since this is
         # probably being loaded by the level editor.
@@ -80,79 +77,90 @@ class BasicLevel(object):
             self.triggers.init_triggers(self, self.player)
 
     def get_background(self):
-        return self.background_images.get(self.current_floor)
-
-    def switch_floor(self, new_floor):
         """
-        Set which floor we're on. This currently iterates every block and mob
-        for the current and new floor, and re-sets their visibility flag as
+        Get the background object for the current room
+        """
+        return self.background_images.get(self.current_room)
+
+    def switch_room(self, new_z):
+        """
+        Set which room we're in. This currently iterates every block and mob
+        for the current and new room, and re-sets their visibility flag as
         appropriate.
         """
         for f in [self.blocks, self.mobs]:
-            for floor in [self.current_floor, new_floor]:
-                items = filter(lambda x: x[0][2] == floor, f.items())
+            for z in [self.current_room, new_z]:
+                items = filter(lambda s: s[0][2] == z, f.items())
                 for k, m in items:
-                    if floor != new_floor:
+                    if z != new_z:
                         m.visible = False
                     else:
                         m.visible = True
-        self.current_floor = new_floor
+        self.current_room = new_z
 
-    def set_block(self, block, x, y, floor):
-        """
-        Set the location of a block for quick collision lookup.
-        """
-        block.visible = floor == self.current_floor
-        block.translate()
-        self.blocks[(x, y, floor)] = block
 
-    def unset_block(self, x, y, floor):
-        k = (x, y, floor)
-        if k in self.blocks:
-            del self.blocks[k]
+    def set_sprite(self, sprite, coords, translate = True):
+        """
+        Set the location of a material block or mob for quick collision lookup.
+        """
+        if not (isinstance(coords, (tuple, list)) and len(coords) == 3):
+            raise ValueError("'coords' must be a tuple or list of "
+                    "three coordinates")
+                    
+        if isinstance(sprite, blackmango.materials.BaseMaterial):
+            d = self.blocks
+        elif isinstance(sprite, blackmango.sprites.BasicMobileSprite):
+            d = self.mobs
 
-    def get_block(self, x, y, floor):
+        if coords in d:
+            raise ValueError("Cannot set %s to %s, an object of the same"
+                " tracked class exists there already" % sprite, coords)
+        else:
+            # If the sprite exists in another location, clear the index
+            for k, v in d.items():
+                if v is sprite:
+                    del d[k]
+            # Set the new index and update the sprite's world_location attrib.
+            d[coords] = sprite
+            sprite.world_location = coords
+            # If it's the player, the view moves with the sprite. Otherwise we
+            # hide it when it goes off screen.
+            if sprite is self.player:
+                self.switch_room(coords[2])
+            else:
+                sprite.visible = coords[2] == self.current_room
+            if translate:
+                sprite.translate()
+
+    def get_sprites(self, coords):
         """
-        Get the material at <x>, <y>, <floor>. If the provided coordinates are
-        invalid, returns an instance of VoidMaterial.
+        Get the existing material block and mob at the specified location,
+        returned as a 2-tuple of (block, mob). If either (or both) don't exist,
+        their value will be returned as None, or, in the case of material
+        blocks, as a VoidMaterial when the specified coordinates are out of
+        bounds.
         """
-        try:
-            return self.blocks[(x, y, floor)]
-        except (IndexError, KeyError):
-            if not self.player:
-                # Return None if the player object is not present, since that
-                # probably means this is being run in the level editor.
-                return None
+        if not (isinstance(coords, (tuple, list)) and len(coords) == 3):
+            raise ValueError("'coords' must be a tuple or list of "
+                    "three coordinates")
+
+        block, mob = self.blocks.get(coords), self.mobs.get(coords)
+        if block is None and (self.player):
+            x, y, z = coords
+            # If we're retriveing a material that's out of bounds,
+            # return an instance of VoidMaterial
             if x < 0 or x > self.size[0] - 1 or \
                y < 0 or y > self.size[1] - 1 or \
-               floor < 0 or floor > self.size[2] - 1:
-                return MATERIALS[-1]()
-            return None
+               z < 0 or z > self.size[2] - 1:
+                block = MATERIALS[-1]()
 
-    def set_mob(self, mob, x, y, floor):
-        """
-        Set the location of a mob for quick collision lookup.
-        """
-        mob.visible = floor == self.current_floor
-        mob.translate()
-        self.mobs[(x, y, floor)] = mob
-
-    def unset_mob(self, x, y, floor):
-        k = (x, y, floor)
-        if k in self.mobs:
-            del self.mobs[k]
-
-    def get_mob(self, x, y, floor):
-        """
-        Get the mob at <x>, <y>, <floor>. If the provided coordinates are
-        invalid, returns None.
-        """
-        try:
-            return self.mobs[(x, y, floor)]
-        except (IndexError, KeyError):
-            return None
+        return block, mob
 
     def tick(self):
+        """
+        Called by the window object, this method calls individual mob behvaiour
+        ticks and level trigger ticks
+        """
         if self.scheduled_destroy:
             return
         for _, mob in self.mobs.items():
@@ -162,7 +170,7 @@ class BasicLevel(object):
 
     def serialize(self):
         """
-        Return a string that represents the current level state.
+        Return a string that represents the curret level state.
         Saved level data should be identical in format to prepared level data.
         """
         blocks = {}
@@ -184,12 +192,11 @@ class BasicLevel(object):
             mobs[k] = (idx, v._args, v._kwargs)
 
         saved_level = SavedLevel({
-            "PLAYER_START": self.starting_location,
-            "NAME": self.title_card,
+            "NAME": self.init_data.NAME,
+            "BACKGROUNDS": self.init_data.BACKGROUNDS,
+            "PLAYER_START": self.init_data.PLAYER_START,
             "BLOCKS": repr(blocks),
             "MOBS": repr(mobs),
-            "BACKGROUNDS": self.backgrounds,
-            "SIZE": self.size,
         })
         return repr(saved_level)
 
@@ -205,7 +212,6 @@ class SavedLevel(object):
     values.
     """
     _d = {
-        "SIZE": (0,0,0),
         "NAME": '',
         "LEVEL_NAME": '',
         "BACKGROUNDS": {},

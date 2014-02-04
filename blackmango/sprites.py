@@ -85,6 +85,8 @@ class BaseSprite(pyglet.sprite.Sprite):
         super(BaseSprite, self).__init__(image,
                 batch = sprite_batch, group = group)
 
+        # From now on this will be updated by the level object when calling
+        # set_sprite()
         self.world_location = (x, y, z)
 
         if blackmango.configure.DEBUG:
@@ -173,33 +175,6 @@ class BasicMobileSprite(BaseSprite):
 
         self.animations = []
 
-    def teleport(self, x, y, z):
-        """
-        Change the position of the sprite in the game world instantly.
-        """
-        dest = (x, y, z)
-        level = blackmango.ui.game_window.view.current_level
-
-        block = level.get_block(*dest)
-        # Don't check interaction callbacks during teleport (otherwise you'll
-        # get endless loops on teleporters).
-        if block and block.is_solid:
-            return
-        mob = level.get_mob(*dest)
-        if mob and mob.is_solid:
-            return
-
-        level.unset_mob(*self.world_location)
-        level.set_mob(self, *dest)
-        self.world_location = dest
-
-        if level.current_floor != z:
-            self.visible = False
-        else:
-            self.visible = True
-
-        self.translate()
-
     def turn(self, direction):
         """
         Set the turn direction in degrees, where 'direction' is [1, 2, 3, 4],
@@ -232,13 +207,13 @@ class BasicMobileSprite(BaseSprite):
             elif delta_x:
                 self.turn(2 if delta_x > 0 else 4)
 
-        block = level.get_block(*dest)
+        block, mob = level.get_sprites(dest)
         if block and block.is_solid:
             #block.push(self, self.world_location)
             # Interact with whatever you're pushing
             ##block.interaction_callback( self)
             # and whatever you're standing on
-            block = level.get_block(*self.world_location)
+            block, _ = level.get_sprites(self.world_location)
             if block and not block.is_portal:
                 block.interaction_callback(self)
             # If the block is a portal, only activate it again if the mob is
@@ -249,7 +224,7 @@ class BasicMobileSprite(BaseSprite):
             return
         # Deal with floor blocks of varying heights
         elif block and block.height and not block.is_solid:
-            current_block = level.get_block(*self.world_location)
+            current_block, _ = level.get_sprites(self.world_location)
             if not current_block:
                 current_block_height = 0
             else:
@@ -264,15 +239,11 @@ class BasicMobileSprite(BaseSprite):
         elif block:
             callback = functools.partial(block.interaction_callback, self)
 
-        mob = level.get_mob(*dest)
         if mob and mob.is_solid:
             mob.push(self, self.world_location)
             return
 
-        level.unset_mob(*self.world_location)
-        level.set_mob(self, *dest)
-
-        self.world_location = dest
+        level.set_sprite(self, dest, translate = False)
         self.smooth_translate(callback = callback)
 
     def translate(self):
@@ -281,7 +252,7 @@ class BasicMobileSprite(BaseSprite):
         for the current sprite object.
         """
         level = blackmango.ui.game_window.view.current_level
-        block = level.get_block(*self.world_location)
+        block, _ = level.get_sprites(self.world_location)
         w_w, w_h = translate_coordinates(*self.world_location[:2],
             height_offset = block.world_height if block else 0)
         self.set_position(w_w, w_h)
@@ -295,7 +266,7 @@ class BasicMobileSprite(BaseSprite):
         """
         cur_x, cur_y = self.x, self.y
         level = blackmango.ui.game_window.view.current_level
-        block = level.get_block(*self.world_location)
+        block, _ = level.get_sprites(self.world_location)
         dest_x, dest_y = translate_coordinates(*self.world_location[:2],
             height_offset = block.world_height if block else 0)
 
@@ -349,8 +320,7 @@ class BasicMobileSprite(BaseSprite):
         # values. If the total opacity hits 1, sight is blocked.
         opacity = 0
         for coord in coords:
-            b = level.get_block(*coord)
-            m = level.get_mob(*coord)
+            b, m = level.get_sprites(coord)
             if b:
                 opacity += b.opacity
             if m:
@@ -383,12 +353,12 @@ class BasicMobileSprite(BaseSprite):
         # Don't try to move onto blocks that are occupied by solids
         if delta_x:
             next_pos = (x + delta_x, y, z)
-            block = level.get_block(*next_pos)
+            block, _ = level.get_sprites(next_pos)
             if block and block.is_solid:
                 delta_x = 0
         if delta_y:
             next_pos = (x, y + delta_y, z)
-            block = level.get_block(*next_pos)
+            block, _ = level.get_sprites(next_pos)
             if block and block.is_solid:
                 delta_y = 0
 

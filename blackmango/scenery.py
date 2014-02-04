@@ -8,8 +8,8 @@ class Background(object):
 
     def __init__(self, image):
         self.image = image
-        image = blackmango.assetloader.load_image(self.image)
-        self.texture = pyglet.image.TileableTexture.create_for_image(image)
+        im = blackmango.assetloader.load_image(self.image)
+        self.texture = pyglet.image.TileableTexture.create_for_image(im)
 
     def draw(self):
         w, h = blackmango.ui.game_window.get_size()

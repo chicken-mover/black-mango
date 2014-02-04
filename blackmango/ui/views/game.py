@@ -58,9 +58,9 @@ class GameView(BaseView):
         if level_data:
             self.logger.debug("Starting new game at level %s" % self.level)
             self.start_level(level_data)
-        elif level.endswith('.blackmango'):
+        elif self.level.endswith('.blackmango'):
             self.logger.debug("Loading game from file %s" % self.level)
-            self.load_level(level)
+            self.load_level(self.level)
         else:
             raise ValueError("Invalid argument passed to GameView.__init__: %s"\
                                 % self.level)
@@ -126,10 +126,8 @@ class GameView(BaseView):
         self.current_level.load()
 
         # Place the player into the level
-        starting_location = self.current_level.starting_location
-        self.current_level.set_mob(self.player, *starting_location)
-        self.player.world_location = starting_location
-        self.player.translate()
+        starting_location = level_data.PLAYER_START
+        self.current_level.set_sprite(self.player, starting_location)
 
         self.mode = MODE_NORMAL
         self.logger.debug("Game started: %s" % repr(self.current_level))

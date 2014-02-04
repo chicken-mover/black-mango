@@ -42,22 +42,6 @@ class Player(blackmango.sprites.BasicMobileSprite):
         mask.on_activate(self)
 
     @isalive
-    def teleport(self, x, y, z):
-        """
-        Overrides the parent class, because if the player changes floors, we
-        want to move the currently viewed level floor, too.
-        """
-        level = blackmango.ui.game_window.view.current_level
-
-        dest = (x, y, z)
-        level.unset_mob(*self.world_location)
-        level.set_mob(self, *dest)
-        self.world_location = dest
-        if level.current_floor != z:
-            level.switch_floor(z)
-        self.translate()
-
-    @isalive
     def kill(self):
         self.dead = True
 
