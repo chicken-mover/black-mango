@@ -18,12 +18,11 @@ def isalive(f):
 
 class Player(blackmango.sprites.BasicMobileSprite):
 
-    def __init__(self, x = 0, y = 0, z = 0):
+    def __init__(self):
 
         color = (0,255,0, 255)
 
-        super(Player, self).__init__(None, x, y, z,
-                color)
+        super(Player, self).__init__(None, color)
 
         self.logger = blackmango.configure.logger
 

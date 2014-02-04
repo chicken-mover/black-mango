@@ -64,9 +64,6 @@ class BaseSprite(pyglet.sprite.Sprite):
         )
 
     def __init__(self, image = None,
-            x = 0,
-            y = 0,
-            z = 0,
             render_group = 'mobs',
             fill_color = (255,255,255, 255),
             width = blackmango.configure.GRID_SIZE,
@@ -87,7 +84,7 @@ class BaseSprite(pyglet.sprite.Sprite):
 
         # From now on this will be updated by the level object when calling
         # set_sprite()
-        self.world_location = (x, y, z)
+        self.world_location = (0,0,0)
 
         if blackmango.configure.DEBUG:
 
@@ -154,16 +151,13 @@ class BaseSprite(pyglet.sprite.Sprite):
 class BasicMobileSprite(BaseSprite):
 
     def __init__(self, image = None,
-            x = 0,
-            y = 0,
-            z = 0,
             color = None,
             direction = 3,
         ):
 
         color = color or (0,0,255,255)
 
-        super(BasicMobileSprite, self).__init__(image, x, y, z,
+        super(BasicMobileSprite, self).__init__(image,
                 'mobs', color)
 
         self.is_solid = True
@@ -292,8 +286,8 @@ class BasicMobileSprite(BaseSprite):
         
         if mob.opacity == 0: return # Invisible mobs
 
-        x, y, z = map(int, self.world_location)
-        px, py, pz = map(int, mob.world_location)
+        x, y, z = self.world_location
+        px, py, pz = mob.world_location
 
         if z != pz: return False
 
@@ -379,10 +373,6 @@ class BasicMobileSprite(BaseSprite):
         """
         Give the next movement delta to apply to move towards <mob>.
         """
-        x, y, z = self.world_location
-        px, py, pz = mob.world_location
-
-        if z != pz:
+        if self.world_location[2] != mob.world_location[2]:
             return # Different room
-
-        return self._path_delta((x, y, z), (px, py, pz))
+        return self._path_delta(self.world_location, mob.world_location)

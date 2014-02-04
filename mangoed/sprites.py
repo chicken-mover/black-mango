@@ -50,9 +50,10 @@ class GridCursor(blackmango.sprites.BaseSprite):
         world_x = (x) / scale 
         world_y = -1 * (y - h) / scale
 
-        self.world_location = (
+        self.world_location = [int(i) for i in (
             math.floor(world_x - 1),
             math.floor(world_y - 1),
             self.world_location[2]
-        )
+        )]
+        self.world_location = tuple(self.world_location)
         self.translate()

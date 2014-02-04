@@ -103,11 +103,11 @@ class EditorView(BaseView):
                 f.write(mangoed.configure.TRIGGER_TEMPLATE)
         print "Wrote level:", self.level_ref
 
-    def switch_floor(self, floor):
+    def switch_room(self, room):
         """
-        Switch the view to another floor/room
+        Switch the view to another room/room
         """
-        self.current_level.switch_floor(floor)
+        self.current_level.switch_room(room)
 
     def quit(self):
         """
@@ -134,7 +134,7 @@ class EditorView(BaseView):
 
     def select_action(self):
         """
-        Depending on the mode, select a material/mob for placement, or switch floor
+        Depending on the mode, select a material/mob for placement, or switch room
         view.
         """
         try:
@@ -159,7 +159,7 @@ class EditorView(BaseView):
                 print "No such mob:", k
                 self.selected_key = None
         elif self.mode == MODE_SELECT:
-            self.switch_floor(k)
+            self.switch_room(k)
 
     def select_existing(self, x, y, z):
         """
@@ -168,17 +168,17 @@ class EditorView(BaseView):
         """
         sel = None
         if self.mode == MODE_SELECT:
-            sel = self.current_level.get_mob(x, y, z)
+            _, sel = self.current_level.get_sprites((x, y, z))
             if sel:
                 self.set_mode(MODE_MOB)
             else:
-                sel = self.current_level.get_block(x, y, z)
+                sel, _ = self.current_level.get_sprites((x, y, z))
                 if self:
                     self.set_mode(MODE_MATERIAL)
         elif self.mode == MODE_MATERIAL:
-            sel = self.current_level.get_block(x, y, z)
+            sel, _ = self.current_level.get_sprites((x, y, z))
         elif self.mode == MODE_MOB:
-            sel = self.current_level.get_mob(x, y, z)
+            _, sel = self.current_level.get_sprites((x, y, z))
         for d in (MATERIALS, MOBS):
             for k, v in d.items():
                 if v and isinstance(sel, v):
@@ -192,12 +192,10 @@ class EditorView(BaseView):
         specified grid square.
         """
         if self.mode == MODE_MATERIAL:
-            b = self.current_level.get_block(x, y, z)
-            self.current_level.unset_block(x, y, z)
+            b, _ = self.current_level.get_sprites((x, y, z))
             b.delete()
         elif self.mode == MODE_MOB:
-            m = self.current_level.get_mob(x, y, z)
-            self.current_level.unset_mob(x, y, z)
+            _, m = self.current_level.get_sprites((x, y, z))
             m.delete()
 
     def edit_obj(self, obj):
@@ -240,9 +238,9 @@ class EditorView(BaseView):
         # Replace it
         obj = cls(*args, **kwargs)
         if self.mode == MODE_MATERIAL:
-            self.current_level.set_material(obj, *coords)
+            self.current_level.set_sprite(obj, coords)
         elif self.mode == MODE_MOB:
-            self.current_level.set_mob(obj, *coords)
+            self.current_level.set_sprite(obj, coords)
 
     def on_draw(self):
         """
@@ -265,14 +263,12 @@ class EditorView(BaseView):
             if self.selected_key and not sel:
                 if self.mode == MODE_MATERIAL:
                     d = MATERIALS
-                    f = self.current_level.set_block
                 elif self.mode == MODE_MOB:
                     d = MOBS
-                    f = self.current_level.set_mob
                 try:
-                    m = d[self.selected_key](x = cx, y = cy, 
-                            z = self.current_level.current_floor)
-                    f(m, cx, cy, self.current_level.current_floor)
+                    m = d[self.selected_key]()
+                    coords = (cx, cy, self.current_level.current_room)
+                    self.current_level.set_sprite(m, coords)
                     print 'Placed %s' % m
                 except:
                     print traceback.format_exc()
@@ -318,7 +314,7 @@ class EditorView(BaseView):
         elif keypress in [key.DELETE, key.BACKSPACE]:
             self.delete_existing(*self.cursor.world_location)
 
-        # Handle material selection sequences or floor switching sequences
+        # Handle material selection sequences or room switching sequences
         elif keypress == key.COLON and self.secondary_mode is None:
             self.secondary_mode = SECONDARY_MODE_START
         elif keypress in [key.ENTER, key.NUM_ENTER] and \
