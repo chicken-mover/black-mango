@@ -6,6 +6,7 @@ it's pretty bare bones.
 import errno
 import os
 import pyglet
+import traceback
 
 from pyglet.window import key
 from pyglet.window import mouse
@@ -268,10 +269,13 @@ class EditorView(BaseView):
                 elif self.mode == MODE_MOB:
                     d = MOBS
                     f = self.current_level.set_mob
-                m = d[self.selected_key](x = cx, y = cy, 
-                        z = self.current_level.current_floor)
-                f(m, cx, cy, self.current_level.current_floor)
-                print 'Placed %s' % m
+                try:
+                    m = d[self.selected_key](x = cx, y = cy, 
+                            z = self.current_level.current_floor)
+                    f(m, cx, cy, self.current_level.current_floor)
+                    print 'Placed %s' % m
+                except:
+                    print traceback.format_exc()
             else:
                 print 'Nothing selected to place'
 

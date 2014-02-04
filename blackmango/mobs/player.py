@@ -29,7 +29,7 @@ class Player(blackmango.sprites.BasicMobileSprite):
 
         self.current_mask = None
         self.dead = False
-
+    
     @isalive
     def activate_mask(self, i):
         if self.current_mask:

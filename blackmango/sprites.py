@@ -17,7 +17,7 @@ sprite_batch = pyglet.graphics.Batch()
 color_cache = {}
 
 TRANSLATION_OFFSET = 0
-STEP_THRESHOLD = 1
+STEP_THRESHOLD = 2
 
 def storecall(f):
     """
@@ -39,7 +39,7 @@ def translate_coordinates(x, y, height_offset = 0):
     scale = blackmango.configure.GRID_SIZE
     dx = (x + TRANSLATION_OFFSET) * scale
     dy = h - (y + 1 + TRANSLATION_OFFSET) * scale
-    return dx + (height_offset * 7), dy
+    return dx, dy + (height_offset * 7)
     
 class BaseSprite(pyglet.sprite.Sprite):
 
@@ -250,7 +250,11 @@ class BasicMobileSprite(BaseSprite):
         # Deal with floor blocks of varying heights
         elif block and block.height and not block.is_solid:
             current_block = level.get_block(*self.world_location)
-            if block.height - current_block.height <= STEP_THRESHOLD:
+            if not current_block:
+                current_block_height = 0
+            else:
+                current_block_height = current_block.world_height
+            if block.world_height - current_block_height <= STEP_THRESHOLD:
                 pass
             else:
                 # TODO:
