@@ -123,6 +123,7 @@ class BasicLevel(object):
                     del d[k]
             # Set the new index and update the sprite's world_location attrib.
             d[coords] = sprite
+            sprite.world_location_prev = sprite.world_location
             sprite.world_location = coords
             # If it's the player, the view moves with the sprite. Otherwise we
             # hide it when it goes off screen.

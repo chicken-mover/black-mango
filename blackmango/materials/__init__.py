@@ -57,8 +57,13 @@ class BasePortalMaterial(BaseMaterial):
         b, m = level.get_sprites(self.destination)
         if b and b.is_solid: return
         if m and m.is_solid: return
-        level.set_sprite(mob, self.destination)
-        
+        walkstart = mob.world_location_prev
+        walkend = self.world_location
+        level.set_sprite(mob, next)
+        # If the sprite was walking when it was teleported, move it forward
+        # again by 1. This is used for off-screen portal behaviour
+        move = mob._path_delta(walkstart, walkend)
+        mob.move(*move)
 
 class VoidMaterial(BaseMaterial):
 

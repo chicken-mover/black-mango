@@ -85,6 +85,7 @@ class BaseSprite(pyglet.sprite.Sprite):
         # From now on this will be updated by the level object when calling
         # set_sprite()
         self.world_location = (0,0,0)
+        self.world_location_prev = None
 
         if blackmango.configure.DEBUG:
 
