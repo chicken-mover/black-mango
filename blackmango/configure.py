@@ -52,14 +52,10 @@ def setup_logger(lvl = DEBUG):
 STARTING_LEVEL = 'test' #'puzzle_demo1'
 
 LEVEL_TEMPLATE = """
-
 from blackmango.levels.%(LEVEL_NAME)s.triggers import LevelTriggers
 
 SIZE = %(SIZE)s
 NAME = %(NAME)s
-
-NEXT_LEVEL = %(NEXT_LEVEL)s
-PREV_LEVEL = %(PREV_LEVEL)s
 
 TRIGGERS = LevelTriggers
 

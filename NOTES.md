@@ -49,5 +49,5 @@ $ find . -type f -name '*.py' -exec $PY27/cython -a -f {} \;
 ## Cleanup from that compile:
 ```bash
 $ sudo find . -type f -name '*.c' -exec rm -v {} \;
-$ sudo find . -type f -name '*.pyc' -exec rm -v {} \;
+$ sudo find . -type f -name '*.py[co]' -exec rm -v {} \;
 ```

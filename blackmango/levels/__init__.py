@@ -21,9 +21,6 @@ class BasicLevel(object):
     level_size = None,
     starting_location = None
 
-    next_level = None
-    previous_level = None
-
     blocks = None
 
     # Blocks and mobs are tracked seperately. I don't know if this is a good
@@ -48,11 +45,10 @@ class BasicLevel(object):
         # Probably being loaded by the level editor. Ignore triggers
         if level_data.TRIGGERS:
             self.triggers = level_data.TRIGGERS()
-        self.next_level = level_data.NEXT_LEVEL
         self.backgrounds = level_data.BACKGROUNDS.copy()
         for k, v in self.backgrounds.items():
             if v:
-                self.backgrounds[k] = blackmango.scenery.Background(v)
+                self.background_images[k] = blackmango.scenery.Background(v)
 
         self.blockdata = level_data.BLOCKS
         self.mobdata = level_data.MOBS
@@ -84,7 +80,7 @@ class BasicLevel(object):
             self.triggers.init_triggers(self, self.player)
 
     def get_background(self):
-        return self.backgrounds.get(self.current_floor)
+        return self.background_images.get(self.current_floor)
 
     def switch_floor(self, new_floor):
         """
@@ -188,8 +184,12 @@ class BasicLevel(object):
             mobs[k] = (idx, v._args, v._kwargs)
 
         saved_level = SavedLevel({
+            "PLAYER_START": self.starting_location,
+            "NAME": self.title_card,
             "BLOCKS": repr(blocks),
             "MOBS": repr(mobs),
+            "BACKGROUNDS": self.backgrounds,
+            "SIZE": self.size,
         })
         return repr(saved_level)
 
@@ -208,8 +208,6 @@ class SavedLevel(object):
         "SIZE": (0,0,0),
         "NAME": '',
         "LEVEL_NAME": '',
-        "NEXT_LEVEL": '',
-        "PREV_LEVEL": '',
         "BACKGROUNDS": {},
         "PLAYER_START": (0,0,0),
         "BLOCKS": {},
@@ -219,7 +217,10 @@ class SavedLevel(object):
     def __repr__(self):
         formatd = self._d.copy()
         for k, v in formatd.items():
-            formatd[k] = pprint.pformat(v).strip('"\'') or repr(type(v)())
+            if v and isinstance(v, BasicLevelTriggers):
+                formatd[k] = 'LevelTriggers'
+            else:
+                formatd[k] = pprint.pformat(v) or repr(type(v)())
         return blackmango.configure.LEVEL_TEMPLATE % formatd
     def __init__(self, dictionary = {}, level_ref = None):
         self.level_ref = level_ref

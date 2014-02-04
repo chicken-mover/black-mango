@@ -1,5 +1,4 @@
 
-
 from blackmango.levels.test.triggers import LevelTriggers
 
 SIZE = (19, 11, 1)
