@@ -113,8 +113,9 @@ class BasicLevel(object):
             d = self.mobs
 
         if coords in d:
-            raise ValueError("Cannot set %s to %s, an object of the same"
-                " tracked class exists there already" % sprite, coords)
+            raise ValueError("Cannot set %s to %s, an object of "
+                "the same tracked class exists there already" % \
+                sprite, coords)
         else:
             # If the sprite exists in another location, clear the index
             for k, v in d.items():

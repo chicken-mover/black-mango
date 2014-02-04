@@ -94,6 +94,21 @@ class BaseSprite(pyglet.sprite.Sprite):
                     batch = sprite_batch,
                     group = ORDERED_GROUPS.get('foreground'))
 
+    def delete(self):
+        """
+        Delete the sprite from the level, and then call the parent method to
+        delete it from video memory
+        """
+        level = blackmango.ui.game_window.view.current_level
+        for d in (level.blocks, level.mobs):
+            for k, v in d.items():
+                if v is self:
+                    del d[k]
+                    return super(BaseSprite, self).delete()
+        else:
+            # If it's not anywhere in the level, simply delete it
+            return super(BaseSprite, self).delete()
+        
     def push(self, pusher, force):
         """
         Receive a push from <pusher>. Called when something is trying to move to
