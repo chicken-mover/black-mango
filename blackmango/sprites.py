@@ -341,7 +341,16 @@ class BasicMobileSprite(BaseSprite):
 
         return True
 
-    def _path_delta(self, c1, c2):
+    def path_to(self, mob):
+        """
+        Give the next movement delta to apply to move towards <mob>.
+        """
+        if self.world_location[2] != mob.world_location[2]:
+            return # Different room
+        return self._path_delta(self.world_location, mob.world_location)
+
+    @staticmethod
+    def _path_delta(c1, c2):
         """
         Return the next delta between three-tuple coordinates <c1> and <c2>
         according to the pathing algo.
@@ -384,11 +393,3 @@ class BasicMobileSprite(BaseSprite):
             return (delta_x, 0)
         else:
             return (0, delta_y)
-
-    def path_to(self, mob):
-        """
-        Give the next movement delta to apply to move towards <mob>.
-        """
-        if self.world_location[2] != mob.world_location[2]:
-            return # Different room
-        return self._path_delta(self.world_location, mob.world_location)
