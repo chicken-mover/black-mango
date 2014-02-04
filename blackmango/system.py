@@ -30,7 +30,7 @@ _DIR_MACOS_SAVEDGAMES = '~/Documents/Black Mango/Saved Games'
 _DIR_POSIX_APPDATA = os.path.join(blackmango.configure.POSIX_DATA_DIR,
                         'appdata/')
 _DIR_POSIX_SAVEDGAMES = os.path.join(blackmango.configure.POSIX_DATA_DIR,
-                        'savedgames/')
+                            'savedgames/')
 
 _posix_expandfunc = os.path.expanduser
 
