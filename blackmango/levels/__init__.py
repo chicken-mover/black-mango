@@ -62,8 +62,8 @@ class BasicLevel(object):
     def load(self):
 
         for data, lookuplist in [
-            (self.init_data.BLOCKS, MATERIALS)
-            (self.init_data.MOBS, MOBS)
+            (self.init_data.BLOCKS, MATERIALS),
+            (self.init_data.MOBS, MOBS),
         ]:
             for coords, blockinfo in data.items():
                 id, args, kwargs = blockinfo
@@ -216,6 +216,7 @@ class SavedLevel(object):
     _d = {
         "NAME": '',
         "LEVEL_NAME": '',
+        "SIZE": (0,0,0),
         "BACKGROUNDS": {},
         "PLAYER_START": (0,0,0),
         "BLOCKS": {},

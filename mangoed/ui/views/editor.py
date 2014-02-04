@@ -315,11 +315,13 @@ class EditorView(BaseView):
             self.delete_existing(*self.cursor.world_location)
 
         # Handle material selection sequences or room switching sequences
-        elif keypress == key.COLON and self.secondary_mode is None:
+        elif keypress in [key.COLON, key.SEMICOLON] and self.secondary_mode is None:
             self.secondary_mode = SECONDARY_MODE_START
+            print "(bufopen)"
         elif keypress in [key.ENTER, key.NUM_ENTER] and \
             self.secondary_mode == SECONDARY_MODE_START:
             self.secondary_mode = None
+            print self.secondary_mode_buffer
             self.select_action()
         elif self.secondary_mode == SECONDARY_MODE_START:
             self.secondary_mode_buffer += key.symbol_string(keypress).strip('_')
