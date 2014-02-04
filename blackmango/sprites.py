@@ -239,9 +239,10 @@ class BasicMobileSprite(BaseSprite):
                 block.interaction_callback(self)
             # If the block is a portal, only activate it again if the mob is
             # trying to move off the level (ie, it's a door or something)
-            if dest[0] < 0 or dest[1] < 0 or dest[0] > level.size[0] or \
-               dest[1] > level.size[1]:
-                block.interaction_callback(self)
+            elif block:
+                if dest[0] < 0 or dest[1] < 0 or dest[0] > level.size[0] or \
+                   dest[1] > level.size[1]:
+                    block.interaction_callback(self)
             return
         # Deal with floor blocks of varying heights
         elif block and block.height and not block.is_solid:
