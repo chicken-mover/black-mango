@@ -4,7 +4,6 @@ Defines the BaseSprite class, from which mobs and materials inherit.
 
 import functools
 import pyglet
-import random
 
 import blackmango.app
 import blackmango.configure
@@ -35,13 +34,18 @@ def translate_coordinates(x, y, height_offset = 0):
     Translate world coordinates and an optional height offset into screen
     coordinates for sprite rendering.
     """
-    w, h = blackmango.ui.game_window.get_size()
+    _, h = blackmango.ui.game_window.get_size()
     scale = blackmango.configure.GRID_SIZE
     dx = (x + TRANSLATION_OFFSET) * scale
     dy = h - (y + 1 + TRANSLATION_OFFSET) * scale
-    return dx, dy + (height_offset * 7)
+    return dx, dy + (height_offset * blackmango.configure.HEIGHT_OFFSET)
     
 class BaseSprite(pyglet.sprite.Sprite):
+    """
+    A subclass of pyglet.sprite.Sprite from which all sprites in the game are
+    derived. This establishes certain properties and interface features which
+    are necessary for interaction with the game environment.
+    """
 
     is_solid = False
     is_mover = False
@@ -165,6 +169,13 @@ class BaseSprite(pyglet.sprite.Sprite):
 
 
 class BasicMobileSprite(BaseSprite):
+    """
+    A basic mobile sprite from which players and non-player mobs are derived.
+    Note that non-player mobs derive from blackmango.mobs.SimpleMob, itself a
+    subclass of this class.
+
+    Defines movement and interaction potential.
+    """
 
     def __init__(self, image = None,
             color = None,

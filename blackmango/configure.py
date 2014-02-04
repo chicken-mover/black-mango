@@ -32,6 +32,8 @@ ORDERED_GROUPS = {
     'foreground': pyglet.graphics.OrderedGroup(3),
 }
 
+HEIGHT_OFFSET = 7 # In pixels
+
 # number of frames when animating movement slides. potentially will be used for
 # sprite animations, too.
 BASE_ANIMATION_FRAMES = 10 # Keep this a common factor of GRID_SIZE or you will
