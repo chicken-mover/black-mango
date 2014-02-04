@@ -37,7 +37,6 @@ HEIGHT_OFFSET = 7 # In pixels
 # number of frames when animating movement slides. potentially will be used for
 # sprite animations, too.
 BASE_ANIMATION_FRAMES = 10 # Keep this a common factor of GRID_SIZE or you will
-                           # get wierd jittery animations when sliding a sprite.
 
 # Loaded by assetloader.load_colordata()
 COLORS = {}

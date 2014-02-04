@@ -8,17 +8,25 @@ cd $DIR
 
 source vars.sh
 
-cd ..
+cd ../build
+echo "Copying source tree..."
+cp -rv ../blackmango ./
+
+echo "Comiling submodules with Cython ..."
+find . -type f -name '*.py' -exec cython -f {} \;
+# TODO: Actual compile step. Probbaly do this part and the immediately preceding
+# command with distutils: http://docs.cython.org/src/reference/compilation.html
+
 
 # This option is not recommended under Windows, according to the PyInstaller
 # docs.
 if [ "$(expr substr $(uname -s) 1 6 2>&1)" == "CYGWIN" ]; then
-    STRIP_SYMBOLS=''
+    PYINSTALLER_STRIP_SYMBOLS=''
 else
-    STRIP_SYMBOLS='--strip'
+    PYINSTALLER_STRIP_SYMBOLS='--strip'
 fi
 
-ALL_OPTIONS=(
+PYINSTALLER_ALL_OPTIONS=(
     --distpath=./dist/
     --workpath=./build/
     --specpath=./spec/
@@ -28,30 +36,31 @@ ALL_OPTIONS=(
     --windowed
 )
 
-DEBUG_OPTIONS=(
+PYINSTALLER_DEBUG_OPTIONS=(
     --debug
 )
 
-NODEBUG_OPTIONS=(
+PYINSTALLER_NODEBUG_OPTIONS=(
     $STRIP_SYMBOLS
 )
 
-RESOURCES=()
+PYINSTALLER_RESOURCES=()
 
 function load-resources() {
     for resource in $(find $RESOURCE_PATH -type f); do
         r="--resource=$resource,DATA,$(basename $resource)"
         echo "Found resource $r"
-        RESOURCES+=($r)
+        PYINSTALLER_RESOURCES+=($r)
     done
 }
 
-SCRIPTPATH="blackmango/__init__.py"
+PYINSTALLER_SCRIPTPATH="blackmango/__init__.py"
 
 function make() {
     load-resources
-    $PYTHON -OO $PYINSTALLER ${ALL_OPTIONS[@]} ${NODEBUG_OPTIONS[@]} \
-         ${RESOURCES[@]} $SCRIPTPATH $@
+    $PYTHON -OO $PYINSTALLER ${PYINSTALLER_ALL_OPTIONS[@]} \
+        ${PYINSTALLER_NODEBUG_OPTIONS[@]} ${PYINSTALLER_RESOURCES[@]} \
+        $PYINSTALLER_SCRIPTPATH $@
 }
 
 function clean() {
@@ -66,8 +75,8 @@ function clean() {
 
 function make-debug() {
     load-resources
-    $PYINSTALLER ${ALL_OPTIONS[@]} ${DEBUG_OPTIONS[@]} $SCRIPTPATH \
-        ${RESOURCES[@]} $@
+    $PYINSTALLER ${PYINSTALLER_ALL_OPTIONS[@]} ${PYINSTALLER_DEBUG_OPTIONS[@]} \
+         $PYINSTALLER_SCRIPTPATH ${PYINSTALLER_RESOURCES[@]} $@
 }
 
 function help() {
