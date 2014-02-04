@@ -365,31 +365,25 @@ class BasicMobileSprite(BaseSprite):
             return (0,0)# Different room
 
         mx, my = px - x, py - y
-
-        delta_x, delta_y = int(mx > 0) or -1*int(mx < 0), \
-                           int(my > 0) or -1*int(my < 0)
+        delta_x = int(mx > 0) or -1*int(mx < 0)
+        delta_y = int(my > 0) or -1*int(my < 0)
 
         # Don't try to move onto blocks that are occupied by solids
         if delta_x:
-            next_pos = (x + delta_x, y, z)
-            block, _ = level.get_sprites(next_pos)
+            block, _ = level.get_sprites((x + delta_x, y, z))
             if block and block.is_solid:
                 delta_x = 0
         if delta_y:
-            next_pos = (x, y + delta_y, z)
-            block, _ = level.get_sprites(next_pos)
+            block, _ = level.get_sprites((x, y + delta_y, z))
             if block and block.is_solid:
                 delta_y = 0
 
         # Don't return diagonal paths
         if delta_x and delta_y:
-            # To keep pathing from being boring, randomly choose between which
-            # axis gets moved along first
-            delta = [delta_x, delta_y]
-            delta[random.choice((0, 1))] = 0
-            delta_x, delta_y = delta
+            # Move along the axis with the greatest delta first
+            if abs(mx) > abs(my):
+                delta_x = 0
+            else:
+                delta_y = 0
 
-        if delta_x:
-            return (delta_x, 0)
-        else:
-            return (0, delta_y)
+        return (delta_x, 0) if delta_x else (0, delta_y)
