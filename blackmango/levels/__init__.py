@@ -82,6 +82,16 @@ class BasicLevel(object):
         """
         return self.background_images.get(self.current_room)
 
+    def get_room_size(self, room = None):
+        """
+        Get the size of the currently active room, or the room specified by
+        <room>.
+        """
+        if room is None:
+            room = self.current_room
+        return self.room_sizes.get(room) or \
+                (blackmango.configure.GX, blackmango.configure.GY)
+
     def switch_room(self, new_z):
         """
         Set which room we're in. This currently iterates every block and mob
@@ -151,10 +161,7 @@ class BasicLevel(object):
             x, y, z = coords
             # Get the size if it is set, or fall back to a size constrained by
             # the screen.
-            size = self.room_sizes.get(self.current_room) or \
-                (blackmango.configure.GX, blackmango.configure.GY)
-            if not size: raise ValueError("Size of room %s is not set" % \
-                self.current_room)
+            size = self.get_room_size(z)
             # If we're retriveing a material that's out of bounds,
             # return an instance of VoidMaterial
             if x < 0 or x > size[0] - 1 or \
