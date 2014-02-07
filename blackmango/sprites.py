@@ -11,11 +11,18 @@ import blackmango.ui
 
 from blackmango.configure import ORDERED_GROUPS
 
+# All sprites go into the same bach (for efficiency), with relative layers
+# determined by ordered groups
 sprite_batch = pyglet.graphics.Batch()
-
+# Cache of generated solid-color image objects. No point in ever generating more
+# than one object for each color.
 color_cache = {}
 
+# This applies globally, and is used by the MangoEd editor to display the rows
+# and columns just outside of the normal level area.
 TRANSLATION_OFFSET = 0
+# How large a height difference can be (inspecting a step's .height property)
+# before you can't move onto it
 STEP_THRESHOLD = 2
 
 def storecall(f):
