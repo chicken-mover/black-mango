@@ -1,6 +1,3 @@
 #!/bin/bash
 
-source scripts/vars.sh
-
-echo "Performing automatic push to origin/$BRANCH (CTL-C to abort)"
-sleep 2 && git push origin $BRANCH && git push --tags
+source scripts/automerge.sh

@@ -10,5 +10,9 @@ chmod u+x scripts/build.sh
 chmod u+x scripts/run-debug.sh
 chmod u+x scripts/install-hooks.sh
 
+# Mostly interested in running this on plain merges, but it will also run when
+# a git-pull is performed (because that's just a fetch and merge)
+source scripts/automerge.sh
+
 echo 'This is what `git clean -fd` would do right now:'
 git clean -fnd
