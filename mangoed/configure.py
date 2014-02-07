@@ -19,7 +19,7 @@ GRID_SIZE -= 5
 blackmango.configure.GRID_SIZE = GRID_SIZE
 # Display the blocks just offscreen in the editor
 SCREEN_SIZE = (GRID_SIZE * 21, GRID_SIZE * 13)
-blackmango.sprites.TRANSLATION_OFFSET = 1
+blackmango.sprites.BASE_TRANSLATION_OFFSET = 1
 blackmango.configure.SCREEN_SIZE = SCREEN_SIZE
 
 MAIN_WINDOW_TITLE = 'MANGOED'

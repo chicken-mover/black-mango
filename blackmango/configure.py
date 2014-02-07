@@ -18,7 +18,8 @@ FULLSCREEN = False
 GRID_SIZE = 50
 
 # Main game window size.
-SCREEN_SIZE = (GRID_SIZE * 19, GRID_SIZE * 11)
+GX, GY = (19, 11)
+SCREEN_SIZE = (GRID_SIZE * GX, GRID_SIZE * GY)
 
 SAVE_GAME_VERSION='BLACKMANGO-001'
 
@@ -53,7 +54,7 @@ def setup_logger(lvl = DEBUG):
 STARTING_LEVEL = 'test' #'puzzle_demo1'
 
 LEVEL_TEMPLATE = """
-from blackmango.levels.%(LEVEL_NAME)s.triggers import LevelTriggers
+from blackmango.levels.%(MODULE_NAME)s.triggers import LevelTriggers
 
 SIZE = %(SIZE)s
 NAME = %(NAME)s
@@ -62,7 +63,7 @@ TRIGGERS = LevelTriggers
 
 # Everything below this line is automatically generated.
 
-BACKGROUNDS = %(BACKGROUNDS)s
+ROOMS = %(ROOMS)s
 PLAYER_START = %(PLAYER_START)s
 BLOCKS = %(BLOCKS)s
 MOBS = %(MOBS)s

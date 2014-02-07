@@ -1,4 +1,7 @@
 
+# Automatic MangoEd files
+*.mangoed-backup
+
 # Swaps and tempfiles
 *.pyc
 *.pyo

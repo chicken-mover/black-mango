@@ -20,10 +20,24 @@ color_cache = {}
 
 # This applies globally, and is used by the MangoEd editor to display the rows
 # and columns just outside of the normal level area.
-TRANSLATION_OFFSET = 0
+BASE_TRANSLATION_OFFSET = 0
+# This value is used to scroll the view as the screen is re-centered by the
+# game view.
+current_translation_offset = (0, 0)
 # How large a height difference can be (inspecting a step's .height property)
 # before you can't move onto it
 STEP_THRESHOLD = 2
+
+def set_translation_offset(x, y):
+    """
+    Offset the screen coordinates that world coordinates are translated into
+    by (x, y) pixels.
+    """
+    global current_translation_offset
+    current_translation_offset = tuple([
+        current_translation_offset[0] + x,
+        current_translation_offset[1] + y,
+    ])
 
 def storecall(f):
     """
@@ -43,8 +57,9 @@ def translate_coordinates(x, y, height_offset = 0):
     """
     _, h = blackmango.ui.game_window.get_size()
     scale = blackmango.configure.GRID_SIZE
-    dx = (x + TRANSLATION_OFFSET) * scale
-    dy = h - (y + 1 + TRANSLATION_OFFSET) * scale
+    dx, dy = current_translation_offset
+    dx += (x + BASE_TRANSLATION_OFFSET) * scale
+    dy += h - (y + 1 + BASE_TRANSLATION_OFFSET) * scale
     return dx, dy + (height_offset * blackmango.configure.HEIGHT_OFFSET)
     
 class BaseSprite(pyglet.sprite.Sprite):

@@ -199,6 +199,14 @@ class GameView(BaseView):
         pass
 
     @loading_halt
+    def center_view_on_player(self):
+        """
+        Re-center the view on the player, if it has moved out into the middle
+        of the room, and the room is larger than the screen view.
+        """
+        
+
+    @loading_halt
     def tick(self):
         """
         Called on every window tick
@@ -222,5 +230,7 @@ class GameView(BaseView):
             self.load_level()
         elif keyboard.check('game_quit'):
             self.quit_to_main_menu()
+
+        self.center_view_on_player()
 
         return

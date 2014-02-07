@@ -34,7 +34,6 @@ class BasicLevel(object):
         self.init_data = level_data
 
         self.current_room = level_data.PLAYER_START[2]
-        self.size = level_data.SIZE
 
         self.scheduled_destroy = False
         
@@ -43,17 +42,18 @@ class BasicLevel(object):
             self.triggers = level_data.TRIGGERS()
 
         self.background_images = {}
-        for k, v in level_data.BACKGROUNDS.items():
-            if v:
+        self.room_sizes = {}
+        for k, v in level_data.ROOMS.items():
+            size, background = v.get('size'), v.get('background')
+            self.room_sizes[k] = size
+            if background:
                 # Make only one Background object per image, to keep things
                 # reasonably efficient.
                 img_values = self.background_images.values()
                 existing = filter(lambda x: x.image == v, img_values)
-                if len(existing):
-                    self.background_images[k] = existing[0]
-                else:
-                    self.background_images[k] = blackmango.scenery.Background(v)
-
+                self.background_images[k] = existing[0] if len(existing) else \
+                                       blackmango.scenery.Background(background)
+            
         self.blocks = {}
         self.mobs = {}
 
@@ -149,11 +149,16 @@ class BasicLevel(object):
         block, mob = self.blocks.get(coords), self.mobs.get(coords)
         if block is None and (self.player):
             x, y, z = coords
+            # Get the size if it is set, or fall back to a size constrained by
+            # the screen.
+            size = self.room_sizes.get(self.current_room) or \
+                (blackmango.configure.GX, blackmango.configure.GY)
+            if not size: raise ValueError("Size of room %s is not set" % \
+                self.current_room)
             # If we're retriveing a material that's out of bounds,
             # return an instance of VoidMaterial
-            if x < 0 or x > self.size[0] - 1 or \
-               y < 0 or y > self.size[1] - 1 or \
-               z < 0 or z > self.size[2] - 1:
+            if x < 0 or x > size[0] - 1 or \
+               y < 0 or y > size[1] - 1:
                 block = MATERIALS[-1]()
 
         return block, mob
@@ -172,11 +177,14 @@ class BasicLevel(object):
 
     def serialize(self):
         """
-        Return a string that represents the curret level state.
-        Saved level data should be identical in format to prepared level data.
+        Return a string of level data, suitable for storage as a module. This is
+        used by MangoEd.
         """
         blocks = {}
         mobs = {}
+
+        max_xs = {}
+        max_ys = {}
         
         for k, v in self.blocks.items():
             for idx, cls in MATERIALS.items():
@@ -184,6 +192,12 @@ class BasicLevel(object):
                     break
             else:
                 continue
+
+            # We'll use these values for rewriting room size attributes
+            x, y, z = k
+            if max_xs.get(z, 0) < x: max_xs[z] = x
+            if max_ys.get(z, 0) < y: max_xs[z] = y
+
             blocks[k] = (idx, v._args, v._kwargs)
         for k, v in self.mobs.items():
             for idx, cls in MOBS.items():
@@ -191,14 +205,36 @@ class BasicLevel(object):
                     break
             else:
                 continue
+
+            # We'll use these values for rewriting room size attributes
+            x, y, z = k
+            if max_xs.get(z, 0) < x: max_xs[z] = x
+            if max_ys.get(z, 0) < y: max_xs[z] = y
+
             mobs[k] = (idx, v._args, v._kwargs)
+
+        rooms = {}
+        # The room size is never smaller than the screen size, but it can be
+        # anything larger.
+        for room in set(max_xs.keys() + max_ys.keys()):
+            x = max_xs.get(room, 0)
+            if blackmango.configure.GX > x:
+                x = blackmango.configure.GX
+            y = max_ys.get(room, 0)
+            if blackmango.configure.GY > y:
+                y = blackmango.configure.GY
+            data = self.init_data.ROOMS
+            rooms[room] = {
+                'size': (x, y),
+                'background': data.get(room, {}).get('background', '')
+            }
 
         saved_level = SavedLevel({
             "NAME": self.init_data.NAME,
-            "BACKGROUNDS": self.init_data.BACKGROUNDS,
             "PLAYER_START": self.init_data.PLAYER_START,
             "BLOCKS": repr(blocks),
             "MOBS": repr(mobs),
+            "ROOMS": self.init_data.ROOMS,
         })
         return repr(saved_level)
 
@@ -215,12 +251,11 @@ class SavedLevel(object):
     """
     _d = {
         "NAME": '',
-        "LEVEL_NAME": '',
-        "SIZE": (0,0,0),
-        "BACKGROUNDS": {},
+        "MODULE_NAME": '',
         "PLAYER_START": (0,0,0),
         "BLOCKS": {},
         "MOBS": {},
+        "ROOMS": {},
         "TRIGGERS": None,
     }
     def __repr__(self):
@@ -228,8 +263,11 @@ class SavedLevel(object):
         for k, v in formatd.items():
             if v and isinstance(v, BasicLevelTriggers):
                 formatd[k] = 'LevelTriggers'
+            elif k == 'MODULE_NAME':
+                format[k] = repr(v).strip("'")
             else:
-                formatd[k] = pprint.pformat(v) or repr(type(v)())
+                formatd[k] = pprint.pformat(v, indent = 4, width = 80) \
+                                                            or repr(type(v)())
         return blackmango.configure.LEVEL_TEMPLATE % formatd
     def __init__(self, dictionary = {}, level_ref = None):
         self.level_ref = level_ref
