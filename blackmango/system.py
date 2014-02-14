@@ -1,7 +1,6 @@
 """
 This module smooths over the differences between OSes and packaged environments
 and provides values for system paths needed by the app.
-
 """
 
 import os

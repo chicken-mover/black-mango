@@ -30,6 +30,7 @@ Black Mango
     blackmango/sprites.rst
     blackmango/system.rst
     blackmango/ui.rst
+    blackmango/ui.views.rst
 
 MangoEd
 -------

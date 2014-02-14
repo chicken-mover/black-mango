@@ -7,16 +7,25 @@ import sys
 
 import blackmango.configure
 
+#: A global reference to the instance of :class:`GameWindow` created during
+#: initialization.
 game_window = None
 
+#: An instance of :class:`pyglet.window.Platform`
 game_platform = pyglet.window.get_platform()
+#: An instance of :class:`pyglet.window.Display` that represents the default
+#: display according to pyglet.
 game_display = game_platform.get_default_display()
+#: An instance of :class:`pyglet.window.Screen` that represents the default
+#: screen according to pyglet.
 game_screen = game_display.get_default_screen()
 
 # There is only one GameWindow object active at any one time.
 def init(*args, **kwargs):
     """
-    Called by the central startup routine during initialization.
+    Called by the central startup routine during initialization. This creates an
+    instance of :class:`GameWindow` in the module's global scope so that it
+    can be accessed by other modules as `blackmango.app.game_window`.
     """
     global game_window
     # Prevent circular imports
@@ -24,10 +33,24 @@ def init(*args, **kwargs):
     game_window = GameWindow(*args, **kwargs)
 
 class GameWindow(pyglet.window.Window):
+    """
+    A subclass of :class:`pyglet.window.Window`. This class has two primary
+    purposes:
 
+    1. To track the current view, as represented by an object from one of the
+       :mod:`blackmango.ui.views` submodules, and
+    2. to delegate inputs and clock ticks from pyglet to the views and (through
+       them) whatever the views are controlling.
+    """
+
+    #: A property storing a reference to the current view.
     view = None
 
     def __init__(self):
+        """
+        Set up the game view based on the current values in
+        :mod:`blackmango.configure`.
+        """
 
         if blackmango.configure.FULLSCREEN:
             super(GameWindow, self).__init__(
@@ -60,8 +83,8 @@ class GameWindow(pyglet.window.Window):
 
     def set_view(self, view):
         """
-        Set the current view to an instance of a view object from the module
-        blackmango.ui.views.
+        Set the current view to an instance of a view object that is a subclass
+        of :class:`blackmango.ui.views.BaseView`.
         """
         if self.view:
             self.logger.debug("Tearing down view %s" %  repr(self.view))
@@ -100,9 +123,7 @@ class GameWindow(pyglet.window.Window):
     def on_key_press(self, key, modifiers):
         """
         Triggered by the application event loop, this method delegates further
-        event calls to the current view. The delegated calls are additionally
-        passed the `keyboard` property of this object, which gives all current
-        key presses.
+        event calls to the current view.
         """
         if self.view and hasattr(self.view, 'on_key_press'):
             self.view.on_key_press(key, modifiers)
@@ -110,9 +131,7 @@ class GameWindow(pyglet.window.Window):
     def tick(self, dt):
         """
         Triggered by the application event loop, this method delegates further
-        event calls to the current view. The delegated calls are additionally
-        passed the `keyboard` property of this object, which gives all current
-        key presses.
+        event calls to the current view.
         """
         if self.view:
             self.view.tick()
