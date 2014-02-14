@@ -23,7 +23,7 @@ class Background(object):
     def __init__(self, image):
         """
         Create a new instance using *image* as the source image file. *image*
-        must reside in the :ref:`Assets directory <asset-dirtree>`
+        must reside in the :ref:`Assets directory <asset-tree>`
         """
         self.image = image
         im = blackmango.assetloader.load_image(self.image)

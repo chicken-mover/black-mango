@@ -1,6 +1,6 @@
 """
 :mod:`app` --- Main application event loop management
-===========================================
+=====================================================
 
 This module provides the :class:`BlackMangoApp` class, which manages the event
 loop.
@@ -27,7 +27,6 @@ class BlackMangoApp(pyglet.app.EventLoop):
     A subclass of :py:class:`pyglet.app.EventLoop`. This manages the running
     loop and is responsible for setting an exit code when the loop quits.
     """
-
 
     #: Has a value of ``None`` until the event loop exits, at which point the
     #: value will match a suitable POSIX exit code (see
