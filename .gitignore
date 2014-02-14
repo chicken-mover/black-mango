@@ -21,9 +21,12 @@ __pycache__
 build/
 dist/
 spec/
+docs/_build/*
+
 # Just in case the build directory is leaking
 *.spec
 *.o
+
 # Cython generates C and shared object files *everywhere*
 *.c
 *.so
