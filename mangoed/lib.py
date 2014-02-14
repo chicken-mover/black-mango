@@ -1,6 +1,6 @@
 """
-:mod:`lib` --- Generic utility functions
-========================================
+:mod:`mangoed.lib` --- Generic utility functions
+================================================
 
 """
 

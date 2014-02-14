@@ -1,10 +1,6 @@
 """
-:mod:`scenery` --- Static scene graphics
-===========================================
-
 This module provides utilities for managing static scene graphics, like
 backgrounds and 'doodads'.
-
 """
 
 import pyglet

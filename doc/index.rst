@@ -16,6 +16,8 @@ Black Mango
     :numbered:
     :maxdepth: 5
 
+    blackmango/__init__.rst
+
     blackmango/app.rst
     blackmango/assetloader.rst
     blackmango/configure.rst

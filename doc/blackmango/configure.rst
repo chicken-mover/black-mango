@@ -1,3 +1,5 @@
+:mod:`blackmango.configure` --- Configuration and universal variables
+=====================================================================
 
 .. automodule:: blackmango.configure
 

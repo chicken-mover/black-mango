@@ -1,3 +1,5 @@
+:mod:`blackmango.assetloader` --- Loading of static assets
+==========================================================
 
 .. automodule:: blackmango.assetloader
 

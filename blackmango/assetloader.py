@@ -1,7 +1,4 @@
 """
-:mod:`assetloader` --- Loading of static assets
-===============================================
-
 This module provides utility functions for loading static assets from the
 project's asset directory tree.
 

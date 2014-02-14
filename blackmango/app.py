@@ -1,7 +1,4 @@
 """
-:mod:`app` --- Main application event loop management
-=====================================================
-
 This module provides the :class:`BlackMangoApp` class, which manages the event
 loop.
 """

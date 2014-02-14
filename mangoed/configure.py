@@ -1,6 +1,6 @@
 """
-:mod:`configure` --- Configuration and universal variables
-==========================================================
+:mod:`mangoed.configure` --- Configuration and universal variables
+==================================================================
 
 This overrides and expands on the values present in :mod:`blackmango.configure`
 for use in MangoEd. Only overriden values are described in the documentation

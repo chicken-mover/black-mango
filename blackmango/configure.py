@@ -1,7 +1,4 @@
 """
-:mod:`configure` --- Configuration and universal variables
-==========================================================
-
 The values in this file are used throughout the app, as well as in MangoEd and
 by tools like the Git commit hooks and the Sphinx conf.py file.
 

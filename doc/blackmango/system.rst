@@ -1,3 +1,5 @@
+:mod:`blackmango.system` --- System-dependent global values
+===========================================================
 
 .. automodule:: blackmango.system
 

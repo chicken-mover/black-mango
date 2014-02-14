@@ -1,3 +1,5 @@
+:mod:`blackmango.scenery` --- Static scene graphics
+===================================================
 
 .. automodule:: blackmango.scenery
 

@@ -1,8 +1,32 @@
 """
-Black Mango is a puzzle game.
+This module performs the app startup sequence and launches the main app event
+loop. It is also responsible for shutting the app down cleanly when the event
+loop finally exits.
 
-(c) 2014 Chicken Mover.
-All rights reserved.
+Initialization order
+--------------------
+
+The following gives a rough outline of the order in which initialization
+occurs:
+
+1. Import :mod:`blackmango.preload` to fix potential import problems.
+2. Load modules and set up command-line arguments.
+3. Parse command line arguments and override values in
+   :mod:`blackmango.configure` as necessary.
+4. Run :function:`blackmango.app.init` and :function:`blackmango.ui.init` to set
+   up the references to the app and UI objects that the whole program needs
+   access to.
+5. Set the starting view to :class:`blackmango.ui.views.main_menu.MainMenuView`.
+6. Schedule :meth:`blackmango.ui.GameWindow.tick` with 
+   :func:`pyglet.clock.schedule` and start the event loop with
+   :meth:`blackmango.app.BlackMangoApp.run`
+
+See also
+--------
+
++ :class:`blackmango.app.BlackMangoApp` - The main app event loop.
++ :mod:`blackmango.ui` - The module which handles the user interface and
+  collects input.
 """
 
 # Perform preload tasks (things which must be executed first)

@@ -1,7 +1,4 @@
 """
-:mod:`preload` --- Do-me-first initialization code
-==================================================
-
 Importing this module adjusts the values of :data:`sys.modules` and
 :data:`sys.path` to compensate for potential import issues in various
 environments.
