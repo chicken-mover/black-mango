@@ -1,5 +1,5 @@
 :mod:`blackmango.app` --- Main application event loop management
-=====================================================
+================================================================
 
 .. automodule:: blackmango.app
 
