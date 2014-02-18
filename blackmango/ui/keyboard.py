@@ -6,6 +6,8 @@ import blackmango.ui
 
 from pyglet.window import key
 
+# A dictionary that maps action names to a list of acceptable key presses for
+# that action.
 bindings = {
 
     # Movement and player control
@@ -35,6 +37,10 @@ bindings = {
 }
 
 def check(binding):
+    """
+    Check *binding* to see if it is being pressed at the moment. The value of
+    *binding* should be one of the keys in :data:`bindings`.
+    """
     possible_keys = bindings.get(binding)
     for keyset in possible_keys:
         try:

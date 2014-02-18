@@ -1,5 +1,12 @@
 """
-Defines the BaseSprite class, from which mobs and materials inherit.
+This module defines two major classes, :class:`BaseSprite`, from which all other
+sprites inherit (including :class:`blackmango.materials.BaseMaterial` and its 
+derivatives), and :class:`BasicMobileSprite`, which is the class that the
+:class:`blackmango.mobs.player.Player` and the main mob class,
+:class:`blackmango.mobs.BaseMob`, both inherit from.
+
+Between them, :class:`BaseSprite` and :class:`BasicMobileSprite` define the
+interface through which sprites interact with the engine.
 """
 
 import functools
@@ -11,21 +18,22 @@ import blackmango.ui
 
 from blackmango.configure import ORDERED_GROUPS
 
-# All sprites go into the same bach (for efficiency), with relative layers
-# determined by ordered groups
+#: All sprites go into the same bach (for efficiency), with relative layers
+#: determined by ordered groups. The ordered groups used are the ones in
+#: :data:`blackmango.configure.ORDERED_GROUPS`.
 sprite_batch = pyglet.graphics.Batch()
-# Cache of generated solid-color image objects. No point in ever generating more
-# than one object for each color.
+#: Cache of generated solid-color image objects. No point in ever generating more
+#: than one object for each color.
 color_cache = {}
 
-# This applies globally, and is used by the MangoEd editor to display the rows
-# and columns just outside of the normal level area.
-BASE_TRANSLATION_OFFSET = 0
-# This value is used to scroll the view as the screen is re-centered by the
-# game view.
+#: This applies globally, and is used by the MangoEd editor to display the rows
+#: and columns just outside of the normal level area.
+TRANSLATION_OFFSET = 0
+#: This value is used to scroll the view as the screen is re-centered by the
+#: game view.
 current_translation_offset = (0, 0)
-# How large a height difference can be (inspecting a step's .height property)
-# before you can't move onto it
+#: How large a height difference can be (inspecting a step's .height property)
+#: before you can't move onto it
 STEP_THRESHOLD = 2
 
 def set_translation_offset(x, y):
@@ -41,8 +49,8 @@ def set_translation_offset(x, y):
 
 def storecall(f):
     """
-    A decorator used to dynamically wrap __init__ functions so that instances
-    of sprites store the arguments used to initialize them.
+    A decorator used to dynamically wrap ``__init__`` functions so that
+    instances of sprites store the arguments used to initialize them.
     """
     def wrapped(self, *args, **kwargs):
         f(self, *args, **kwargs)
@@ -52,8 +60,8 @@ def storecall(f):
 
 def translate_coordinates(x, y, height_offset = 0):
     """
-    Translate world coordinates and an optional height offset into screen
-    coordinates for sprite rendering.
+    Translate world coordinates (*x*, *y*) and an optional *height_offset* into
+    screen coordinates for sprite rendering.
     """
     _, h = blackmango.ui.game_window.get_size()
     scale = blackmango.configure.GRID_SIZE
@@ -64,23 +72,44 @@ def translate_coordinates(x, y, height_offset = 0):
     
 class BaseSprite(pyglet.sprite.Sprite):
     """
-    A subclass of pyglet.sprite.Sprite from which all sprites in the game are
-    derived. This establishes certain properties and interface features which
-    are necessary for interaction with the game environment.
+    A subclass of :class:`pyglet.sprite.Sprite` from which all sprites in the
+    game are derived. This establishes certain properties and interface features
+    which are necessary for interaction with the game environment.
     """
 
+    #: Whether the sprite can be moved over or through.
     is_solid = False
+    #: Whether the sprite has the potential for movement. See also:
+    #: :class:`blackmango.mobs.BaseMob`
     is_mover = False
+    #: Whether the sprite has the potential to teleport other players. See also:
+    #: :class:`blackmango.materials.BasePortalMaterial`.
     is_portal = False
+    #: Whether the sprite blocks sight lines. Can be a value from 0 to 1.
     opacity = 0
 
+    #: Whether the sprite is pushable.
     is_pushable = False
+    #: If a sprite is pushable, how easy it is to move depends on its weight.
     weight = 0
+    #: A dict which stores information about the pushes being made against the
+    #: sprite. Depending on the weight and the pressure applied, a block may
+    #: eventuall move
     pushes = {}
 
+    #: For sprites which have :attr:`is_portal` set to ``True``, this gives the
+    #: world location to which it transports other sprites.
     portal_location = None
 
+    #: An attribute for holding a list of pending animations
+    animations = None
+
     def __repr__(self):
+        """
+        Return a string describing the sprite. Gives information about world and
+        screen coordinates, the name of the sprite's class, and whether its
+        :attr:`visible` attribute is set to ``True``.
+        """
 
         vis = 'visible' if self.visible else 'hidden'
         name = self.__class__.__name__
@@ -89,12 +118,27 @@ class BaseSprite(pyglet.sprite.Sprite):
             vis, name, self.world_location, self.x, self.y
         )
 
+        self.animations = []
+
     def __init__(self, image = None,
             render_group = 'mobs',
             fill_color = (255,255,255, 255),
             width = blackmango.configure.GRID_SIZE,
             height = blackmango.configure.GRID_SIZE,
         ):
+        """
+        Initialize a new sprite.
+
+        + *image* - An image loaded with
+          :func:`blackmango.assetloader.load_image`
+        + *render_group* - Which ordered group to place the sprite in. This
+          should match a key from :data:`blackmango.configure.ORDERED_GROUPS`
+        + *fill_color* - If *image* is not provided, a fill color will be used.
+          This should be a 4-tuple of ``(R, G, B, A)`` values.
+        + *width* and *height* - The size of the sprite. Should almost always be
+          left as the default values, which will match the value of
+          :data:`blackmango.configure.GRID_SIZE`.
+        """
 
         if not image:
             if fill_color not in color_cache:
@@ -138,7 +182,7 @@ class BaseSprite(pyglet.sprite.Sprite):
         
     def push(self, pusher, force):
         """
-        Receive a push from <pusher>. Called when something is trying to move to
+        Receive a push from *pusher*. Called when something is trying to move to
         this object's location, but can't.
         """
         # TODO: 'force' should escalate as long as the pusher hasn't moved and
@@ -147,6 +191,10 @@ class BaseSprite(pyglet.sprite.Sprite):
         pass
 
     def set_position(self, x, y):
+        """
+        Set the screen position of the current sprite to *(x, y)*. Called by
+        :meth:`translate`.
+        """
         if blackmango.configure.DEBUG:
             if hasattr(self, 'direction') and \
                self.visible:
@@ -161,15 +209,23 @@ class BaseSprite(pyglet.sprite.Sprite):
     def translate(self):
         """
         Translate the current game world coordinates into the screen position
-        for the current sprite object.
+        at which to display this sprite.
         """
         w_w, w_h = translate_coordinates(*self.world_location[:2])
         self.set_position(w_w, w_h)
 
     def animate(self, dt, callback = None, t = .025):
         """
-        Iterate the animation queue for the current object and execute
-        everything we find there.
+        Iterate the animation queue for the current object schedule each frame
+        with :func:`pyglet.clock.schedule_once`.
+
+        This method should be scheduled with :func:`pyglet.clock.schedule_once`
+        after setting animations up in the :attr:`animations` queue.
+
+        + *dt* - The number of seconds since the last tick of
+          :mod:`pyglet.clock`.
+        + *callback* - A callable to run when the animation is complete.
+        + *t* - The interval between frames of animation.
         """
 
         for idx, fargs in enumerate(self.animations):
@@ -193,16 +249,26 @@ class BaseSprite(pyglet.sprite.Sprite):
 class BasicMobileSprite(BaseSprite):
     """
     A basic mobile sprite from which players and non-player mobs are derived.
-    Note that non-player mobs derive from blackmango.mobs.SimpleMob, itself a
-    subclass of this class.
+    Note that non-player mobs derive from :class:`blackmango.mobs.SimpleMob`,
+    itself a subclass of this.
 
     Defines movement and interaction potential.
     """
+
+    #: The direction that the sprite is currently facing. See :meth:`turn`.
+    direction = 3
 
     def __init__(self, image = None,
             color = None,
             direction = 3,
         ):
+        """
+        + *image* - An image loaded with
+          :func:`blackmango.assetloader.load_image`
+        + *color* - If *image* is not provided, a fill color will be used.
+          This should be a 4-tuple of ``(R, G, B, A)`` values.
+        + *direction* - The initial direction that the sprite is facing.
+        """
 
         color = color or (0,0,255,255)
 
@@ -220,7 +286,7 @@ class BasicMobileSprite(BaseSprite):
 
     def turn(self, direction):
         """
-        Set the turn direction in degrees, where 'direction' is [1, 2, 3, 4],
+        Set the turn direction, where *direction* is one of 1, 2, 3, or 4,
         with '1' being 'north' and proceeding clockwise.
         """
         # TODO: Reflect turn in sprite image
@@ -228,7 +294,9 @@ class BasicMobileSprite(BaseSprite):
 
     def move(self, delta_x = 0, delta_y = 0, strafe = False):
         """
-        Move the sprite in the game world with an accompanying animation.
+        Move the sprite in the game world with an accompanying animation. If
+        *strafe* is true, the sprite will move without changing the value of
+        :attr:`direction`.
         """
         # TODO: Animate actual image frames
         if self.animations:
@@ -303,10 +371,10 @@ class BasicMobileSprite(BaseSprite):
 
     def smooth_translate(self, callback = None):
         """
-        Like self.translate, but provides gradual movement between two
-        positions.
+        Like :meth:`translate`, but provides gradual movement between two
+        positions with animation.
 
-        The <callback> callable is called after the final animation frame.
+        The *callback* callable is called after the final animation frame.
         """
         cur_x, cur_y = self.x, self.y
         level = blackmango.ui.game_window.view.current_level
@@ -329,7 +397,7 @@ class BasicMobileSprite(BaseSprite):
 
     def can_see(self, mob):
         """
-        Check to see if this mob can see the target <mob>.
+        Check to see if this sprite can see the target sprite *mob*.
         """
         
         level = blackmango.ui.game_window.view.current_level
@@ -377,7 +445,9 @@ class BasicMobileSprite(BaseSprite):
 
     def path_to(self, mob):
         """
-        Give the next movement delta to apply to move towards <mob>.
+        Return a two-tuple representing the next movement delta to apply in
+        order to reach the location of the sprite *mob*. This delta is
+        calculated using :meth:`_path_delta`.
         """
         if self.world_location[2] != mob.world_location[2]:
             return # Different room
@@ -386,8 +456,8 @@ class BasicMobileSprite(BaseSprite):
     @staticmethod
     def _path_delta(c1, c2):
         """
-        Return the next delta between three-tuple coordinates <c1> and <c2>
-        according to the pathing algo.
+        Return the next delta between three-tuple coordinates *c1* and *c2*
+        according to the pathing scheme.
         """
 
         level = blackmango.ui.game_window.view.current_level
