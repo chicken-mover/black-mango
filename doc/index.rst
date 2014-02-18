@@ -1,8 +1,3 @@
-.. Black Mango documentation master file, created by
-   sphinx-quickstart on Fri Feb 14 10:46:19 2014.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Black Mango documentation
 =======================================
 
@@ -15,6 +10,8 @@ Black Mango
 .. toctree::
     :numbered:
     :maxdepth: 5
+
+    Getting started <blackmango/appendicies/getting-started.rst>
 
     blackmango/__init__.rst
 
