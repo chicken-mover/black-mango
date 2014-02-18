@@ -276,6 +276,15 @@ class EditorView(BaseView):
         Performs the requisite draw operations delegated from the EditorWindow
         class
         """
+        # Make sure all sprites update thier screen coordinates.
+        all_sprites = self.current_level.mobs.values() + \
+                      self.current_level.blocks.values()
+        for sprite in all_sprites:
+            # Only update sprites in the current room, because none of the other
+            # ones are visible.
+            if sprite.world_location[2] == self.current_level.current_room:
+                sprite.translate()
+                
         background = self.current_level.get_background()
         if background:
             background.draw()
@@ -317,6 +326,8 @@ class EditorView(BaseView):
         Called by the window on every key press
         """
 
+        scroll = (0,0)
+
         # Mode switching
         if keypress == key.ESCAPE:
             if self.secondary_mode == SECONDARY_MODE_START:
@@ -329,8 +340,22 @@ class EditorView(BaseView):
         elif keypress == key.B:
             self.set_mode(MODE_MATERIAL)
 
+        # Scrolling
+        if keypress == key.UP:
+            scroll = (0, -10)
+        elif keypress == key.DOWN:
+            scroll = (0, 10)
+        elif keypress == key.LEFT:
+            scroll = (-10, 0)
+        elif keypress == key.RIGHT:
+            scroll = (0, 10)
+
+        if modifiers & key.MOD_SHIFT:
+            scroll = tuple([i * 10 for i in scroll])
+        blackmango.sprites.set_translation_offset(*scroll)
+
         # Save and quit
-        elif keypress == key.Q:
+        if keypress == key.Q:
             self.quit()
         elif keypress == key.W:
             self.save_level()
