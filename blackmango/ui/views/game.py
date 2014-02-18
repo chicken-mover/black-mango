@@ -215,15 +215,18 @@ class GameView(BaseView):
             # ones are visible.
             if sprite.world_location[2] == self.current_level.current_room:
                 sprite.translate()
-        # Adjust the background position
 
-
-        # Draw everything.
-
+        # The background is blitted seperately, first. In the future if this
+        # can be worked into one of the existing batches, that would be ideal.
         background = self.current_level.get_background()
         if background:
-            background.draw()
-        
+            # The background position has to be adjusted along with the window
+            # scroll effect. It is only adjusted the minimal amount (the value
+            # of the offset modulo the dimensions of the image) to keep the
+            # movement smooth.
+            background.draw(blackmango.sprites.current_translation_offset)
+
+        # Draw everything else using the batches.
         blackmango.sprites.sprite_batch.draw()
         if self.title_card:
             blackmango.ui.labels.title_batch.draw()

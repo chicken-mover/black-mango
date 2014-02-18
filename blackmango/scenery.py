@@ -25,11 +25,17 @@ class Background(object):
         im = blackmango.assetloader.load_image(self.image)
         self.texture = pyglet.image.TileableTexture.create_for_image(im)
 
-    def draw(self):
+    def draw(self, offset = None):
         """
         Draw the background, blitting the image in a tiled pattern from the top-
         left corner of the screen.
         """
+        if not offset:
+            offset = (0, 0)
+        offset = (
+            offset[0] % self.image.width,
+            offset[1] % self.image.height,
+        )
         w, h = blackmango.ui.game_window.get_size()
-        self.texture.blit_tiled(1, 1, 0, w, h)
+        self.texture.blit_tiled(1 - offset[0], 1 - offset[1], 0, w, h)
 
