@@ -2,11 +2,11 @@
 A simple level object for loading level data and tracking stuff that's
 happening inside the level.
 
-This class also controls what part of the level we're looking at at any given
+This class also controls what room of the level we're looking at at any given
 moment, and keeps references to mobs and blocks for quick collision lookup.
 
-The level's `tick` method is used to iterate and call the `behavior` method on
-each mob in the level.
+The :meth:`BasicLevel.tick` method is used to iterate and call the
+:meth:`SimpleMob.behavior` method on each mob in the level.
 """
 
 import pprint
@@ -109,7 +109,7 @@ class BasicLevel(object):
         self.current_room = new_z
 
 
-    def set_sprite(self, sprite, coords, translate = True):
+    def set_sprite(self, sprite, coords):
         """
         Set the location of a material block or mob for quick collision lookup.
         """
@@ -141,8 +141,6 @@ class BasicLevel(object):
                 self.switch_room(coords[2])
             else:
                 sprite.visible = coords[2] == self.current_room
-            if translate:
-                sprite.translate()
 
     def get_sprites(self, coords):
         """

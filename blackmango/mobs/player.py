@@ -46,11 +46,11 @@ class Player(blackmango.sprites.BasicMobileSprite):
 
     @isalive
     def move(self, *args, **kwargs):
-        super(Player, self).move(*args, **kwargs)
+        return super(Player, self).move(*args, **kwargs)
 
     @isalive
     def turn(self, *args, **kwargs):
-        super(Player, self).turn(*args, **kwargs)
+        return super(Player, self).turn(*args, **kwargs)
 
     @isalive
     def tick(self):

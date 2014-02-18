@@ -69,6 +69,39 @@ def translate_coordinates(x, y, height_offset = 0):
     dx += (x + BASE_TRANSLATION_OFFSET) * scale
     dy += h - (y + 1 + BASE_TRANSLATION_OFFSET) * scale
     return dx, dy + (height_offset * blackmango.configure.HEIGHT_OFFSET)
+
+def untranslate_coordinates(x, y, height_offset = 0):
+    """
+    Given screen corrdinates (*x*, *y*), return world coordinates that they
+    occupy.
+
+    Similar to the `translate()` method, but in reverse. So given the grid
+    below:
+
+    .. code-block:: text
+
+          0,0 1,0 2,0
+            +-+-+
+            |A|B|
+        0,1 +-+-+
+            |C|D|
+        0,2 +-+-+
+                2,2
+
+    An (*x*, *y*) in quadrant D positions the sprite at ``(1, 1)``, anywhere in
+    A at ``(0, 0)``, etc.
+    """
+    _, h = blackmango.ui.game_window.get_size()
+    scale = blackmango.configure.GRID_SIZE
+
+    world_x = (x) / scale
+    world_y = -1 * (y - h) / scale
+
+    world_location = [int(i) for i in (
+        math.floor(world_x - 1),
+        math.floor(world_y - 1),
+    )]
+    return tuple(world_location)
     
 class BaseSprite(pyglet.sprite.Sprite):
     """
@@ -355,7 +388,7 @@ class BasicMobileSprite(BaseSprite):
             mob.push(self, self.world_location)
             return
 
-        level.set_sprite(self, dest, translate = False)
+        level.set_sprite(self, dest)
         self.smooth_translate(callback = callback)
 
     def translate(self):
@@ -367,7 +400,20 @@ class BasicMobileSprite(BaseSprite):
         block, _ = level.get_sprites(self.world_location)
         w_w, w_h = translate_coordinates(*self.world_location[:2],
             height_offset = block.world_height if block else 0)
-        self.set_position(w_w, w_h)
+        if w_w < 1 or \
+           w_h < 1 or \
+           w_w + self.width > screen_w or \
+           w_h + self.height > screen_h:
+            # Go ahead and make sure the batch draw skips anything offscreen.
+            # The GameView should be calling this on every draw, so it will get
+            # changed again as soon as this sprite is on screen.
+            self.visible = False
+        else:
+            # Out-of-room sprites shouldn't even have this method called, so
+            # it is safe to manualy set the visible flag back to True here.
+            self.visible = True
+            self.set_position(w_w, w_h)
+        return w_w, w_h
 
     def smooth_translate(self, callback = None):
         """

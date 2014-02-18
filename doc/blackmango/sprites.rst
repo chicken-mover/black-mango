@@ -8,6 +8,7 @@ Functions
 
 .. autofunction:: storecall
 .. autofunction:: translate_coordinates
+.. autofunction:: untranslate_coordinates
 
 Classes
 -------

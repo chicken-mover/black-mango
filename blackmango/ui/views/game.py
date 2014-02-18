@@ -168,7 +168,58 @@ class GameView(BaseView):
         """
         Called on every window draw (unless the window isn't drawing views for
         some reason, like during loading of new games).
+
+        This method handles repositioning the screen and making sure that all
+        sprites which are going to get drawn update themselves.
         """
+
+        # Get the player location, screen size, and the size of the current
+        # room, which are all required for the calculations we are about to
+        # make.
+        player_location = self.current_player.world_location[:2]
+        screen_width, screen_height = blackmango.configure.SCREEN_SIZE
+        room_size = self.current_level.get_room_size()
+
+        # Get the offset that needs to be made to center the player over the
+        # center of the screen
+        new_screen_center = blackmango.sprites.translate_coordinates(*player_location)
+        new_center_delta = (
+            new_screen_center[0] - (screen_width//2),
+            new_screen_center[1] - (screen_height[1]//2),
+        )
+        # Using the new offset, make sure that the corners of the screen aren't
+        # outside of the playable area. If they are, we are going to adjust
+        # them back inside the proper bounds
+        delta_x_fix = 0
+        delta_y_fix = 0
+        blackmango.sprites.set_translation_offset(*new_center_delta)
+        result = blackmango.sprites.untranslate_coordinates(1,1)
+        # Quick and dirty bounds checking
+        if result[0] < 0 or result[0] > room_size[0]:
+            delta_x_fix += -1 * result[0]
+        if result[1] < 0 or result[1] > room_size[1]:
+            delta_y_fix += -1 * result[1]
+        # Set the translation offset again, adjusting for any of the fixes
+        # above (this function adds each call together, rather than resetting
+        # values to absolutes).
+        blackmango.sprites.set_translation_offset(
+            delta_x_fix * blackmango.configure.GRID_SIZE,
+            delta_y_fix * blackmango.configure.GRID_SIZE,
+        )
+
+        # Make sure all sprites update thier screen coordinates.
+        all_sprites = self.current_level.mobs.values() + \
+                      self.current_level.blocks.values()
+        for sprite in all_sprites:
+            # Only update sprites in the current room, because none of the other
+            # ones are visible.
+            if sprite.world_location[2] == self.current_level.current_room:
+                sprite.translate()
+        # Adjust the background position
+
+
+        # Draw everything.
+
         background = self.current_level.get_background()
         if background:
             background.draw()

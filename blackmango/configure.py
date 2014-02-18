@@ -35,8 +35,8 @@ SCREEN_SIZE = (GRID_SIZE * GX, GRID_SIZE * GY)
 #: relevance, because we are likely to move to stateless saved games.
 SAVE_GAME_VERSION='BLACKMANGO-001'
 
-#: Default POSIX data dir (except Mac OS). Can be modified with the --data-dir
-#: flag.
+#: Default POSIX data dir (except Mac OS). Can be modified with the 
+#: ``--data-dir`` flag.
 POSIX_DATA_DIR = '~/.blackmango'
 
 #: Batch rendering groups used by :py:class:`pyglet.sprite.Sprite` subclasses.
