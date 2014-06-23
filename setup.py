@@ -34,10 +34,17 @@ if __name__ == "__main__":
         test_suite = 'nose.collector',
     )
 
-    if len(sys.argv) > 1 and sys.argv[1] == 'develop':
+    try:
+        if len(sys.argv) > 1 and sys.argv[1] == 'develop' and os.uname():
 
-        print "\nInstalling git hooks"
-        stat, output = commands.getstatusoutput('bash scripts/install-hooks.sh')
-        print output
-        if stat != 0:
-            print >>sys.stderr, "Git hook installation failed!"
+            print "\nInstalling git hooks"
+            stat, output = commands.getstatusoutput('bash scripts/install-hooks.sh')
+            print output
+            if stat != 0:
+                print >>sys.stderr, "Git hook installation failed!"
+    except AttributeError:
+        # Non-Cygwin Windows environment
+        print >>sys.stderr, """
+WARNING: Can't auto-install git hooks, because this is a non-Cygwin Windows
+         environment.
+"""
