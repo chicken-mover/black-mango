@@ -1,5 +1,6 @@
 
 import commands
+import os
 import setuptools
 import sys
 
@@ -35,6 +36,7 @@ if __name__ == "__main__":
     )
 
     try:
+        
         if len(sys.argv) > 1 and sys.argv[1] == 'develop' and os.uname():
 
             print "\nInstalling git hooks"
@@ -42,6 +44,7 @@ if __name__ == "__main__":
             print output
             if stat != 0:
                 print >>sys.stderr, "Git hook installation failed!"
+
     except AttributeError:
         # Non-Cygwin Windows environment
         print >>sys.stderr, """
