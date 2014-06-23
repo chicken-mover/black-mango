@@ -8,19 +8,19 @@ import sys
 import blackmango.configure
 
 #: A global reference to the instance of :class:`GameWindow` created during
-#: initialization.
+#: initialization. There is only one GameWindow object active at any one time.
 game_window = None
 
-#: An instance of :class:`pyglet.window.Platform`
+#: An instance of :class:`pyglet.window.Platform` for the current platform.
+#: This is initailized at import.
 game_platform = pyglet.window.get_platform()
 #: An instance of :class:`pyglet.window.Display` that represents the default
-#: display according to pyglet.
+#: display according to pyglet. This is initailized at import.
 game_display = game_platform.get_default_display()
 #: An instance of :class:`pyglet.window.Screen` that represents the default
-#: screen according to pyglet.
+#: screen according to pyglet. This is initailized at import.
 game_screen = game_display.get_default_screen()
 
-# There is only one GameWindow object active at any one time.
 def init(*args, **kwargs):
     """
     Called by the central startup routine during initialization. This creates an
