@@ -2,19 +2,23 @@
 A really fuckin' basic level editor for Black Mango
 """
 
+# Perform preload tasks (things which must be executed first)
+import blackmango.preload
+
 import argparse
+import pyglet
 import sys
 
-ARGUMENTS = (
-    ('filepath', {
-        'help': 'Filepath to load on startup and write to on completion.'
-                ' Without a file specified, the program will just dump the '
-                'final output to stdout when it exits.'
-    }),)
+import blackmango.assetloader
+import mangoed.app
+import mangoed.configure
+import mangoed.ui
 
-def main(data):
-    print data
-    return 1, ''
+ARGUMENTS = (
+    ('level', {
+        'help': 'The name of the level to edit. If the level does not exist on'
+                ' startup it will be created on save.',
+    }),)
 
 if __name__ == "__main__":
 
@@ -25,9 +29,22 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    with open(args.filepath, 'w+') as f:
-        exitcode, data = main(f.read())
-        if not exitcode:
-            f.seek(0).write(data)
-        else:
-            sys.exit(exitcode)
+    mangoed.configure.setup_logger(mangoed.configure.DEBUG)
+    logger = mangoed.configure.logger
+
+    mangoed.ui.init()
+    mangoed.app.init()
+
+    blackmango.assetloader.load_fonts()
+    mangoed.configure.COLORS = blackmango.assetloader.load_colordata()
+
+    from mangoed.ui.views.editor import EditorView
+    mangoed.ui.editor_window.set_view(EditorView(level = args.level))
+    mangoed.ui.editor_window.view.load()
+
+    pyglet.clock.schedule(mangoed.ui.editor_window.tick)
+
+    mangoed.app.app.run()
+
+    sys.exit(mangoed.app.app.returncode)
+

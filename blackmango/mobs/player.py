@@ -18,44 +18,27 @@ def isalive(f):
 
 class Player(blackmango.sprites.BasicMobileSprite):
 
-    def __init__(self, x = 0, y = 0, z = 0):
+    def __init__(self):
 
         color = (0,255,0, 255)
 
-        super(Player, self).__init__(None, x, y, z,
-                color)
+        super(Player, self).__init__(None, color)
 
         self.logger = blackmango.configure.logger
 
         self.current_mask = None
         self.dead = False
-
+    
     @isalive
     def activate_mask(self, i):
         if self.current_mask:
             self.logger.debug('Deactivate mask: %s' % self.current_mask)
-            self.current_mask.on_deactivate()
+            self.current_mask.on_deactivate(self)
         self.logger.debug('Activate mask: %s' % i)
         mask = MASKS[i]
         # TODO: Animate mask change
         self.current_mask = mask
         mask.on_activate(self)
-
-    @isalive
-    def teleport(self, x, y, z):
-        """
-        Overrides the parent class, because if the player changes floors, we
-        want to move the currently viewed level floor, too.
-        """
-        level = blackmango.ui.game_window.view.current_level
-
-        dest = (x, y, z)
-        level.unset_mob(*self.world_location)
-        level.set_mob(self, *dest)
-        self.world_location = dest
-        if level.current_floor != z:
-            level.switch_floor(z)
-        self.translate()
 
     @isalive
     def kill(self):

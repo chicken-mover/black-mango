@@ -10,25 +10,21 @@ base materials should be divided out into logically appropriate submodules.
 """
 
 import blackmango.configure
+import blackmango.ui
 import blackmango.sprites
 
 class BaseMaterial(blackmango.sprites.BaseSprite):
-    
-    def __init__(self, image = None,
-            x = 0,
-            y = 0,
-            z = 0,
-            color = None,
-        ):
+
+    def __init__(self, image = None, color = None):
 
         color = color or (255,255,255,255)
 
-        super(BaseMaterial, self).__init__(image, x, y, z,
-                'background', color)
+        super(BaseMaterial, self).__init__(image, 'background', color)
 
         self.is_solid = True
         self.is_mover = False
         self.is_portal = False
+        self.world_height = 0 # Displaces mobs standing on top of it
         self.opacity = 0
 
     def interaction_callback(self, mob):
@@ -36,16 +32,10 @@ class BaseMaterial(blackmango.sprites.BaseSprite):
 
 class BasePortalMaterial(BaseMaterial):
 
-    def __init__(self, image = None,
-            x = 0,
-            y = 0,
-            z = 0,
-            color = None,
-            destination = None, 
-        ):
+    def __init__(self, image = None, color = None, destination = None):
 
         color = color or (255,0,0,255)
-        super(BasePortalMaterial, self).__init__(image, x, y, z, color)
+        super(BasePortalMaterial, self).__init__(image, color)
 
         self.is_solid = False
         self.is_portal = True
@@ -62,8 +52,18 @@ class BasePortalMaterial(BaseMaterial):
         like walking up to an object, or more complex ones that do things like
         interact with the level itself
         """
-        mob.teleport(*self.destination)
-        
+        level = blackmango.ui.game_window.view.current_level
+        # Teleport the mob
+        b, m = level.get_sprites(self.destination)
+        if b and b.is_solid: return
+        if m and m.is_solid: return
+        walkstart = mob.world_location_prev
+        walkend = self.world_location
+        level.set_sprite(mob, next)
+        # If the sprite was walking when it was teleported, move it forward
+        # again by 1. This is used for off-screen portal behaviour
+        move = mob._path_delta(walkstart, walkend)
+        mob.move(*move)
 
 class VoidMaterial(BaseMaterial):
 
@@ -71,7 +71,7 @@ class VoidMaterial(BaseMaterial):
 
         color = (0,0,0,0)
 
-        super(VoidMaterial, self).__init__(color = color)
+        super(VoidMaterial, self).__init__(None, color = color)
 
         self.is_solid = True
         self.is_mover = False

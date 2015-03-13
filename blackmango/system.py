@@ -1,3 +1,7 @@
+"""
+This module smooths over the differences between OSes and packaged environments
+and provides values for system paths needed by the app.
+"""
 
 import os
 import sys
@@ -11,11 +15,21 @@ import blackmango.configure
 
 # '_MEIPASS2' is the PyInstaller temp directory when using --onefile. It is
 # nuked on shutdown, so don't rely on it having data from a previous run.
+#
+#: The path to the root directory from which the main Black Mango app is
+#: running. In finalized builds, this may not be a real or permanent directory.
 DIR_ENV = os.environ.get('_MEIPASS2') or \
         os.path.dirname(os.path.dirname(blackmango.__file__))
+#: The root path to the :ref:`asset tree <asset-tree>`.
 DIR_ASSETS = os.path.join(DIR_ENV, 'assets')
 
+#: The app data directory for the current OS. The value of this is dependent on
+#: the proper procedure for storing app data on the current system, and is set
+#: dynamically on startup.
 DIR_APPDATA = None
+#: The saved games directory for the current OS. The value of this is dependent
+#: on the proper procedure for storing app data on the current system, and is
+#: set dynamically on startup.
 DIR_SAVEDGAMES = None
 
 # Python should deal with pathsep issues correctly. (test this)
@@ -30,7 +44,7 @@ _DIR_MACOS_SAVEDGAMES = '~/Documents/Black Mango/Saved Games'
 _DIR_POSIX_APPDATA = os.path.join(blackmango.configure.POSIX_DATA_DIR,
                         'appdata/')
 _DIR_POSIX_SAVEDGAMES = os.path.join(blackmango.configure.POSIX_DATA_DIR,
-                        'savedgames/')
+                            'savedgames/')
 
 _posix_expandfunc = os.path.expanduser
 

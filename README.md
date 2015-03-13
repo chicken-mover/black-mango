@@ -8,8 +8,10 @@ Git commit messages should follow
 
 ## Requirements
 
-* `pyglet` and `xmltodict` are `install_requires` entries (ie, you do not need
-  to install those dependencies manually).
+* Python Image Library, `pyglet` and `xmltodict` are `install_requires` entries
+  (ie, you do not need to install those dependencies manually). You *can* use
+  Pillow instead of PIL if you like (this is the default package provided by
+  `sudo pacman -S python2-imaging` on Arch).
 * ~~`mock` and `nose` for testing~~ (unit tests are on hold)
 * `setuptools` must be manually installed before you begin.
 * In all commands, `python` refers to a Python 2.7 interpreter. If you do not
