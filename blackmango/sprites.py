@@ -10,6 +10,7 @@ interface through which sprites interact with the engine.
 """
 
 import functools
+import math
 import pyglet
 
 import blackmango.app
@@ -63,6 +64,7 @@ def translate_coordinates(x, y, height_offset = 0):
     Translate world coordinates (*x*, *y*) and an optional *height_offset* into
     screen coordinates for sprite rendering.
     """
+    BASE_TRANSLATION_OFFSET = 0 # FIXME: What is this meant to represent?
     _, h = blackmango.ui.game_window.get_size()
     scale = blackmango.configure.GRID_SIZE
     dx, dy = current_translation_offset

@@ -57,10 +57,8 @@ class BasicLevel(object):
             self.triggers = level_data.TRIGGERS()
 
         self.background_images = {}
-        self.room_sizes = {}
         for k, v in level_data.ROOMS.items():
-            size, background = v.get('size'), v.get('background')
-            self.room_sizes[k] = size
+            background = v.get('background')
             if background:
                 # Make only one Background object per image, to keep things
                 # reasonably efficient.
@@ -96,16 +94,6 @@ class BasicLevel(object):
         Get the background object for the current room
         """
         return self.background_images.get(self.current_room)
-
-    def get_room_size(self, room = None):
-        """
-        Get the size of the currently active room, or the room specified by
-        <room>.
-        """
-        if room is None:
-            room = self.current_room
-        return self.room_sizes.get(room) or \
-                (blackmango.configure.GX, blackmango.configure.GY)
 
     def switch_room(self, new_z):
         """
@@ -170,17 +158,6 @@ class BasicLevel(object):
                     "three coordinates")
 
         block, mob = self.blocks.get(coords), self.mobs.get(coords)
-        if block is None and (self.player):
-            x, y, z = coords
-            # Get the size if it is set, or fall back to a size constrained by
-            # the screen.
-            size = self.get_room_size(z)
-            # If we're retriveing a material that's out of bounds,
-            # return an instance of VoidMaterial
-            if x < 0 or x > size[0] - 1 or \
-               y < 0 or y > size[1] - 1:
-                block = MATERIALS[-1]()
-
         return block, mob
 
     def tick(self):
@@ -213,7 +190,7 @@ class BasicLevel(object):
             else:
                 continue
 
-            # We'll use these values for rewriting room size attributes
+            # We'll use these values for rewriting room attributes
             x, y, z = k
             if max_xs.get(z, 0) < x: max_xs[z] = x
             if max_ys.get(z, 0) < y: max_xs[z] = y
@@ -226,7 +203,7 @@ class BasicLevel(object):
             else:
                 continue
 
-            # We'll use these values for rewriting room size attributes
+            # We'll use these values for rewriting room attributes
             x, y, z = k
             if max_xs.get(z, 0) < x: max_xs[z] = x
             if max_ys.get(z, 0) < y: max_xs[z] = y
@@ -237,15 +214,8 @@ class BasicLevel(object):
         # The room size is never smaller than the screen size, but it can be
         # anything larger.
         for room in set(max_xs.keys() + max_ys.keys()):
-            x = max_xs.get(room, 0)
-            if blackmango.configure.GX > x:
-                x = blackmango.configure.GX
-            y = max_ys.get(room, 0)
-            if blackmango.configure.GY > y:
-                y = blackmango.configure.GY
             data = self.init_data.ROOMS
             rooms[room] = {
-                'size': (x, y),
                 'background': data.get(room, {}).get('background', '')
             }
 
