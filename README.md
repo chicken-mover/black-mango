@@ -6,38 +6,27 @@ Please make sure to add docstrings to everything and adhere to the
 Git commit messages should follow 
 [the standard format](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
 
-## Requirements
+## Setup
 
-* Python Image Library, `pyglet` and `xmltodict` are `install_requires` entries
-  (ie, you do not need to install those dependencies manually). You *can* use
-  Pillow instead of PIL if you like (this is the default package provided by
-  `sudo pacman -S python2-imaging` on Arch).
-* ~~`mock` and `nose` for testing~~ (unit tests are on hold)
-* `setuptools` must be manually installed before you begin.
-* In all commands, `python` refers to a Python 2.7 interpreter. If you do not
-  have Python 2.7 installed, you can download a prepackaged installer from the
-  [Python website](http://www.python.org/getit/) (on Windows or OS X) or, under
-  Linux, install it on your favorite package manager (Arch:
-  `sudo pacman -S python2`; Debian: `sudo apt-get install python`)
+### Set up Black Mango
 
-### Build requirements
+To set up everything in a virtualenv, do:
 
-**NB.:** You do not need to build binaries to test the functionality of the
-game. Binaries should only be build when you need to actually test whether the
-game builds correctly on a given system. Skip to "Setup instructions for
-development" for infomation on normal testing.
+```bash
+$ mkvirtualenv black-mango
+$ git clone https://github.com/chicken-mover/black-mango
+$ cd black-mango
+$ pip install -r requirements.txt
+$ python setup.py develop
+```
 
-* For building binary executables, you will need
-  [PyInstaller](http://www.pyinstaller.org/):
+### Install PyInstaller (for creating distributable one-file packages)
 
 ```bash
 $ git clone git://github.com/pyinstaller/pyinstaller.git
 $ cd pyinstaller
 $ sudo python setup.py install
 ```
-
-* You will also need access to a Bash interpreter. On Windows, Cygwin should
-  suffice.
 
 ## Setup instructions for development
 

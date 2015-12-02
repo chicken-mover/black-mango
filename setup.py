@@ -23,15 +23,6 @@ if __name__ == "__main__":
             'mangoed',
         ],
         packages = setuptools.find_packages(exclude = ['blackmango_tests']),
-        install_requires = [
-            'pyglet>=1.1.4',
-            'xmltodict>=0.8.3',
-            'PIL>=1.1.7',
-        ],
-#        tests_require = [
-#            'mock>=1.0.1',
-#            'nose>=1.3.0',
-#        ],
         test_suite = 'nose.collector',
     )
 
