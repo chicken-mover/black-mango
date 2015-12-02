@@ -55,11 +55,11 @@ class EditorView(BaseView):
         self.background = None
 
         level = mangoed.lib.name_cleanup(level)
-        self.level_ref = level
+        self.level_ref = level.strip()
 
     def load(self):
-        level_data = LEVELS.get(self.level_ref)
-        
+        level_data = blackmango.levels.load(self.level_ref)
+
         self.batch = pyglet.graphics.Batch()
         self.cursor = mangoed.sprites.GridCursor()
         self.cursorinfo = CursorInfo(repr(self.cursor.world_location),
@@ -76,14 +76,15 @@ class EditorView(BaseView):
         """
         Create a new empty level
         """
-        level = blackmango.levels.SavedLevel()
+        level = blackmango.levels.SavedLevel({
+            "NAME": self.level_ref,
+        })
         self.load_level(level)
 
     def load_level(self, leveldata):
         """
         Load an existing level from the main Black Mango source tree.
         """
-        leveldata.MODULE_NAME = self.level_ref
         self.current_level = blackmango.levels.BasicLevel(leveldata)
         self.current_level.load()
 
@@ -101,6 +102,7 @@ class EditorView(BaseView):
                 raise
         with open(os.path.join(this_level_dir, '__init__.py'), 'w') as f:
             f.write(serialized_data)
+        print this_level_dir, serialized_data
         triggers = os.path.join(this_level_dir, 'triggers.py')
         if not os.path.exists(triggers):
             with open(triggers, 'w') as f:
@@ -120,17 +122,16 @@ class EditorView(BaseView):
 """ % datetime.datetime.now()
         LEVELS = {}
         for level in all_levels:
-            modspec = 'blackmango.levels.%s\n' % level.strip('./')
-            imports += 'import '+modspec
+            modspec = 'blackmango.levels.%s' % level.strip('./')
             LEVELS[level] = modspec
         level_list_file = os.path.join(levels_dir, 'levellist.py')
+        backup_list_file = level_list_file + ".mangoed-backup." + str(time.time())
         if os.path.exists(level_list_file):
-            shutil.move(level_list_file, '%s.%s.mangoed-backup' % \
-                                                (level_list_file, time.time()))
+            shutil.move(level_list_file, backup_list_file)
         with open(level_list_file, 'w') as f:
             f.write(imports + '\nLEVELS = ')
-            f.write(pprint.pformat(LEVELS, indent = 4, width = 80))
-        print "Rewrote level list. Backup stored as:", backup_file
+            f.write(pprint.pformat(LEVELS))
+        print "Rewrote level list. Backup stored as:", backup_list_file
 
     def switch_room(self, room):
         """
@@ -331,7 +332,7 @@ class EditorView(BaseView):
         # Mode switching
         if keypress == key.ESCAPE:
             if self.secondary_mode == SECONDARY_MODE_START:
-                self.clear_selections
+                self.clear_selections()
                 self.secondary_mode = None
             else:
                 self.set_mode(MODE_SELECT)
@@ -346,9 +347,9 @@ class EditorView(BaseView):
         elif keypress == key.DOWN:
             scroll = (0, 10)
         elif keypress == key.LEFT:
-            scroll = (-10, 0)
+            scroll = (10, 0)
         elif keypress == key.RIGHT:
-            scroll = (0, 10)
+            scroll = (-10, 0)
 
         if modifiers & key.MOD_SHIFT:
             scroll = tuple([i * 10 for i in scroll])

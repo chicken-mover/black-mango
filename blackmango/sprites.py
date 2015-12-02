@@ -402,8 +402,8 @@ class BasicMobileSprite(BaseSprite):
             height_offset = block.world_height if block else 0)
         if w_w < 1 or \
            w_h < 1 or \
-           w_w + self.width > screen_w or \
-           w_h + self.height > screen_h:
+           w_w + self.width > blackmango.ui.game_screen.width or \
+           w_h + self.height > blackmango.ui.game_screen.height:
             # Go ahead and make sure the batch draw skips anything offscreen.
             # The GameView should be calling this on every draw, so it will get
             # changed again as soon as this sprite is on screen.
@@ -484,7 +484,6 @@ class BasicMobileSprite(BaseSprite):
             if m:
                 opacity += m.opacity
             if opacity >= 1:
-                print opacity
                 return False
 
         return True

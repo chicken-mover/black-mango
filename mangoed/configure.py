@@ -33,7 +33,7 @@ blackmango.configure.SCREEN_SIZE = SCREEN_SIZE
 MAIN_WINDOW_TITLE = 'MANGOED'
 
 #: The default DEBUG value in MangoEd is higher than in Black Mango.
-DEBUG = logging.ERROR
+DEBUG = logging.DEBUG # logging.ERROR
 
 #: 
 logger = None

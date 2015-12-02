@@ -10,13 +10,28 @@ The :meth:`BasicLevel.tick` method is used to iterate and call the
 """
 
 import pprint
+import sys
 
 import blackmango.materials
 import blackmango.scenery
 import blackmango.sprites
+import blackmango.levels.levellist
 
 from blackmango.materials.materiallist import MATERIALS
 from blackmango.mobs.moblist import MOBS
+
+
+
+def load(ref):
+    """
+    Load a level by name. *ref* must be a key in the LEVELS dict in
+    :py:module:`blackmango.levels.levellist`
+    """
+    impref = blackmango.levels.levellist.LEVELS.get(ref)
+    if impref:
+        __import__(impref)
+        return sys.modules[impref]
+
 
 class BasicLevel(object):
 
@@ -237,8 +252,8 @@ class BasicLevel(object):
         saved_level = SavedLevel({
             "NAME": self.init_data.NAME,
             "PLAYER_START": self.init_data.PLAYER_START,
-            "BLOCKS": repr(blocks),
-            "MOBS": repr(mobs),
+            "BLOCKS": blocks,
+            "MOBS": mobs,
             "ROOMS": self.init_data.ROOMS,
         })
         return repr(saved_level)
@@ -269,13 +284,13 @@ class SavedLevel(object):
             if v and isinstance(v, BasicLevelTriggers):
                 formatd[k] = 'LevelTriggers'
             elif k == 'MODULE_NAME':
-                format[k] = repr(v).strip("'")
+                formatd[k] = repr(self._d.get("NAME")).strip("'")
             else:
-                formatd[k] = pprint.pformat(v, indent = 4, width = 80) \
-                                                            or repr(type(v)())
+                formatd[k] = pprint.pformat(v) or repr(type(v)())
+
         return blackmango.configure.LEVEL_TEMPLATE % formatd
-    def __init__(self, dictionary = {}, level_ref = None):
-        self.level_ref = level_ref
+
+    def __init__(self, dictionary = {}):
         self._d.update(dictionary)
     def __getattr__(self, k):
         return self._d[k]

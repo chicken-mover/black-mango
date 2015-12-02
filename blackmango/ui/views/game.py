@@ -146,7 +146,7 @@ class GameView(BaseView):
         def loader(dt):
             next_level_str = self.current_level.next_level
             self.logger.debug("Loading next level: %s" % next_level_str)
-            level_data = LEVELS.get(self.current_level.next_level)
+            level_data = blackmango.levels.load(next_level_str)
             self.start_level(level_data)
         # Don't load the next level until the current update has completed
         # (otherwise Pyglet will barf when you start to tear down Sprites that

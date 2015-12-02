@@ -82,7 +82,6 @@ STARTING_LEVEL = 'test' #'puzzle_demo1'
 LEVEL_TEMPLATE = """
 from blackmango.levels.%(MODULE_NAME)s.triggers import LevelTriggers
 
-SIZE = %(SIZE)s
 NAME = %(NAME)s
 
 TRIGGERS = LevelTriggers
