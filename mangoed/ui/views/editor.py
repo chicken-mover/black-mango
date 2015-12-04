@@ -347,13 +347,13 @@ class EditorView(BaseView):
         elif keypress == key.DOWN:
             scroll = (0, 10)
         elif keypress == key.LEFT:
-            scroll = (10, 0)
-        elif keypress == key.RIGHT:
             scroll = (-10, 0)
+        elif keypress == key.RIGHT:
+            scroll = (10, 0)
 
         if modifiers & key.MOD_SHIFT:
             scroll = tuple([i * 10 for i in scroll])
-        blackmango.sprites.set_translation_offset(*scroll)
+        blackmango.sprites.set_translation_offset(*map(lambda x: x//10, scroll))
 
         # Save and quit
         if keypress == key.Q:

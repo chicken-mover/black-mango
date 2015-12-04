@@ -16,6 +16,7 @@ import blackmango.mobs.player
 import blackmango.sprites
 import blackmango.system
 import blackmango.ui
+import blackmango.ui.keyboard as keyboard
 import blackmango.ui.labels
 
 from blackmango.levels.levellist import LEVELS
@@ -128,6 +129,8 @@ class GameView(BaseView):
         # Place the player into the level
         starting_location = level_data.PLAYER_START
         self.current_level.set_sprite(self.player, starting_location)
+        # Set initial screen centering on player
+        blackmango.sprites.current_translation_offset = tuple(starting_location[:2])
 
         self.mode = MODE_NORMAL
         self.logger.debug("Game started: %s" % repr(self.current_level))
@@ -168,25 +171,7 @@ class GameView(BaseView):
         """
         Called on every window draw (unless the window isn't drawing views for
         some reason, like during loading of new games).
-
-        This method handles repositioning the screen and making sure that all
-        sprites which are going to get drawn update themselves.
         """
-
-        # Get the player location, screen size, and the size of the current
-        # room, which are all required for the calculations we are about to
-        # make.
-        player_location = self.player.world_location[:2]
-        screen_width, screen_height = blackmango.configure.SCREEN_SIZE
-
-        # Get the offset that needs to be made to center the player over the
-        # center of the screen
-        new_screen_center = blackmango.sprites.translate_coordinates(*player_location)
-        new_center_delta = (
-            new_screen_center[0] - (screen_width//2),
-            new_screen_center[1] - (screen_height//2),
-        )
-        blackmango.sprites.set_translation_offset(*new_center_delta)
 
         # Make sure all sprites update thier screen coordinates.
         all_sprites = self.current_level.mobs.values() + \
@@ -231,7 +216,28 @@ class GameView(BaseView):
         """
         Called by the window on every key press
         """
-        pass
+        move = [0,0]
+        if keyboard.check('move_up'):
+            move[1] = -1
+        elif keyboard.check('move_down'):
+            move[1] = 1
+        # Enable diagonals: change this 'elif' to 'if'
+        elif keyboard.check('move_left'):
+            move[0] = -1
+        elif keyboard.check('move_right'):
+            move[0] = 1
+
+        elif keyboard.check('switch_mask_1'):
+            self.player.activate_mask(1)
+        elif keyboard.check('switch_mask_2'):
+            self.player.activate_mask(2)
+        elif keyboard.check('switch_mask_3'):
+            self.player.activate_mask(3)
+        elif keyboard.check('switch_mask_4'):
+            self.player.activate_mask(4)
+
+        if move != [0,0]:
+            self.player.move(*move)
 
     @loading_halt
     def center_view_on_player(self):

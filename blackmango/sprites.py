@@ -39,14 +39,14 @@ STEP_THRESHOLD = 2
 
 def set_translation_offset(x, y):
     """
-    Offset the screen coordinates that world coordinates are translated into
-    by (x, y) pixels.
+    Given a movement of the player by (x, y), set the offset of all objects on
+    the screen to keep the player centered.
     """
     global current_translation_offset
-    current_translation_offset = tuple([
-        current_translation_offset[0] + x,
-        current_translation_offset[1] + y,
-    ])
+    current_translation_offset = (
+        current_translation_offset[0] + x*-1,
+        current_translation_offset[1] + y*-1,
+    )
 
 def storecall(f):
     """
@@ -64,13 +64,12 @@ def translate_coordinates(x, y, height_offset = 0):
     Translate world coordinates (*x*, *y*) and an optional *height_offset* into
     screen coordinates for sprite rendering.
     """
-    BASE_TRANSLATION_OFFSET = 0 # FIXME: What is this meant to represent?
     _, h = blackmango.ui.game_window.get_size()
     scale = blackmango.configure.GRID_SIZE
     dx, dy = current_translation_offset
-    dx += (x + BASE_TRANSLATION_OFFSET) * scale
-    dy += h - (y + 1 + BASE_TRANSLATION_OFFSET) * scale
-    return dx, dy + (height_offset * blackmango.configure.HEIGHT_OFFSET)
+    dx = (dx + x) * scale
+    dy = h - ((y + dy) * scale)
+    return dx, dy
 
 def untranslate_coordinates(x, y, height_offset = 0):
     """
@@ -392,6 +391,8 @@ class BasicMobileSprite(BaseSprite):
 
         level.set_sprite(self, dest)
         self.smooth_translate(callback = callback)
+
+        return True
 
     def translate(self):
         """

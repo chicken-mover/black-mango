@@ -28,6 +28,7 @@ class Player(blackmango.sprites.BasicMobileSprite):
 
         self.current_mask = None
         self.dead = False
+        self.moving = False
     
     @isalive
     def activate_mask(self, i):
@@ -46,7 +47,10 @@ class Player(blackmango.sprites.BasicMobileSprite):
 
     @isalive
     def move(self, *args, **kwargs):
-        return super(Player, self).move(*args, **kwargs)
+        res = super(Player, self).move(*args, **kwargs)
+        if res:
+            blackmango.sprites.set_translation_offset(*args)
+        return res
 
     @isalive
     def turn(self, *args, **kwargs):
@@ -60,26 +64,4 @@ class Player(blackmango.sprites.BasicMobileSprite):
 
         if self.current_mask:
             self.current_mask.tick(self)
-        
-        move = [0,0]
-        if keyboard.check('move_up'):
-            move[1] = -1
-        elif keyboard.check('move_down'):
-            move[1] = 1
-        # Enable diagonals: change this 'elif' to 'if'
-        elif keyboard.check('move_left'):
-            move[0] = -1
-        elif keyboard.check('move_right'):
-            move[0] = 1
 
-        elif keyboard.check('switch_mask_1'):
-            self.activate_mask(1)
-        elif keyboard.check('switch_mask_2'):
-            self.activate_mask(2)
-        elif keyboard.check('switch_mask_3'):
-            self.activate_mask(3)
-        elif keyboard.check('switch_mask_4'):
-            self.activate_mask(4)
-
-        if move != [0,0]:
-            self.move(*move)
