@@ -20,7 +20,7 @@ SCREEN_SIZE = (950, 550)
 SAVE_GAME_VERSION='BLACKMANGO-001'
 
 # Default POSIX data dir (except Mac OS)
-POSIX_DATA_DIR = '~/.blackmango'
+POSIX_DATA_DIR = '~/.chicken-mover/blackmango'
 
 # Grid size. Used for translating world coordinates into screen coordinates.
 GRID_SIZE = 50
